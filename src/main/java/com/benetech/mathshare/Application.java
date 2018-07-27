@@ -17,6 +17,6 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
-        LOGGER.info("Application is running");
+        LOGGER.info("MathShare is running");
     }
 }
