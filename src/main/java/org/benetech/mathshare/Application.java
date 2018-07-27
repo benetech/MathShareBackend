@@ -10,7 +10,8 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 
 @SpringBootApplication
 //TODO: Remove EnableAutoConfiguration excluded classes when there will be data source attached
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+@SuppressWarnings("checkstyle:hideutilityclassconstructor")
 public class Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
