@@ -1,4 +1,4 @@
-package com.benetech.mathshare;
+package org.benetech.mathshare;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
