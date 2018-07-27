@@ -93,18 +93,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-maven-plugin</artifactId>
-				<configuration>
-					<user>postgres</user>
-					<password>mysecretpassword</password>
-					<url>jdbc:postgresql://localhost:5432/mathshare</url>
-					<schemas>
-						<schema>mathshare</schema>
-					</schemas>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
