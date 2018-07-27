@@ -1,4 +1,4 @@
-package com.benetech.mathshare;
+package org.benetech.mathshare;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
