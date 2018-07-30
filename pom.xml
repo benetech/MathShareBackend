@@ -108,7 +108,7 @@
                 <configuration>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
-                    <configLocation>src/main/resources/checkstyle/checkstyle.xml</configLocation>
+                    <configLocation>checkstyle/checkstyle.xml</configLocation>
                 </configuration>
             </plugin>
             <plugin>
