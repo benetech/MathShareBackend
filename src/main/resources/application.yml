@@ -1,20 +1,20 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/mathshare
-    username: postgres
-    password: mysecretpassword
-    driverClassName: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/mathshare}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:mysecretpassword}
+    driverClassName: ${SPRING_DATASOURCE_DRIVERCLASSNAME:org.postgresql.Driver}
 
   jpa:
     properties:
-      hiberrnate.jdbc.lob.non_contextual_creation: true
+      hiberrnate.jdbc.lob.non_contextual_creation: ${JPA_PROPERTIES_HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION:true}
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 logging:
   level:
-    org.hibernate: ERROR
+    org.hibernate: ${LOGGING_LEVEL_ORG_HIBERNATE:ERROR}
 
-  path: logs
+  path: ${LOGGING_PATH:logs}
 
