@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@SuppressWarnings("checkstyle:hideutilityclassconstructor")
 public class Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
