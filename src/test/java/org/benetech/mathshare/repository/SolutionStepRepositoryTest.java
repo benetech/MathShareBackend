@@ -1,7 +1,7 @@
 package org.benetech.mathshare.repository;
 
 import org.benetech.mathshare.model.entity.SolutionStep;
-import org.benetech.mathshare.model.mother.SolutionStepMother;
+import org.benetech.mathshare.model.mother.SolutionStepUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,9 +21,9 @@ public class SolutionStepRepositoryTest {
 
     @Test
     public void shouldSaveSolutionStep() {
-        solutionStepRepository.save(SolutionStepMother.validInstance());
+        solutionStepRepository.save(SolutionStepUtils.createValidInstance());
         SolutionStep solutionStepFromDB = solutionStepRepository.findAll().get(0);
-        Assert.assertEquals(SolutionStepMother.DEFAULT_STEP_VALUE, solutionStepFromDB.getStepValue());
-        Assert.assertEquals(SolutionStepMother.DEFAULT_DELETED_VALUE, solutionStepFromDB.getDeleted());
+        Assert.assertEquals(SolutionStepUtils.DEFAULT_STEP_VALUE, solutionStepFromDB.getStepValue());
+        Assert.assertEquals(SolutionStepUtils.DEFAULT_DELETED_VALUE, solutionStepFromDB.getDeleted());
     }
 }

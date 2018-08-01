@@ -1,7 +1,7 @@
 package org.benetech.mathshare.repository;
 
 import org.benetech.mathshare.model.entity.Scratchpad;
-import org.benetech.mathshare.model.mother.ScratchpadMother;
+import org.benetech.mathshare.model.mother.ScratchpadUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ public class ScratchpadRepositoryTest {
 
     @Test
     public void shouldSaveScratchpad() {
-        Scratchpad scratchPadToSave = ScratchpadMother.validInstance();
+        Scratchpad scratchPadToSave = ScratchpadUtils.createValidInstance();
         scratchpadRepository.save(scratchPadToSave);
         Scratchpad scratchpadFromDB = scratchpadRepository.findAll().get(0);
         Assert.assertEquals(scratchPadToSave.getContent(), scratchpadFromDB.getContent());

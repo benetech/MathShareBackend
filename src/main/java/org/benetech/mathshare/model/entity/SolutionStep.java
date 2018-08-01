@@ -1,8 +1,11 @@
 package org.benetech.mathshare.model.entity;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
@@ -41,5 +44,7 @@ public class SolutionStep extends AbstractEntity {
     private SolutionStep replacedBy;
 
     @UpdateTimestamp
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private Timestamp dateModified;
 }

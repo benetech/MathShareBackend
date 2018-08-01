@@ -1,7 +1,7 @@
 package org.benetech.mathshare.repository;
 
 import org.benetech.mathshare.model.entity.ProblemSet;
-import org.benetech.mathshare.model.mother.ProblemSetMother;
+import org.benetech.mathshare.model.mother.ProblemSetUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +21,8 @@ public class ProblemSetRepositoryTest {
 
     @Test
     public void shouldSaveProblemSet() {
-        problemSetRepository.save(ProblemSetMother.validInstance());
+        problemSetRepository.save(ProblemSetUtils.createValidInstance());
         ProblemSet problemSetFromDB = problemSetRepository.findAll().get(0);
-        Assert.assertEquals(ProblemSetMother.DEFAULT_EDIT_CODE, problemSetFromDB.getEditCode());
+        Assert.assertEquals(ProblemSetUtils.DEFAULT_EDIT_CODE, problemSetFromDB.getEditCode());
     }
 }
