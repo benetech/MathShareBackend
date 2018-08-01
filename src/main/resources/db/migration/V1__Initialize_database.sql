@@ -2,7 +2,7 @@ CREATE TABLE problem_set(
     id SERIAL PRIMARY KEY,
     edit_code VARCHAR (255) UNIQUE NOT NULL,
     date_created TIMESTAMP NOT NULL DEFAULT now(),
-    date_updated TIMESTAMP
+    date_modified TIMESTAMP
 );
 
 CREATE TABLE problem_set_revision(
@@ -51,7 +51,7 @@ CREATE TABLE solution_step(
     solution_id INTEGER NOT NULL,
     replaced_by INTEGER,
     deleted BOOLEAN NOT NULL DEFAULT false,
-    date_modified TIMESTAMP NOT NULL,
+    date_modified TIMESTAMP,
     FOREIGN KEY (solution_id) REFERENCES problem_solution(id),
     FOREIGN KEY (replaced_by) REFERENCES solution_step(id)
 );
