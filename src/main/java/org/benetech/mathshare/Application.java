@@ -6,13 +6,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@SuppressWarnings("PMD.UseUtilityClass")
+@SuppressWarnings({"checkstyle:hideutilityclassconstructor", "PMD.UseUtilityClass"})
 public class Application {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
-        LOGGER.info("MathShare is running");
+        getLogger().info("MathShare is running");
+    }
+
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(Application.class);
     }
 }
