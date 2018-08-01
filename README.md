@@ -26,6 +26,6 @@ docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=mysecretpassword -e
 
 We recommend using PostgreSQL 9.5.12.
 
-After running the command the application can be built with ```bash  ./mvnw clean install ```
-You could also run the app from IntelliJ IDEA.
+After running the command ```bash  ./mvnw clean install ``` (for Unix systems) or ```bash  ./mvnw.cmd clean install ``` (for Batch) the application will be built and then can be run with java.
+You could also build and run the app from your favourite IDE, we recommend IntelliJ IDEA.
 It is recommended to use pgadmin4 to connect to PostgreSQL database.
