@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -21,9 +22,8 @@ import java.sql.Timestamp;
 @EqualsAndHashCode(callSuper = true)
 public class SolutionRevision extends AbstractEntity {
 
-    @NotNull
-    @NonNull
-    private String shareCode;
+    @Column(insertable = false)
+    private Long shareCode;
 
     @NotNull
     @NonNull
