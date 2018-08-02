@@ -2,17 +2,16 @@ package org.benetech.mathshare.converters;
 
 import java.util.Locale;
 
-public final class UrlCodeConverterUtils {
+public abstract class UrlCodeConverter {
 
     private static final int BASE = 32;
     private static final String MINUS_SIGN = "X";
     private static final String MIN_LONG_CODE = MINUS_SIGN + "8000000000000";
 
-    public static String toUrlCode(Long number) {
-        validateNumber(number);
-        if (number.equals(Long.MIN_VALUE)) {
+    public static String toUrlCode(long number) {
+        if (number == Long.MIN_VALUE) {
             return MIN_LONG_CODE;
-        } else if (number.equals(0L)) {
+        } else if (number == 0L) {
             return "0";
         } else {
             var code = convertNumberToCode(Math.abs(number));
@@ -40,12 +39,6 @@ public final class UrlCodeConverterUtils {
         }
     }
 
-    private static void validateNumber(Long number) {
-        if (number == null) {
-            throw new IllegalArgumentException("Number can't be null");
-        }
-    }
-
     private static boolean isNumberPositive(String code) {
         return !code.contains(String.valueOf(MINUS_SIGN));
     }
@@ -58,7 +51,7 @@ public final class UrlCodeConverterUtils {
         var result = 0L;
         var chars = code.toCharArray();
         for (int i = 0; i < chars.length; i++) {
-            result += countBasePow(i) * Base32TableConverterUtils.fromSign(chars[chars.length - 1 - i]);
+            result += countBasePow(i) * Base32TableConverter.fromSign(chars[chars.length - 1 - i]);
         }
         return positive ? result : (-1) * result;
     }
@@ -70,7 +63,7 @@ public final class UrlCodeConverterUtils {
             var remainder = number % BASE;
             number = number - remainder;
             number /= BASE;
-            result = String.valueOf(Base32TableConverterUtils.toSign(remainder)).concat(result);
+            result = String.valueOf(Base32TableConverter.toSign(remainder)).concat(result);
         }
         return result;
     }
@@ -89,5 +82,5 @@ public final class UrlCodeConverterUtils {
         return result;
     }
 
-    private UrlCodeConverterUtils() { }
+    private UrlCodeConverter() { }
 }

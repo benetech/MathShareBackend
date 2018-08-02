@@ -1,6 +1,6 @@
 package org.benetech.mathshare.repository;
 
-import org.benetech.mathshare.model.mother.SolutionRevisionUtils;
+import org.benetech.mathshare.model.mother.SolutionRevisionMother;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ public class SolutionRevisionRepositoryTest {
     @Test
     public void shouldSaveSolutionRevision() {
         int dbSizeBeforeSave = solutionRevisionRepository.findAll().size();
-        solutionRevisionRepository.saveAndFlush(SolutionRevisionUtils.createValidInstance());
+        solutionRevisionRepository.saveAndFlush(SolutionRevisionMother.createValidInstance());
         int dbSizeAfterSave = solutionRevisionRepository.findAll().size();
         Assert.assertEquals(dbSizeBeforeSave + 1, dbSizeAfterSave);
     }

@@ -2,7 +2,7 @@ package org.benetech.mathshare.converters;
 
 import java.util.Locale;
 
-public final class Base32TableConverterUtils {
+public abstract class Base32TableConverter {
 
     private static final int NUMBER_OF_DIGITS = 10;
 
@@ -24,5 +24,5 @@ public final class Base32TableConverterUtils {
         }
     }
 
-    private Base32TableConverterUtils() { }
+    private Base32TableConverter() { }
 }
