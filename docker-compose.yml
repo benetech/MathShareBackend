@@ -2,18 +2,14 @@ version: '3'
 services:
     server:
         image: benetech/mathshare.server
-        environment:            
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/mathshare
+        env_file: .env
         ports:
             - 8080:8080
         depends_on:
             - postgresql
     postgresql:
         image: postgres:9.5.12
-        environment:
-        - POSTGRES_PASSWORD=mysecretpassword
-        - POSTGRES_USER=postgres
-        - POSTGRES_DB=mathshare
+        env_file: .env
         volumes:
         - db-data:/var/lib/postgresql/data
 volumes:
