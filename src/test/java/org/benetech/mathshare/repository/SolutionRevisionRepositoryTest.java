@@ -1,7 +1,5 @@
 package org.benetech.mathshare.repository;
 
-import org.benetech.mathshare.model.entity.SolutionRevision;
-import org.benetech.mathshare.model.mother.ProblemSolutionUtils;
 import org.benetech.mathshare.model.mother.SolutionRevisionUtils;
 import org.junit.Assert;
 import org.junit.Test;
