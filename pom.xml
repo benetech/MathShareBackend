@@ -22,6 +22,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.10</java.version>
+        <docker.image.prefix>benetech</docker.image.prefix>
+        <dockerfile-maven-plugin.version>1.1.1</dockerfile-maven-plugin.version>
+        <javax.activation.version>1.1.1</javax.activation.version>
     </properties>
 
     <dependencies>
@@ -178,6 +181,30 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${dockerfile-maven-plugin.version}</version>
+                <configuration>
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <dockerDirectory>/</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+                <dependencies>
+                    <!-- required to run the plugin with JDK 10 -->
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                        <version>${javax.activation.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
