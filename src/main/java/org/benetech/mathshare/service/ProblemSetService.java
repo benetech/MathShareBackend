@@ -6,8 +6,10 @@ import org.benetech.mathshare.repository.ProblemSetRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ProblemSetService {
 
     private static final String GENERATED_URL = "generatedUrl";
@@ -27,11 +29,11 @@ public class ProblemSetService {
         return problemSetRevisionRepository.findOneByShareCode(shareUrl);
     }
 
-    public void saveNewVersionOfProblemSet(ProblemSet problemSet) {
+    public ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) {
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(
                 new ProblemSetRevision(problemSet, GENERATED_URL));
         ProblemSetRevision oldRevision = problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
         oldRevision.setReplacedBy(newRevision);
-        problemSetRevisionRepository.save(oldRevision);
+        return problemSetRevisionRepository.save(oldRevision);
     }
 }
