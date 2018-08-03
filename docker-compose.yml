@@ -1,0 +1,16 @@
+version: '3'
+services:
+    server:
+        image: benetech/mathshare.server
+        env_file: .env
+        ports:
+            - 8080:8080
+        depends_on:
+            - postgresql
+    postgresql:
+        image: postgres:9.5.12
+        env_file: .env
+        volumes:
+        - db-data:/var/lib/postgresql/data
+volumes:
+    db-data:
