@@ -29,7 +29,7 @@ public class ProblemSetRepositoryTest {
     @Test
     public void shouldFindByEditCode() {
         problemSetRepository.save(ProblemSetUtils.createValidInstance());
-        ProblemSet problemSet = problemSetRepository.findByEditCode(ProblemSetUtils.DEFAULT_EDIT_CODE);
+        ProblemSet problemSet = problemSetRepository.findOneByEditCode(ProblemSetUtils.DEFAULT_EDIT_CODE);
         Assert.assertEquals(ProblemSetUtils.DEFAULT_EDIT_CODE, problemSet.getEditCode());
     }
 }

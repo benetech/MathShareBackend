@@ -28,21 +28,25 @@ import static org.mockito.Mockito.verify;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL, replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ProblemSetServiceTest {
 
+    private static final String GENERATED_URL = "generatedUrl";
+
     @MockBean
     private ProblemSetRevisionRepository problemSetRevisionRepository;
+
     @MockBean
     private ProblemSetRepository problemSetRepository;
+
     @InjectMocks
     private ProblemSetService problemSetService;
 
     @Before
-    public void setup() {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
     public void shouldGetProblemSet() {
-        given(this.problemSetRevisionRepository.findByShareCode(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE))
+        given(this.problemSetRevisionRepository.findOneByShareCode(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE))
                 .willReturn(ProblemSetRevisionUtils.createValidInstance());
         ProblemSetRevision problemSetRevisionFromDB =  problemSetService.getProblemSetByShareUrl(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE);
         Assert.assertEquals(ProblemSetRevisionUtils.createValidInstance(), problemSetRevisionFromDB);
@@ -50,8 +54,8 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldGetNewestProblemSet() {
-        given(this.problemSetRepository.findByEditCode(ProblemSetUtils.DEFAULT_EDIT_CODE)).willReturn(ProblemSetUtils.createValidInstance());
-        given(this.problemSetRevisionRepository.findByProblemSetAndReplacedBy(ProblemSetUtils.createValidInstance(), null))
+        given(this.problemSetRepository.findOneByEditCode(ProblemSetUtils.DEFAULT_EDIT_CODE)).willReturn(ProblemSetUtils.createValidInstance());
+        given(this.problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(ProblemSetUtils.createValidInstance(), null))
                 .willReturn(ProblemSetRevisionUtils.createNewRevisionOfValidInstance(ProblemSetUtils.createValidInstance()));
         ProblemSetRevision problemSetRevisionFromDB = problemSetService.getLatestProblemSet(ProblemSetUtils.DEFAULT_EDIT_CODE);
         Assert.assertEquals(ProblemSetRevisionUtils.createNewRevisionOfValidInstance(ProblemSetUtils.createValidInstance()), problemSetRevisionFromDB);
@@ -59,10 +63,10 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldSaveNewProblemSetRevision() {
-        given(this.problemSetRevisionRepository.findByProblemSetAndReplacedBy(ProblemSetUtils.createValidInstance(), null))
+        given(this.problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(ProblemSetUtils.createValidInstance(), null))
                 .willReturn(ProblemSetRevisionUtils.createNewRevisionOfValidInstance(ProblemSetUtils.createValidInstance()));
-        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetUtils.createValidInstance(), "generatedUrl")))
-                .willReturn(new ProblemSetRevision(ProblemSetUtils.createValidInstance(), "generatedUrl"));
+        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetUtils.createValidInstance(), GENERATED_URL)))
+                .willReturn(new ProblemSetRevision(ProblemSetUtils.createValidInstance(), GENERATED_URL));
         problemSetService.saveNewVersionOfProblemSet(ProblemSetUtils.createValidInstance());
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
         verify(this.problemSetRevisionRepository, times(2)).save(revisionCaptor.capture());

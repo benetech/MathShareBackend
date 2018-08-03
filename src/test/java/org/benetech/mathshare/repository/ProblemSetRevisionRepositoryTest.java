@@ -5,7 +5,6 @@ import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionUtils;
 import org.benetech.mathshare.model.mother.ProblemSetUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ public class ProblemSetRevisionRepositoryTest {
 
     @Autowired
     private ProblemSetRevisionRepository problemSetRevisionRepository;
+
     @Autowired
     private ProblemSetRepository problemSetRepository;
 
@@ -34,7 +34,7 @@ public class ProblemSetRevisionRepositoryTest {
     @Test
     public void shouldFindProblemSetRevisionByShareCode() {
         problemSetRevisionRepository.save(ProblemSetRevisionUtils.createValidInstance());
-        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findByShareCode(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE);
+        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findOneByShareCode(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE);
         Assert.assertEquals(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE, problemSetRevision.getShareCode());
         Assert.assertEquals(ProblemSetUtils.DEFAULT_EDIT_CODE, problemSetRevision.getProblemSet().getEditCode());
     }
@@ -43,7 +43,7 @@ public class ProblemSetRevisionRepositoryTest {
     public void shouldFindByProblemSetAndReplacedBy() {
         problemSetRevisionRepository.save(ProblemSetRevisionUtils.createValidInstance());
         ProblemSet problemSet = problemSetRepository.findAll().get(0);
-        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findByProblemSetAndReplacedBy(problemSet, null);
+        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
         Assert.assertEquals(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE, problemSetRevision.getShareCode());
 
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(ProblemSetRevisionUtils.createNewRevisionOfValidInstance(problemSet));

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProblemSetRevisionRepository extends JpaRepository<ProblemSetRevision, Long> {
 
-    ProblemSetRevision findByShareCode(String shareCode);
-    ProblemSetRevision findByProblemSetAndReplacedBy(ProblemSet problemSet, ProblemSetRevision replacedBy);
+    ProblemSetRevision findOneByShareCode(String shareCode);
+
+    ProblemSetRevision findAllByProblemSetAndReplacedBy(ProblemSet problemSet, ProblemSetRevision replacedBy);
 }
