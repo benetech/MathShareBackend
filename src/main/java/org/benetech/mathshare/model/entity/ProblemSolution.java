@@ -11,7 +11,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -26,7 +25,6 @@ public class ProblemSolution extends AbstractEntity {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Problem problem;
 
-    @Lob
     @NotNull
     @NonNull
     private String editCode;
