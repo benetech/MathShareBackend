@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -25,9 +26,8 @@ public class ProblemSolution extends AbstractEntity {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Problem problem;
 
-    @NotNull
-    @NonNull
-    private String editCode;
+    @Column(insertable = false)
+    private Long editCode;
 
     @CreationTimestamp
     @Getter(AccessLevel.NONE)

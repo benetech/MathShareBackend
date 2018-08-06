@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -30,12 +31,19 @@ public class ProblemSetRevision extends AbstractEntity {
     @JoinColumn(name = "replaced_by")
     private ProblemSetRevision replacedBy;
 
-    @NotNull
-    @NonNull
-    private String shareCode;
+    @Column(insertable = false)
+    private Long shareCode;
 
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
+
+    public ProblemSetRevision() {
+
+    }
+
+    public ProblemSetRevision(ProblemSet problemSet) {
+        this.problemSet = problemSet;
+    }
 }

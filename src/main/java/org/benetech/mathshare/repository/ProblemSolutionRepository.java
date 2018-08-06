@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProblemSolutionRepository extends JpaRepository<ProblemSolution, Long> {
-    ProblemSolution findOneByEditCode(String editCode);
+    ProblemSolution findOneByEditCode(Long editCode);
 }
