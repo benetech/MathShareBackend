@@ -9,13 +9,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class UrlCodeConverterTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void fromUrlCodeMethodShouldThrowIllegalArgumentExceptionForNotBase32AndNotXCharacters() {
+    public void fromUrlCodeMethodShouldThrowIllegalArgumentExceptionForNotBase32Characters() {
         UrlCodeConverter.fromUrlCode("123#eStrS");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void fromUrlCodeMethodShouldThrowIllegalArgumentExceptionForTooLongString() {
-        UrlCodeConverter.fromUrlCode("800000000000000");
+        UrlCodeConverter.fromUrlCode("P777777777776666666");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -30,85 +30,85 @@ public class UrlCodeConverterTest {
 
     @Test
     public void fromUrlCodeMethodShouldConvertCodeToNotBoundaryLongValueWithBase32() {
-        long result = UrlCodeConverter.fromUrlCode("PF5LVV");
-        Assert.assertEquals(854775807, result);
+        long result = UrlCodeConverter.fromUrlCode("AAAAAABAKTWFG");
+        Assert.assertEquals(542436435L, result);
+    }
+
+    @Test
+    public void fromUrlCodeMethodShouldConvertCodeToNotBoundaryMinusLongValueWithBase32() {
+        long result = UrlCodeConverter.fromUrlCode("777777V4A43EE");
+        Assert.assertEquals(-5435345342L, result);
     }
 
     @Test
     public void fromUrlCodeMethodShouldConvertCodeToMaxLongValueWithBase32() {
-        long result = UrlCodeConverter.fromUrlCode("7VVVVVVVVVVVV");
+        long result = UrlCodeConverter.fromUrlCode("P777777777776");
         Assert.assertEquals(Long.MAX_VALUE, result);
     }
 
     @Test
     public void fromUrlCodeMethodShouldConvertCodeToAlmostMaxLongValueWithBase32() {
-        long result = UrlCodeConverter.fromUrlCode("7VVVVVVVVVVVU");
+        long result = UrlCodeConverter.fromUrlCode("P777777777774");
         Assert.assertEquals(Long.MAX_VALUE - 1, result);
     }
 
     @Test
     public void fromUrlCodeMethodShouldConvertCodeToMinLongValueWithBase32() {
-        long result = UrlCodeConverter.fromUrlCode("X8000000000000");
+        long result = UrlCodeConverter.fromUrlCode("QAAAAAAAAAAAA");
         Assert.assertEquals(Long.MIN_VALUE, result);
     }
 
     @Test
     public void fromUrlCodeMethodShouldConvertCodeToAlmostMinLongValueWithBase32() {
-        long result = UrlCodeConverter.fromUrlCode("X7VVVVVVVVVVVV");
+        long result = UrlCodeConverter.fromUrlCode("QAAAAAAAAAAAC");
         Assert.assertEquals(Long.MIN_VALUE + 1, result);
     }
 
     @Test
     public void fromUrlCodeMethodShouldConvertCodeToZeroWithBase32() {
-        long result = UrlCodeConverter.fromUrlCode("0");
+        long result = UrlCodeConverter.fromUrlCode("AAAAAAAAAAAAA");
         Assert.assertEquals(0L, result);
-    }
-
-    @Test
-    public void fromUrlCodeMethodShouldTreatXAsMinus() {
-        long result = UrlCodeConverter.fromUrlCode("XFV30M30H");
-        Assert.assertEquals(-548783459345L, result);
     }
 
     @Test
     public void toUrlCodeMethodShouldConvertMaxLongValueToCodeWithBase32() {
         String result = UrlCodeConverter.toUrlCode(Long.MAX_VALUE);
-        Assert.assertEquals("7VVVVVVVVVVVV", result);
+        Assert.assertEquals("P777777777776", result);
     }
 
     @Test
     public void toUrlCodeMethodShouldConvertAlmostMaxLongValueToCodeWithBase32() {
         String result = UrlCodeConverter.toUrlCode(Long.MAX_VALUE - 1);
-        Assert.assertEquals("7VVVVVVVVVVVU", result);
+        Assert.assertEquals("P777777777774", result);
     }
 
     @Test
     public void toUrlCodeMethodShouldConvertMinLongValueToCodeWithBase32() {
         String result = UrlCodeConverter.toUrlCode(Long.MIN_VALUE);
-        Assert.assertEquals("X8000000000000", result);
+        Assert.assertEquals("QAAAAAAAAAAAA", result);
     }
 
     @Test
     public void toUrlCodeMethodShouldConvertAlmostMinLongValueToCodeWithBase32() {
         String result = UrlCodeConverter.toUrlCode(Long.MIN_VALUE + 1);
-        Assert.assertEquals("X7VVVVVVVVVVVV", result);
+        Assert.assertEquals("QAAAAAAAAAAAC", result);
     }
 
     @Test
     public void toUrlCodeMethodShouldConvertZeroToCodeWithBase32() {
         String result = UrlCodeConverter.toUrlCode(0L);
-        Assert.assertEquals("0", result);
+        Assert.assertEquals("AAAAAAAAAAAAA", result);
     }
 
     @Test
     public void toUrlCodeMethodShouldConvertNotBoundaryLongValueToCodeWithBase32() {
         String result = UrlCodeConverter.toUrlCode(542436435L);
-        Assert.assertEquals("G59R2J", result);
+        Assert.assertEquals("AAAAAABAKTWFG", result);
     }
 
     @Test
-    public void toUrlCodeMethodShouldTreatMinusAsX() {
+    public void toUrlCodeMethodShouldConvertNotBoundaryMinusLongValueToCodeWithBase32() {
         String result = UrlCodeConverter.toUrlCode(-5435345342L);
-        Assert.assertEquals("X51VHIDU", result);
+        Assert.assertEquals("777777V4A43EE", result);
     }
 }

@@ -26,6 +26,10 @@
         <docker.image.prefix>benetech</docker.image.prefix>
         <dockerfile-maven-plugin.version>1.1.1</dockerfile-maven-plugin.version>
         <javax.activation.version>1.1.1</javax.activation.version>
+        <lombok.version>1.18.2</lombok.version>
+        <commons-codec.version>1.9</commons-codec.version>
+        <spotbugs-annotations.version>3.1.3</spotbugs-annotations.version>
+        <jcip-annotations.version>1.0</jcip-annotations.version>
     </properties>
 
     <dependencies>
@@ -59,6 +63,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -107,9 +112,28 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons-codec.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>${jcip-annotations.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${spotbugs-annotations.version}</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -127,6 +151,11 @@
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
