@@ -38,4 +38,12 @@ public class ProblemSetRevision extends AbstractEntity {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
+
+    public ProblemSetRevision() {
+
+    }
+
+    public ProblemSetRevision(ProblemSet problemSet) {
+        this.problemSet = problemSet;
+    }
 }

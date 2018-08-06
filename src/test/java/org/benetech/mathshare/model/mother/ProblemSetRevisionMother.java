@@ -9,4 +9,8 @@ public abstract class ProblemSetRevisionMother {
         ProblemSet problemSet = ProblemSetMother.createValidInstance();
         return new ProblemSetRevision(problemSet);
     }
+
+    public static ProblemSetRevision createNewRevisionOfValidInstance(ProblemSet problemSet) {
+        return new ProblemSetRevision(problemSet);
+    }
 }
