@@ -5,8 +5,8 @@ import org.benetech.mathshare.model.entity.SolutionRevision;
 
 public abstract class SolutionRevisionMother {
 
-    public static SolutionRevision createValidInstance() {
-        ProblemSolution problemSolution = ProblemSolutionMother.createValidInstance();
+    public static SolutionRevision validInstance() {
+        ProblemSolution problemSolution = ProblemSolutionMother.validInstance();
         return new SolutionRevision(problemSolution);
     }
 

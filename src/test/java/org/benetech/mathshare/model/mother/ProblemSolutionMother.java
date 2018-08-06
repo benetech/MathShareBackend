@@ -5,8 +5,8 @@ import org.benetech.mathshare.model.entity.ProblemSolution;
 
 public abstract class ProblemSolutionMother {
 
-    public static ProblemSolution createValidInstance() {
-        Problem problem = ProblemMother.createValidInstance();
+    public static ProblemSolution validInstance() {
+        Problem problem = ProblemMother.validInstance();
         return new ProblemSolution(problem);
     }
 }

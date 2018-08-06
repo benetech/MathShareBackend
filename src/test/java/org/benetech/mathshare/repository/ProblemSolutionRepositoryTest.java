@@ -28,14 +28,14 @@ public class ProblemSolutionRepositoryTest {
     @Test
     public void shouldSaveProblemSolution() {
         int dbSizeBeforeSave = problemSolutionRepository.findAll().size();
-        problemSolutionRepository.saveAndFlush(ProblemSolutionMother.createValidInstance());
+        problemSolutionRepository.saveAndFlush(ProblemSolutionMother.validInstance());
         int dbSizeAfterSave = problemSolutionRepository.findAll().size();
         Assert.assertEquals(dbSizeBeforeSave + 1, dbSizeAfterSave);
     }
 
     @Test
     public void shouldFindByEditCode() {
-        ProblemSolution saved = problemSolutionRepository.save(ProblemSolutionMother.createValidInstance());
+        ProblemSolution saved = problemSolutionRepository.save(ProblemSolutionMother.validInstance());
         em.refresh(saved);
         ProblemSolution problemSolutionFromDB = problemSolutionRepository.findOneByEditCode(saved.getEditCode());
         Assert.assertNotNull(problemSolutionFromDB);

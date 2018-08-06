@@ -4,7 +4,7 @@ import org.benetech.mathshare.model.entity.ProblemSet;
 
 public abstract class ProblemSetMother {
 
-    public static ProblemSet createValidInstance() {
+    public static ProblemSet validInstance() {
         return new ProblemSet();
     }
 }

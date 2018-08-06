@@ -21,7 +21,7 @@ public class SolutionStepRepositoryTest {
 
     @Test
     public void shouldSaveSolutionStep() {
-        solutionStepRepository.save(SolutionStepMother.createValidInstance());
+        solutionStepRepository.save(SolutionStepMother.validInstance());
         SolutionStep solutionStepFromDB = solutionStepRepository.findAll().get(0);
         Assert.assertEquals(SolutionStepMother.DEFAULT_STEP_VALUE, solutionStepFromDB.getStepValue());
         Assert.assertEquals(SolutionStepMother.DEFAULT_DELETED_VALUE, solutionStepFromDB.getDeleted());

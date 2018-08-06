@@ -18,15 +18,18 @@ public class ProblemSolutionService {
     @Autowired
     private SolutionRevisionRepository solutionRevisionRepository;
 
-    public SolutionRevision getLatestSolutionRevision(Long editUrl) {
+    @Transactional(readOnly = true)
+    public SolutionRevision getLatestSolutionRevision(long editUrl) {
         ProblemSolution problemSolution = problemSolutionRepository.findOneByEditCode(editUrl);
         return solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(problemSolution, null);
     }
 
-    public SolutionRevision getSolutionRevisionByShareUrl(Long shareUrl) {
+    @Transactional(readOnly = true)
+    public SolutionRevision getSolutionRevisionByShareUrl(long shareUrl) {
         return solutionRevisionRepository.findOneByShareCode(shareUrl);
     }
 
+    @Transactional
     public SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution) {
         SolutionRevision newRevision = solutionRevisionRepository.save(
                 new SolutionRevision(problemSolution));

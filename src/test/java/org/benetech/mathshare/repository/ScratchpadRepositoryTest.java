@@ -21,7 +21,7 @@ public class ScratchpadRepositoryTest {
 
     @Test
     public void shouldSaveScratchpad() {
-        Scratchpad scratchPadToSave = ScratchpadMother.createValidInstance();
+        Scratchpad scratchPadToSave = ScratchpadMother.validInstance();
         scratchpadRepository.save(scratchPadToSave);
         Scratchpad scratchpadFromDB = scratchpadRepository.findAll().get(0);
         Assert.assertEquals(scratchPadToSave.getContent(), scratchpadFromDB.getContent());

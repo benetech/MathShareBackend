@@ -7,7 +7,6 @@ import org.benetech.mathshare.repository.ProblemSolutionRepository;
 import org.benetech.mathshare.repository.SolutionRevisionRepository;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -23,7 +22,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@Ignore
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL, replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -48,27 +46,27 @@ public class ProblemSolutionServiceTest {
     @Test
     public void shouldGetProblemSolution() {
         given(this.solutionRevisionRepository.findOneByShareCode(CODE))
-                .willReturn(SolutionRevisionMother.createValidInstance());
+                .willReturn(SolutionRevisionMother.validInstance());
         SolutionRevision solutionRevisionFromDB = problemSolutionService.getSolutionRevisionByShareUrl(CODE);
-        Assert.assertEquals(SolutionRevisionMother.createValidInstance(), solutionRevisionFromDB);
+        Assert.assertEquals(SolutionRevisionMother.validInstance(), solutionRevisionFromDB);
     }
 
     @Test
     public void shouldGetNewestProblemSet() {
-        given(this.problemSolutionRepository.findOneByEditCode(CODE)).willReturn(ProblemSolutionMother.createValidInstance());
-        given(this.solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(ProblemSolutionMother.createValidInstance(), null))
-                .willReturn(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.createValidInstance()));
+        given(this.problemSolutionRepository.findOneByEditCode(CODE)).willReturn(ProblemSolutionMother.validInstance());
+        given(this.solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(ProblemSolutionMother.validInstance(), null))
+                .willReturn(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.validInstance()));
         SolutionRevision solutionRevisionFromDB = problemSolutionService.getLatestSolutionRevision(CODE);
-        Assert.assertEquals(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.createValidInstance()), solutionRevisionFromDB);
+        Assert.assertEquals(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.validInstance()), solutionRevisionFromDB);
     }
 
     @Test
     public void shouldSaveNewProblemSetRevision() {
-        given(this.solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(ProblemSolutionMother.createValidInstance(), null))
-                .willReturn(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.createValidInstance()));
-        given(this.solutionRevisionRepository.save(new SolutionRevision(ProblemSolutionMother.createValidInstance())))
-                .willReturn(new SolutionRevision(ProblemSolutionMother.createValidInstance()));
-        problemSolutionService.saveNewVersionOfSolution(ProblemSolutionMother.createValidInstance());
+        given(this.solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(ProblemSolutionMother.validInstance(), null))
+                .willReturn(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.validInstance()));
+        given(this.solutionRevisionRepository.save(new SolutionRevision(ProblemSolutionMother.validInstance())))
+                .willReturn(new SolutionRevision(ProblemSolutionMother.validInstance()));
+        problemSolutionService.saveNewVersionOfSolution(ProblemSolutionMother.validInstance());
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
         verify(this.solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
 
