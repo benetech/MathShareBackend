@@ -25,4 +25,11 @@ public class ProblemSolutionRepositoryTest {
         ProblemSolution problemSolutionFromDB = problemSolutionRepository.findAll().get(0);
         Assert.assertEquals(ProblemSolutionUtils.DEFAULT_EDIT_CODE, problemSolutionFromDB.getEditCode());
     }
+
+    @Test
+    public void shouldFindByEditCode() {
+        problemSolutionRepository.save(ProblemSolutionUtils.createValidInstance());
+        ProblemSolution problemSolutionFromDB = problemSolutionRepository.findOneByEditCode(ProblemSolutionUtils.DEFAULT_EDIT_CODE);
+        Assert.assertEquals(ProblemSolutionUtils.DEFAULT_EDIT_CODE, problemSolutionFromDB.getEditCode());
+    }
 }
