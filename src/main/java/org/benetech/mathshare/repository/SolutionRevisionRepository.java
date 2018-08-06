@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SolutionRevisionRepository extends JpaRepository<SolutionRevision, Long> {
 
-    SolutionRevision findOneByShareCode(String shareCode);
+    SolutionRevision findOneByShareCode(Long shareCode);
 
     SolutionRevision findAllByProblemSolutionAndReplacedBy(ProblemSolution problemSolution, SolutionRevision replacedBy);
 }

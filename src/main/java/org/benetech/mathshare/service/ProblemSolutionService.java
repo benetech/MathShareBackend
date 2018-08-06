@@ -12,26 +12,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProblemSolutionService {
 
-    private static final String GENERATED_URL = "generatedUrl";
-
     @Autowired
     private ProblemSolutionRepository problemSolutionRepository;
 
     @Autowired
     private SolutionRevisionRepository solutionRevisionRepository;
 
-    public SolutionRevision getLatestSolutionRevision(String editUrl) {
+    public SolutionRevision getLatestSolutionRevision(Long editUrl) {
         ProblemSolution problemSolution = problemSolutionRepository.findOneByEditCode(editUrl);
         return solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(problemSolution, null);
     }
 
-    public SolutionRevision getSolutionRevisionByShareUrl(String shareUrl) {
+    public SolutionRevision getSolutionRevisionByShareUrl(Long shareUrl) {
         return solutionRevisionRepository.findOneByShareCode(shareUrl);
     }
 
     public SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution) {
         SolutionRevision newRevision = solutionRevisionRepository.save(
-                new SolutionRevision(GENERATED_URL, problemSolution));
+                new SolutionRevision(problemSolution));
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findAllByProblemSolutionAndReplacedBy(problemSolution, null);
         oldRevision.setReplacedBy(newRevision);

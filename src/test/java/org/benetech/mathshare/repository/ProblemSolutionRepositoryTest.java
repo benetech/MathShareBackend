@@ -1,7 +1,7 @@
 package org.benetech.mathshare.repository;
 
 import org.benetech.mathshare.model.entity.ProblemSolution;
-import org.benetech.mathshare.model.mother.ProblemSolutionUtils;
+import org.benetech.mathshare.model.mother.ProblemSolutionMother;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +11,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL, replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -19,17 +22,22 @@ public class ProblemSolutionRepositoryTest {
     @Autowired
     private ProblemSolutionRepository problemSolutionRepository;
 
+    @PersistenceContext
+    private EntityManager em;
+
     @Test
     public void shouldSaveProblemSolution() {
-        problemSolutionRepository.save(ProblemSolutionUtils.createValidInstance());
-        ProblemSolution problemSolutionFromDB = problemSolutionRepository.findAll().get(0);
-        Assert.assertEquals(ProblemSolutionUtils.DEFAULT_EDIT_CODE, problemSolutionFromDB.getEditCode());
+        int dbSizeBeforeSave = problemSolutionRepository.findAll().size();
+        problemSolutionRepository.saveAndFlush(ProblemSolutionMother.createValidInstance());
+        int dbSizeAfterSave = problemSolutionRepository.findAll().size();
+        Assert.assertEquals(dbSizeBeforeSave + 1, dbSizeAfterSave);
     }
 
     @Test
     public void shouldFindByEditCode() {
-        problemSolutionRepository.save(ProblemSolutionUtils.createValidInstance());
-        ProblemSolution problemSolutionFromDB = problemSolutionRepository.findOneByEditCode(ProblemSolutionUtils.DEFAULT_EDIT_CODE);
-        Assert.assertEquals(ProblemSolutionUtils.DEFAULT_EDIT_CODE, problemSolutionFromDB.getEditCode());
+        ProblemSolution saved = problemSolutionRepository.save(ProblemSolutionMother.createValidInstance());
+        em.refresh(saved);
+        ProblemSolution problemSolutionFromDB = problemSolutionRepository.findOneByEditCode(saved.getEditCode());
+        Assert.assertNotNull(problemSolutionFromDB);
     }
 }
