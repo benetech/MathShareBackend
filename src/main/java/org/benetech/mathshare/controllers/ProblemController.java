@@ -31,7 +31,7 @@ public class ProblemController {
             if (body != null) {
                 return new ResponseEntity<>(body, HttpStatus.OK);
             } else {
-                logger.error("ProblemSet with code " + code + " wasn't found");
+                logger.error("ProblemSet with code {} wasn't found", code);
             }
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage(), e);
