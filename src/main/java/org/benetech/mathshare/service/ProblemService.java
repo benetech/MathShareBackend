@@ -9,6 +9,7 @@ import org.benetech.mathshare.repository.ProblemRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ public class ProblemService {
     @Autowired
     private ProblemRepository problemRepository;
 
+    @Transactional(readOnly = true)
     public ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
                 UrlCodeConverter.fromUrlCode(code));

@@ -18,15 +18,18 @@ public class ProblemSetService {
     @Autowired
     private ProblemSetRepository problemSetRepository;
 
-    public ProblemSetRevision getLatestProblemSet(Long editUrl) {
+    @Transactional(readOnly = true)
+    public ProblemSetRevision getLatestProblemSet(long editUrl) {
         ProblemSet problemSet = problemSetRepository.findOneByEditCode(editUrl);
         return problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
     }
 
-    public ProblemSetRevision getProblemSetByShareUrl(Long shareUrl) {
+    @Transactional(readOnly = true)
+    public ProblemSetRevision getProblemSetByShareUrl(long shareUrl) {
         return problemSetRevisionRepository.findOneByShareCode(shareUrl);
     }
 
+    @Transactional
     public ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) {
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(
                 new ProblemSetRevision(problemSet));
