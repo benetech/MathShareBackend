@@ -48,7 +48,7 @@ public class ProblemSetServiceTest {
     public void shouldGetProblemSet() {
         given(this.problemSetRevisionRepository.findOneByShareCode(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE))
                 .willReturn(ProblemSetRevisionUtils.createValidInstance());
-        ProblemSetRevision problemSetRevisionFromDB =  problemSetService.getProblemSetByShareUrl(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE);
+        ProblemSetRevision problemSetRevisionFromDB = problemSetService.getProblemSetByShareUrl(ProblemSetRevisionUtils.DEFAULT_SHARE_CODE);
         Assert.assertEquals(ProblemSetRevisionUtils.createValidInstance(), problemSetRevisionFromDB);
     }
 
