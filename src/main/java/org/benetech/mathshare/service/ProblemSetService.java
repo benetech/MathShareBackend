@@ -21,7 +21,7 @@ public class ProblemSetService {
     @Transactional(readOnly = true)
     public ProblemSetRevision getLatestProblemSet(long editUrl) {
         ProblemSet problemSet = problemSetRepository.findOneByEditCode(editUrl);
-        return problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
+        return problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null);
     }
 
     @Transactional(readOnly = true)
@@ -33,8 +33,9 @@ public class ProblemSetService {
     public ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) {
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(
                 new ProblemSetRevision(problemSet));
-        ProblemSetRevision oldRevision = problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
+        ProblemSetRevision oldRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null);
         oldRevision.setReplacedBy(newRevision);
-        return problemSetRevisionRepository.save(oldRevision);
+        problemSetRevisionRepository.save(oldRevision);
+        return newRevision;
     }
 }

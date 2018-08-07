@@ -54,7 +54,7 @@ public class ProblemSetServiceTest {
     @Test
     public void shouldGetNewestProblemSet() {
         given(this.problemSetRepository.findOneByEditCode(CODE)).willReturn(ProblemSetMother.validInstance());
-        given(this.problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(ProblemSetMother.validInstance(), null))
+        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.validInstance(), null))
                 .willReturn(ProblemSetRevisionMother.createNewRevisionOfValidInstance(ProblemSetMother.validInstance()));
         ProblemSetRevision problemSetRevisionFromDB = problemSetService.getLatestProblemSet(CODE);
         Assert.assertEquals(ProblemSetRevisionMother.createNewRevisionOfValidInstance(ProblemSetMother.validInstance()), problemSetRevisionFromDB);
@@ -62,7 +62,7 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldSaveNewProblemSetRevision() {
-        given(this.problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(ProblemSetMother.validInstance(), null))
+        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.validInstance(), null))
                 .willReturn(ProblemSetRevisionMother.createNewRevisionOfValidInstance(ProblemSetMother.validInstance()));
         given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.validInstance())))
                 .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance()));
