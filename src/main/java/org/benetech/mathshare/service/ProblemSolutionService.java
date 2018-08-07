@@ -36,6 +36,7 @@ public class ProblemSolutionService {
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findAllByProblemSolutionAndReplacedBy(problemSolution, null);
         oldRevision.setReplacedBy(newRevision);
-        return solutionRevisionRepository.save(oldRevision);
+        solutionRevisionRepository.save(oldRevision);
+        return newRevision;
     }
 }

@@ -60,7 +60,7 @@ public class ProblemSetRevisionRepositoryTest {
         ProblemSetRevision saved = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance());
         em.refresh(saved);
         ProblemSet problemSet = problemSetRepository.findAll().get(0);
-        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
+        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null);
         Assert.assertNotNull(problemSetRevision);
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(ProblemSetRevisionMother.createNewRevisionOfValidInstance(problemSet));
         Assert.assertNotNull(newRevision);
