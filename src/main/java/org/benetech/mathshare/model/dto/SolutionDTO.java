@@ -1,5 +1,6 @@
 package org.benetech.mathshare.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,15 +8,14 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class ProblemSetDTO {
+@AllArgsConstructor
+public class SolutionDTO {
 
-    private List<ProblemDTO> problems;
+    private ProblemDTO problem;
 
     private String editCode;
 
     private String shareCode;
 
-    public ProblemSetDTO(List<ProblemDTO> problems) {
-        this.problems = problems;
-    }
+    private List<SolutionStepDTO> steps;
 }

@@ -2,7 +2,9 @@ package org.benetech.mathshare.mappers;
 
 import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
+import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
+import org.benetech.mathshare.model.mother.ProblemSetMother;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,12 +15,26 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ProblemMapperTest {
 
     @Test
-    public void shouldMapProblemSetRevisionToProblemSetDTO() {
-        long editCode = 0L;
-        ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode();
+    public void shouldMapProblemSetCodes() {
+        long editCode = 34L;
+        long shareCode = 16L;
+        ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode(shareCode);
         revision.getProblemSet().setEditCode(editCode);
+
         ProblemSetDTO mapped = ProblemMapper.INSTANCE.toProblemSetDTO(revision);
+
         Assert.assertEquals(UrlCodeConverter.toUrlCode(editCode), mapped.getEditCode());
-        Assert.assertEquals(ProblemSetRevisionMother.VALID_CODE, mapped.getShareCode());
+        Assert.assertEquals(UrlCodeConverter.toUrlCode(shareCode), mapped.getShareCode());
+    }
+
+    @Test
+    public void shouldMapProblemSetProblems() {
+        int problemsSize = 3;
+        ProblemSet problemSet = ProblemSetMother.withProblems(problemsSize);
+        ProblemSetRevision revision = ProblemSetRevisionMother.validInstance(problemSet);
+
+        ProblemSetDTO mapped = ProblemMapper.INSTANCE.toProblemSetDTO(revision);
+
+        Assert.assertEquals(problemsSize, mapped.getProblems().size());
     }
 }

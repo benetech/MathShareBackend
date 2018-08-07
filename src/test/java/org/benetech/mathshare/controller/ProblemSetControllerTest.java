@@ -1,4 +1,4 @@
-package org.benetech.mathshare.controllers;
+package org.benetech.mathshare.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
 @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.UnusedPrivateField"})
-public class ProblemControllerTest {
+public class ProblemSetControllerTest {
 
     private static final String BASE_ENDPOINT = "/set/";
 
@@ -57,7 +57,7 @@ public class ProblemControllerTest {
 
     @Autowired
     @InjectMocks
-    private ProblemController problemController;
+    private ProblemSetController problemSetController;
 
     @Mock
     private ProblemSetService problemSetService;
@@ -105,7 +105,7 @@ public class ProblemControllerTest {
 
     @Test
     public void shouldReturn201IfCreated() throws Exception {
-        ProblemSet toSave = ProblemSetMother.withProblems(3);
+        ProblemSet toSave = ProblemSetMother.validInstance();
         when(problemSetService.saveNewVersionOfProblemSet(toSave)).thenReturn(null);
         mockMvc.perform(createProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
@@ -113,9 +113,10 @@ public class ProblemControllerTest {
 
     @Test
     public void shouldReturnProblemSetWithShareAndEditCodes() throws Exception {
-        ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode();
+        long editCode = 54L;
+        long shareCode = 32L;
+        ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode(shareCode);
         ProblemSet toSave = revision.getProblemSet();
-        long editCode = 0L;
         toSave.setEditCode(editCode);
         when(problemSetService.saveNewVersionOfProblemSet(any())).thenReturn(revision);
 
@@ -123,14 +124,12 @@ public class ProblemControllerTest {
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
 
-        Assert.assertEquals(UrlCodeConverter.toUrlCode(0L), result.getEditCode());
-        Assert.assertNotNull(ProblemSetRevisionMother.VALID_CODE, result.getShareCode());
+        Assert.assertEquals(UrlCodeConverter.toUrlCode(editCode), result.getEditCode());
+        Assert.assertEquals(UrlCodeConverter.toUrlCode(shareCode), result.getShareCode());
     }
 
     @Test
     public void shouldReturn400WhenFailedToParseProblemSet() throws Exception {
-        ProblemSet toSave = ProblemSetMother.withProblems(3);
-        when(problemSetService.saveNewVersionOfProblemSet(toSave)).thenReturn(null);
         mockMvc.perform(post(CREATE_ENDPOINT)
                 .content("not a problem set object")
                 .contentType(MediaType.APPLICATION_JSON))

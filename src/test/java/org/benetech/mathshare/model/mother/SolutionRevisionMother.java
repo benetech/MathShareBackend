@@ -13,4 +13,16 @@ public abstract class SolutionRevisionMother {
     public static SolutionRevision createNewRevisionOfValidInstance(ProblemSolution problemSolution) {
         return new SolutionRevision(problemSolution);
     }
+
+    public static SolutionRevision withShareCode(long code) {
+        SolutionRevision result = validInstance();
+        result.setShareCode(code);
+        return result;
+    }
+
+    public static SolutionRevision withSteps(int size) {
+        SolutionRevision result = validInstance();
+        result.setSteps(SolutionStepMother.createValidStepsList(size));
+        return result;
+    }
 }
