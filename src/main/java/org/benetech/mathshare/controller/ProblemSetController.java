@@ -1,4 +1,4 @@
-package org.benetech.mathshare.controllers;
+package org.benetech.mathshare.controller;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.benetech.mathshare.mappers.ProblemMapper;
@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/set")
 @SuppressFBWarnings(value = "SLF4J_FORMAT_SHOULD_BE_CONST",
         justification = "We need Logger to contain non-constant data to be valuable")
-public class ProblemController {
+public class ProblemSetController {
 
-    private final Logger logger = LoggerFactory.getLogger(ProblemController.class);
+    private final Logger logger = LoggerFactory.getLogger(ProblemSetController.class);
 
     @Autowired
     private ProblemSetService problemSetService;

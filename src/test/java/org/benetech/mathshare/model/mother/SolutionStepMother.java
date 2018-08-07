@@ -3,6 +3,10 @@ package org.benetech.mathshare.model.mother;
 import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.SolutionStep;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public abstract class SolutionStepMother {
 
     public static final String DEFAULT_STEP_VALUE = "step value";
@@ -11,5 +15,11 @@ public abstract class SolutionStepMother {
     public static SolutionStep validInstance() {
         ProblemSolution solution = ProblemSolutionMother.validInstance();
         return new SolutionStep(DEFAULT_STEP_VALUE, solution, DEFAULT_DELETED_VALUE);
+    }
+
+    public static List<SolutionStep> createValidStepsList(int size) {
+        return IntStream.range(0, size)
+                .mapToObj(i -> validInstance())
+                .collect(Collectors.toList());
     }
 }
