@@ -21,14 +21,14 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
     @Override
     @Transactional(readOnly = true)
-    public SolutionRevision getLatestSolutionRevision(Long editUrl) {
+    public SolutionRevision getLatestSolutionRevision(long editUrl) {
         ProblemSolution problemSolution = problemSolutionRepository.findOneByEditCode(editUrl);
         return solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(problemSolution, null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public SolutionRevision getSolutionRevisionByShareUrl(Long shareUrl) {
+    public SolutionRevision getSolutionRevisionByShareUrl(long shareUrl) {
         return solutionRevisionRepository.findOneByShareCode(shareUrl);
     }
 
@@ -39,6 +39,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findAllByProblemSolutionAndReplacedBy(problemSolution, null);
         oldRevision.setReplacedBy(newRevision);
-        return solutionRevisionRepository.save(oldRevision);
+        solutionRevisionRepository.save(oldRevision);
+        return newRevision;
     }
 }

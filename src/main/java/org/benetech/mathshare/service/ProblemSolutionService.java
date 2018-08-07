@@ -5,9 +5,9 @@ import org.benetech.mathshare.model.entity.SolutionRevision;
 
 public interface ProblemSolutionService {
 
-    SolutionRevision getLatestSolutionRevision(Long editUrl);
+    SolutionRevision getLatestSolutionRevision(long editUrl);
 
-    SolutionRevision getSolutionRevisionByShareUrl(Long shareUrl);
+    SolutionRevision getSolutionRevisionByShareUrl(long shareUrl);
 
     SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution);
 }

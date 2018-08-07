@@ -34,7 +34,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     @Transactional(readOnly = true)
     public ProblemSetRevision getLatestProblemSet(long editUrl) {
         ProblemSet problemSet = problemSetRepository.findOneByEditCode(editUrl);
-        return problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
+        return problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null);
     }
 
     @Override
@@ -50,9 +50,10 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         }
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(
                 new ProblemSetRevision(problemSet));
-        ProblemSetRevision oldRevision = problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
+        ProblemSetRevision oldRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null);
         oldRevision.setReplacedBy(newRevision);
-        return problemSetRevisionRepository.save(oldRevision);
+        problemSetRevisionRepository.save(oldRevision);
+        return newRevision;
     }
 
     @Override
