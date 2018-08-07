@@ -31,13 +31,15 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     private ProblemRepository problemRepository;
 
     @Override
-    public ProblemSetRevision getLatestProblemSet(Long editUrl) {
+    @Transactional(readOnly = true)
+    public ProblemSetRevision getLatestProblemSet(long editUrl) {
         ProblemSet problemSet = problemSetRepository.findOneByEditCode(editUrl);
         return problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
     }
 
     @Override
-    public ProblemSetRevision getProblemSetByShareUrl(Long shareUrl) {
+    @Transactional(readOnly = true)
+    public ProblemSetRevision getProblemSetByShareUrl(long shareUrl) {
         return problemSetRevisionRepository.findOneByShareCode(shareUrl);
     }
 
@@ -54,6 +56,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
                 UrlCodeConverter.fromUrlCode(code));

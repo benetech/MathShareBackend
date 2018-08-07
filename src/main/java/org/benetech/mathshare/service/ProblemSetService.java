@@ -6,9 +6,9 @@ import org.benetech.mathshare.model.entity.ProblemSetRevision;
 
 public interface ProblemSetService {
 
-    ProblemSetRevision getLatestProblemSet(Long editUrl);
+    ProblemSetRevision getLatestProblemSet(long editUrl);
 
-    ProblemSetRevision getProblemSetByShareUrl(Long shareUrl);
+    ProblemSetRevision getProblemSetByShareUrl(long shareUrl);
 
     ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) throws IllegalArgumentException;
 

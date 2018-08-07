@@ -17,8 +17,8 @@ public class ProblemMapperTest {
         long editCode = 0L;
         ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode();
         revision.getProblemSet().setEditCode(editCode);
-        ProblemSetDTO y = ProblemMapper.INSTANCE.toProblemSetDTO(revision);
-        Assert.assertEquals(UrlCodeConverter.toUrlCode(editCode), y.getEditCode());
-        Assert.assertEquals(ProblemSetRevisionMother.VALID_CODE, y.getShareCode());
+        ProblemSetDTO mapped = ProblemMapper.INSTANCE.toProblemSetDTO(revision);
+        Assert.assertEquals(UrlCodeConverter.toUrlCode(editCode), mapped.getEditCode());
+        Assert.assertEquals(ProblemSetRevisionMother.VALID_CODE, mapped.getShareCode());
     }
 }

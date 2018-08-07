@@ -20,12 +20,14 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     private SolutionRevisionRepository solutionRevisionRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public SolutionRevision getLatestSolutionRevision(Long editUrl) {
         ProblemSolution problemSolution = problemSolutionRepository.findOneByEditCode(editUrl);
         return solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(problemSolution, null);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SolutionRevision getSolutionRevisionByShareUrl(Long shareUrl) {
         return solutionRevisionRepository.findOneByShareCode(shareUrl);
     }

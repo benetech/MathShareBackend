@@ -43,7 +43,7 @@ public class ProblemSetRevision extends AbstractEntity {
 
     }
 
-    public ProblemSetRevision(ProblemSet problemSet) {
+    public ProblemSetRevision(@NotNull ProblemSet problemSet) {
         this.problemSet = problemSet;
     }
 }
