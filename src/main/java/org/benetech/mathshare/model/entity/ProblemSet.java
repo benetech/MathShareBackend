@@ -8,9 +8,13 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,6 +23,9 @@ public class ProblemSet extends AbstractEntity {
 
     @Column(insertable = false)
     private Long editCode;
+
+    @OneToMany(mappedBy = "problemSet", cascade = CascadeType.PERSIST)
+    private List<Problem> problems = new ArrayList<>();
 
     @CreationTimestamp
     @Getter(AccessLevel.NONE)

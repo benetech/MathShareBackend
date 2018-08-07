@@ -1,5 +1,6 @@
 package org.benetech.mathshare.model.mother;
 
+import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
 
@@ -20,5 +21,11 @@ public abstract class ProblemSetRevisionMother {
 
     public static ProblemSetRevision createNewRevisionOfValidInstance(ProblemSet problemSet) {
         return new ProblemSetRevision(problemSet);
+    }
+
+    public static ProblemSetRevision withShareCode() {
+        ProblemSetRevision result = validInstance();
+        result.setShareCode(UrlCodeConverter.fromUrlCode(VALID_CODE));
+        return result;
     }
 }

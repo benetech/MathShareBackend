@@ -12,4 +12,12 @@ import java.util.List;
 public class ProblemSetDTO {
 
     private List<ProblemDTO> problems;
+
+    private String editCode;
+
+    private String shareCode;
+
+    public ProblemSetDTO(List<ProblemDTO> problems) {
+        this.problems = problems;
+    }
 }
