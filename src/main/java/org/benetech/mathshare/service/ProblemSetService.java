@@ -1,40 +1,16 @@
 package org.benetech.mathshare.service;
 
+import org.benetech.mathshare.model.dto.ProblemSetDTO;
 import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
-import org.benetech.mathshare.repository.ProblemSetRepository;
-import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Service
-@Transactional
-public class ProblemSetService {
+public interface ProblemSetService {
 
-    @Autowired
-    private ProblemSetRevisionRepository problemSetRevisionRepository;
+    ProblemSetRevision getLatestProblemSet(Long editUrl);
 
-    @Autowired
-    private ProblemSetRepository problemSetRepository;
+    ProblemSetRevision getProblemSetByShareUrl(Long shareUrl);
 
-    @Transactional(readOnly = true)
-    public ProblemSetRevision getLatestProblemSet(long editUrl) {
-        ProblemSet problemSet = problemSetRepository.findOneByEditCode(editUrl);
-        return problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
-    }
+    ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) throws IllegalArgumentException;
 
-    @Transactional(readOnly = true)
-    public ProblemSetRevision getProblemSetByShareUrl(long shareUrl) {
-        return problemSetRevisionRepository.findOneByShareCode(shareUrl);
-    }
-
-    @Transactional
-    public ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) {
-        ProblemSetRevision newRevision = problemSetRevisionRepository.save(
-                new ProblemSetRevision(problemSet));
-        ProblemSetRevision oldRevision = problemSetRevisionRepository.findAllByProblemSetAndReplacedBy(problemSet, null);
-        oldRevision.setReplacedBy(newRevision);
-        return problemSetRevisionRepository.save(oldRevision);
-    }
+    ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException;
 }

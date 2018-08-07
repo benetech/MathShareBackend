@@ -5,6 +5,7 @@ import org.benetech.mathshare.model.mother.ProblemSolutionMother;
 import org.benetech.mathshare.model.mother.SolutionRevisionMother;
 import org.benetech.mathshare.repository.ProblemSolutionRepository;
 import org.benetech.mathshare.repository.SolutionRevisionRepository;
+import org.benetech.mathshare.service.impl.ProblemSolutionServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public class ProblemSolutionServiceTest {
     private ProblemSolutionRepository problemSolutionRepository;
 
     @InjectMocks
-    private ProblemSolutionService problemSolutionService;
+    private ProblemSolutionServiceImpl problemSolutionService;
 
     @Before
     public void setUp() {

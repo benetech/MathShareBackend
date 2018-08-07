@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -15,11 +16,14 @@ import javax.persistence.PersistenceContext;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL, replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ProblemSetRepositoryTest {
 
     @Autowired
     private ProblemSetRepository problemSetRepository;
+
+    @Autowired
+    private ProblemRepository problemRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -38,5 +42,13 @@ public class ProblemSetRepositoryTest {
         em.refresh(saved);
         ProblemSet problemSet = problemSetRepository.findOneByEditCode(saved.getEditCode());
         Assert.assertNotNull(problemSet);
+    }
+
+    @Test
+    public void shouldSaveProblemSetAndAllItsProblems() {
+        int problemsBeforeSave = problemRepository.findAll().size();
+        ProblemSet saved = problemSetRepository.save(ProblemSetMother.withProblems(3));
+        em.refresh(saved);
+        Assert.assertEquals(problemsBeforeSave + 3, problemRepository.findAll().size());
     }
 }

@@ -11,22 +11,30 @@ public abstract class ProblemMother {
 
     public static final String DEFAULT_PROBLEM_TEXT = "problem text";
 
+    public static Problem validInstance(ProblemSet problemSet, String text) {
+        return new Problem(problemSet, text);
+    }
+
     public static Problem validInstance() {
         return validInstance(DEFAULT_PROBLEM_TEXT);
     }
 
     public static Problem validInstance(String text) {
         ProblemSet problemSet = ProblemSetMother.validInstance();
-        return new Problem(problemSet, text);
+        return validInstance(problemSet, text);
     }
 
     public static Problem validInstance(ProblemSet problemSet) {
-        return new Problem(problemSet, DEFAULT_PROBLEM_TEXT);
+        return validInstance(problemSet, DEFAULT_PROBLEM_TEXT);
+    }
+
+    public static List<Problem> createValidProblemsList(ProblemSet problemSet, int size) {
+        return IntStream.range(0, size)
+                .mapToObj(i -> validInstance(problemSet, String.valueOf(i)))
+                .collect(Collectors.toList());
     }
 
     public static List<Problem> createValidProblemsList(int size) {
-        return IntStream.range(0, size)
-                .mapToObj(i -> validInstance(String.valueOf(i)))
-                .collect(Collectors.toList());
+        return createValidProblemsList(ProblemSetMother.validInstance(), size);
     }
 }
