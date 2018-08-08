@@ -32,9 +32,7 @@ import java.util.stream.Collectors;
 import static org.benetech.mathshare.model.mother.ProblemSetRevisionMother.INVALID_CODE;
 import static org.benetech.mathshare.model.mother.ProblemSetRevisionMother.VALID_CODE;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -91,7 +89,7 @@ public class ProblemSetServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegallArgumentExceptionForNotNullId() {
+    public void shouldThrowIllegalArgumentExceptionForNotNullId() {
         ProblemSet toSave = new ProblemSet();
         toSave.setId(1);
         problemSetService.saveNewVersionOfProblemSet(toSave);
@@ -99,12 +97,13 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldReturnProblemsListByUrlCode() {
-        ProblemSet problemSet = ProblemSetMother.validInstance();
+        ProblemSetRevision problemSetRevision = ProblemSetRevisionMother.validInstance(
+                ProblemSetMother.withEditCode(UrlCodeConverter.fromUrlCode(VALID_CODE)));
         List<Problem> problems = ProblemMother.createValidProblemsList(3);
 
         when(problemSetRevisionRepository.findOneByShareCode(UrlCodeConverter.fromUrlCode(VALID_CODE)))
-                .thenReturn(ProblemSetRevisionMother.validInstance(problemSet));
-        when(problemRepository.findAllByProblemSet(problemSet))
+                .thenReturn(problemSetRevision);
+        when(problemRepository.findAllByProblemSetRevision(problemSetRevision))
                 .thenReturn(problems);
 
         ProblemSetDTO result = problemSetService.findProblemsByUrlCode(VALID_CODE);

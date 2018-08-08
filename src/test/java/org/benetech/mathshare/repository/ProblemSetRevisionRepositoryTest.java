@@ -28,6 +28,9 @@ public class ProblemSetRevisionRepositoryTest {
     @Autowired
     private ProblemSetRepository problemSetRepository;
 
+    @Autowired
+    private ProblemRepository problemRepository;
+
     @PersistenceContext
     private EntityManager em;
 
@@ -64,5 +67,13 @@ public class ProblemSetRevisionRepositoryTest {
         Assert.assertNotNull(problemSetRevision);
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(ProblemSetRevisionMother.createNewRevisionOfValidInstance(problemSet));
         Assert.assertNotNull(newRevision);
+    }
+
+    @Test
+    public void shouldSaveProblemSetRevisonAndAllItsProblems() {
+        int problemsBeforeSave = problemRepository.findAll().size();
+        ProblemSetRevision saved = problemSetRevisionRepository.save(ProblemSetRevisionMother.withProblems(3));
+        em.refresh(saved);
+        Assert.assertEquals(problemsBeforeSave + 3, problemRepository.findAll().size());
     }
 }

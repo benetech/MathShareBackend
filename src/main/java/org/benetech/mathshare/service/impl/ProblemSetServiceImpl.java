@@ -64,8 +64,8 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         if (revision == null) {
             return null;
         }
-        List<ProblemDTO> problems = problemRepository.findAllByProblemSet(revision.getProblemSet())
+        List<ProblemDTO> problems = problemRepository.findAllByProblemSetRevision(revision)
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        return new ProblemSetDTO(problems);
+        return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()));
     }
 }

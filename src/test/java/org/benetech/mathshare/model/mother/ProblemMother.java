@@ -1,7 +1,7 @@
 package org.benetech.mathshare.model.mother;
 
 import org.benetech.mathshare.model.entity.Problem;
-import org.benetech.mathshare.model.entity.ProblemSet;
+import org.benetech.mathshare.model.entity.ProblemSetRevision;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,8 +11,8 @@ public abstract class ProblemMother {
 
     public static final String DEFAULT_PROBLEM_TEXT = "problem text";
 
-    public static Problem validInstance(ProblemSet problemSet, String text) {
-        return new Problem(problemSet, text);
+    public static Problem validInstance(ProblemSetRevision problemSetRevision, String text) {
+        return new Problem(problemSetRevision, text);
     }
 
     public static Problem validInstance() {
@@ -20,21 +20,21 @@ public abstract class ProblemMother {
     }
 
     public static Problem validInstance(String text) {
-        ProblemSet problemSet = ProblemSetMother.validInstance();
-        return validInstance(problemSet, text);
+        ProblemSetRevision problemSetRevision = ProblemSetRevisionMother.validInstance();
+        return validInstance(problemSetRevision, text);
     }
 
-    public static Problem validInstance(ProblemSet problemSet) {
-        return validInstance(problemSet, DEFAULT_PROBLEM_TEXT);
+    public static Problem validInstance(ProblemSetRevision problemSetRevision) {
+        return validInstance(problemSetRevision, DEFAULT_PROBLEM_TEXT);
     }
 
-    public static List<Problem> createValidProblemsList(ProblemSet problemSet, int size) {
+    public static List<Problem> createValidProblemsList(ProblemSetRevision problemSetRevision, int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> validInstance(problemSet, String.valueOf(i)))
+                .mapToObj(i -> validInstance(problemSetRevision, String.valueOf(i)))
                 .collect(Collectors.toList());
     }
 
     public static List<Problem> createValidProblemsList(int size) {
-        return createValidProblemsList(ProblemSetMother.validInstance(), size);
+        return createValidProblemsList(ProblemSetRevisionMother.validInstance(), size);
     }
 }

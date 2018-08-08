@@ -29,7 +29,7 @@ public class Problem extends AbstractEntity {
     @NotNull
     @NonNull
     @ManyToOne(cascade = CascadeType.PERSIST)
-    private ProblemSet problemSet;
+    private ProblemSetRevision problemSetRevision;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "replaced_by")

@@ -2,9 +2,7 @@ package org.benetech.mathshare.mappers;
 
 import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
-import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
-import org.benetech.mathshare.model.mother.ProblemSetMother;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,10 +26,9 @@ public class ProblemMapperTest {
     }
 
     @Test
-    public void shouldMapProblemSetProblems() {
+    public void shouldMapProblemSetRevisionProblems() {
         int problemsSize = 3;
-        ProblemSet problemSet = ProblemSetMother.withProblems(problemsSize);
-        ProblemSetRevision revision = ProblemSetRevisionMother.validInstance(problemSet);
+        ProblemSetRevision revision = ProblemSetRevisionMother.withProblems(problemsSize);
 
         ProblemSetDTO mapped = ProblemMapper.INSTANCE.toProblemSetDTO(revision);
 

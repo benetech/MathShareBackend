@@ -25,7 +25,7 @@ public interface ProblemMapper {
     ProblemSetDTO toDto(ProblemSet problemSet);
 
     @Mappings({
-            @Mapping(source = "problemSet.problems", target = "problems"),
+            @Mapping(source = "problems", target = "problems"),
             @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "shareCode"),
             @Mapping(source = "problemSet.editCode", target = "editCode", qualifiedByName = "editCode")})
     ProblemSetDTO toProblemSetDTO(ProblemSetRevision revision);

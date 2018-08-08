@@ -17,11 +17,11 @@ CREATE TABLE problem_set_revision(
 
 CREATE TABLE problem(
     id SERIAL PRIMARY KEY,
-    problem_set_id INTEGER NOT NULL,
+    problem_set_revision_id INTEGER NOT NULL,
     replaced_by INTEGER,
     problem_text TEXT NOT NULL,
     date_created TIMESTAMP NOT NULL DEFAULT now(),
-    FOREIGN KEY (problem_set_id) REFERENCES problem_set(id),
+    FOREIGN KEY (problem_set_revision_id) REFERENCES problem_set_revision(id),
     FOREIGN KEY (replaced_by) REFERENCES problem(id)
 );
 
@@ -48,11 +48,11 @@ CREATE TABLE solution_step(
     id SERIAL PRIMARY KEY,
     explanation TEXT,
     step_value TEXT NOT NULL,
-    solution_id INTEGER NOT NULL,
+    solution_revision_id INTEGER NOT NULL,
     replaced_by INTEGER,
     deleted BOOLEAN NOT NULL DEFAULT false,
     date_modified TIMESTAMP,
-    FOREIGN KEY (solution_id) REFERENCES problem_solution(id),
+    FOREIGN KEY (solution_revision_id) REFERENCES solution_revision(id),
     FOREIGN KEY (replaced_by) REFERENCES solution_step(id)
 );
 

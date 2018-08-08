@@ -2,8 +2,10 @@ package org.benetech.mathshare.mappers;
 
 import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.model.dto.SolutionDTO;
+import org.benetech.mathshare.model.dto.SolutionStepDTO;
 import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.SolutionRevision;
+import org.benetech.mathshare.model.entity.SolutionStep;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -18,6 +20,8 @@ public interface SolutionMapper {
     SolutionDTO toDto(ProblemSolution solution);
 
     ProblemSolution fromDto(SolutionDTO solution);
+
+    SolutionStepDTO toDto(SolutionStep solutionStep);
 
     @Mappings({
             @Mapping(source = "problemSolution.problem", target = "problem"),

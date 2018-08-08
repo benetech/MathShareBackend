@@ -94,9 +94,10 @@ public class ProblemSetControllerTest {
 
     @Test
     public void shouldReturnProblemSetDTOWithProblemsList() throws Exception {
+        long editCode = 34L;
         List<ProblemDTO> problems = ProblemMother.createValidProblemsList(3).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        when(problemSetService.findProblemsByUrlCode(VALID_CODE)).thenReturn(new ProblemSetDTO(problems));
+        when(problemSetService.findProblemsByUrlCode(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(editCode)));
         String response = mockMvc.perform(getProblemSet(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);

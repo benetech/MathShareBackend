@@ -9,4 +9,10 @@ public abstract class ProblemSolutionMother {
         Problem problem = ProblemMother.validInstance();
         return new ProblemSolution(problem);
     }
+
+    public static ProblemSolution withEditCode(long code) {
+        ProblemSolution result = validInstance();
+        result.setEditCode(code);
+        return result;
+    }
 }

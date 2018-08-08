@@ -15,7 +15,8 @@ public class ProblemSetDTO {
 
     private String shareCode;
 
-    public ProblemSetDTO(List<ProblemDTO> problems) {
+    public ProblemSetDTO(List<ProblemDTO> problems, String editCode) {
         this.problems = problems;
+        this.editCode = editCode;
     }
 }
