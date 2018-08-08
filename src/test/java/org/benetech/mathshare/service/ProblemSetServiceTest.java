@@ -32,7 +32,9 @@ import java.util.stream.Collectors;
 import static org.benetech.mathshare.model.mother.ProblemSetRevisionMother.INVALID_CODE;
 import static org.benetech.mathshare.model.mother.ProblemSetRevisionMother.VALID_CODE;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest

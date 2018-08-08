@@ -11,5 +11,4 @@ import java.util.List;
 public interface SolutionStepRepository extends JpaRepository<SolutionStep, Integer> {
 
     List<SolutionStep> findAllBySolutionRevision(SolutionRevision solutionRevision);
-
 }

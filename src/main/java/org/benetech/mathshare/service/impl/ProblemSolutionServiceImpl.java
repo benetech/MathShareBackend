@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,8 +68,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             return null;
         }
 
-        ProblemDTO problem = Arrays.asList(problemRepository.findById(revision.getProblemSolution().getId()).get())
-                .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList()).get(0);
+        ProblemDTO problem = ProblemMapper.INSTANCE.toDto(problemRepository.findById(revision.getProblemSolution().getId()).get());
 
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision)
                 .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());

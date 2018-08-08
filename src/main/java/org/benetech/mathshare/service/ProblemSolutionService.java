@@ -13,5 +13,4 @@ public interface ProblemSolutionService {
     SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution);
 
     SolutionDTO findSolutionByUrlCode(String code) throws IllegalArgumentException;
-
 }
