@@ -1,6 +1,6 @@
 package org.benetech.mathshare.model.mother;
 
-import org.benetech.mathshare.model.entity.ProblemSolution;
+import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
 
 import java.util.List;
@@ -13,8 +13,8 @@ public abstract class SolutionStepMother {
     public static final Boolean DEFAULT_DELETED_VALUE = false;
 
     public static SolutionStep validInstance() {
-        ProblemSolution solution = ProblemSolutionMother.validInstance();
-        return new SolutionStep(DEFAULT_STEP_VALUE, solution, DEFAULT_DELETED_VALUE);
+        SolutionRevision solutionRevision = SolutionRevisionMother.validInstance();
+        return new SolutionStep(DEFAULT_STEP_VALUE, solutionRevision, DEFAULT_DELETED_VALUE);
     }
 
     public static List<SolutionStep> createValidStepsList(int size) {

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,21 @@ public class ProblemSolutionController {
 
     @Autowired
     private ProblemSolutionService problemSolutionService;
+
+    @GetMapping("/view/{code}")
+    ResponseEntity<SolutionDTO> getProblemSolution(@PathVariable String code) {
+        try {
+            SolutionDTO body = problemSolutionService.findSolutionByUrlCode(code);
+            if (body != null) {
+                return new ResponseEntity<>(body, HttpStatus.OK);
+            } else {
+                logger.error("ProblemSet with code {} wasn't found", code);
+            }
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 
     @PostMapping(path = "/new")
     ResponseEntity<SolutionDTO> createProblemSolution(@RequestBody SolutionDTO solution) {

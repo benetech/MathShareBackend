@@ -18,4 +18,10 @@ public class SolutionDTO {
     private String shareCode;
 
     private List<SolutionStepDTO> steps;
+
+    public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode) {
+        this.problem = problem;
+        this.steps = steps;
+        this.editCode = editCode;
+    }
 }

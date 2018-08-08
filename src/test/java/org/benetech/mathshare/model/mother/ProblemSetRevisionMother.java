@@ -1,7 +1,10 @@
 package org.benetech.mathshare.model.mother;
 
+import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
+
+import java.util.List;
 
 public abstract class ProblemSetRevisionMother {
 
@@ -25,6 +28,13 @@ public abstract class ProblemSetRevisionMother {
     public static ProblemSetRevision withShareCode(long code) {
         ProblemSetRevision result = validInstance();
         result.setShareCode(code);
+        return result;
+    }
+
+    public static ProblemSetRevision withProblems(int size) {
+        ProblemSetRevision result = validInstance();
+        List<Problem> problems = ProblemMother.createValidProblemsList(result, size);
+        result.setProblems(problems);
         return result;
     }
 }

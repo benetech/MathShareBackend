@@ -1,9 +1,6 @@
 package org.benetech.mathshare.model.mother;
 
-import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSet;
-
-import java.util.List;
 
 public abstract class ProblemSetMother {
 
@@ -11,10 +8,9 @@ public abstract class ProblemSetMother {
         return new ProblemSet();
     }
 
-    public static ProblemSet withProblems(int size) {
+    public static ProblemSet withEditCode(long code) {
         ProblemSet result = validInstance();
-        List<Problem> problems = ProblemMother.createValidProblemsList(result, size);
-        result.setProblems(problems);
+        result.setEditCode(code);
         return result;
     }
 }

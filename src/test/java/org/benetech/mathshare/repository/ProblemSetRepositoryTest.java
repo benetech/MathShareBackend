@@ -22,9 +22,6 @@ public class ProblemSetRepositoryTest {
     @Autowired
     private ProblemSetRepository problemSetRepository;
 
-    @Autowired
-    private ProblemRepository problemRepository;
-
     @PersistenceContext
     private EntityManager em;
 
@@ -42,13 +39,5 @@ public class ProblemSetRepositoryTest {
         em.refresh(saved);
         ProblemSet problemSet = problemSetRepository.findOneByEditCode(saved.getEditCode());
         Assert.assertNotNull(problemSet);
-    }
-
-    @Test
-    public void shouldSaveProblemSetAndAllItsProblems() {
-        int problemsBeforeSave = problemRepository.findAll().size();
-        ProblemSet saved = problemSetRepository.save(ProblemSetMother.withProblems(3));
-        em.refresh(saved);
-        Assert.assertEquals(problemsBeforeSave + 3, problemRepository.findAll().size());
     }
 }

@@ -28,7 +28,7 @@ public class SolutionRevision extends AbstractEntity {
     @Column(insertable = false)
     private Long shareCode;
 
-    @OneToMany(mappedBy = "solution", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "solutionRevision", cascade = CascadeType.PERSIST)
     private List<SolutionStep> steps = new ArrayList<>();
 
     @NotNull

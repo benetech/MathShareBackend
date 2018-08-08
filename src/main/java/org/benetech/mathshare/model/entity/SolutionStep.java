@@ -33,7 +33,7 @@ public class SolutionStep extends AbstractEntity {
     @NotNull
     @NonNull
     @ManyToOne(cascade = CascadeType.PERSIST)
-    private ProblemSolution solution;
+    private SolutionRevision solutionRevision;
 
     @NotNull
     @NonNull
