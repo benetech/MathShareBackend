@@ -68,7 +68,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             return null;
         }
 
-        ProblemDTO problem = ProblemMapper.INSTANCE.toDto(problemRepository.findById(revision.getProblemSolution().getId()).get());
+        ProblemDTO problem = ProblemMapper.INSTANCE.toDto(
+                problemRepository.findById(revision.getProblemSolution().getId()).get());
 
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision)
                 .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());

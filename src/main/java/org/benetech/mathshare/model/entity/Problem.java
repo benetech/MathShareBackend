@@ -28,10 +28,10 @@ public class Problem extends AbstractEntity {
 
     @NotNull
     @NonNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private ProblemSetRevision problemSetRevision;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "replaced_by")
     private Problem replacedBy;
 
@@ -39,6 +39,10 @@ public class Problem extends AbstractEntity {
     @NotNull
     @NonNull
     private String problemText;
+
+    @NotNull
+    @NonNull
+    private String title;
 
     @CreationTimestamp
     @Getter(AccessLevel.NONE)

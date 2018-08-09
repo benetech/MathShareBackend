@@ -62,28 +62,33 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldGetProblemSet() {
+        ProblemSet problemSet = ProblemSetMother.mockInstance();
+        ProblemSetRevision revision = ProblemSetRevisionMother.validInstance(problemSet);
         given(this.problemSetRevisionRepository.findOneByShareCode(CODE))
-                .willReturn(ProblemSetRevisionMother.validInstance());
+                .willReturn(revision);
         ProblemSetRevision problemSetRevisionFromDB = problemSetService.getProblemSetByShareUrl(CODE);
-        Assert.assertEquals(ProblemSetRevisionMother.validInstance(), problemSetRevisionFromDB);
+        Assert.assertEquals(revision, problemSetRevisionFromDB);
     }
 
     @Test
     public void shouldGetNewestProblemSet() {
-        given(this.problemSetRepository.findOneByEditCode(CODE)).willReturn(ProblemSetMother.validInstance());
-        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.validInstance(), null))
-                .willReturn(ProblemSetRevisionMother.createNewRevisionOfValidInstance(ProblemSetMother.validInstance()));
+        ProblemSet problemSet = ProblemSetMother.mockInstance();
+        ProblemSetRevision revision = ProblemSetRevisionMother.revisionOf(problemSet);
+        given(this.problemSetRepository.findOneByEditCode(CODE)).willReturn(problemSet);
+        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
+                .willReturn(revision);
         ProblemSetRevision problemSetRevisionFromDB = problemSetService.getLatestProblemSet(CODE);
-        Assert.assertEquals(ProblemSetRevisionMother.createNewRevisionOfValidInstance(ProblemSetMother.validInstance()), problemSetRevisionFromDB);
+        Assert.assertEquals(revision, problemSetRevisionFromDB);
     }
 
     @Test
     public void shouldSaveNewProblemSetRevision() {
-        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.validInstance(), null))
-                .willReturn(ProblemSetRevisionMother.createNewRevisionOfValidInstance(ProblemSetMother.validInstance()));
-        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.validInstance())))
-                .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance()));
-        problemSetService.saveNewVersionOfProblemSet(ProblemSetMother.validInstance());
+        ProblemSet problemSet = ProblemSetMother.mockInstance();
+        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
+                .willReturn(ProblemSetRevisionMother.revisionOf(problemSet));
+        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(problemSet)))
+                .willReturn(new ProblemSetRevision(problemSet));
+        problemSetService.saveNewVersionOfProblemSet(problemSet);
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
         verify(this.problemSetRevisionRepository, times(2)).save(revisionCaptor.capture());
 
@@ -99,13 +104,13 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldReturnProblemsListByUrlCode() {
-        ProblemSetRevision problemSetRevision = ProblemSetRevisionMother.validInstance(
-                ProblemSetMother.withEditCode(UrlCodeConverter.fromUrlCode(VALID_CODE)));
-        List<Problem> problems = ProblemMother.createValidProblemsList(3);
+        ProblemSet problemSet = ProblemSetMother.mockInstance();
+        ProblemSetRevision revision = ProblemSetRevisionMother.revisionOf(problemSet);
+        List<Problem> problems = ProblemMother.createValidProblemsList(revision, 3);
 
         when(problemSetRevisionRepository.findOneByShareCode(UrlCodeConverter.fromUrlCode(VALID_CODE)))
-                .thenReturn(problemSetRevision);
-        when(problemRepository.findAllByProblemSetRevision(problemSetRevision))
+                .thenReturn(revision);
+        when(problemRepository.findAllByProblemSetRevision(revision))
                 .thenReturn(problems);
 
         ProblemSetDTO result = problemSetService.findProblemsByUrlCode(VALID_CODE);

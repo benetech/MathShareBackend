@@ -5,14 +5,19 @@ import org.benetech.mathshare.model.entity.ProblemSolution;
 
 public abstract class ProblemSolutionMother {
 
-    public static ProblemSolution validInstance() {
-        Problem problem = ProblemMother.validInstance();
+    public static final Long EDIT_CODE = 89L;
+
+    public static ProblemSolution validInstance(Problem problem) {
         return new ProblemSolution(problem);
     }
 
-    public static ProblemSolution withEditCode(long code) {
-        ProblemSolution result = validInstance();
-        result.setEditCode(code);
+    public static ProblemSolution withEditCode(Problem problem, long editCode) {
+        ProblemSolution result = validInstance(problem);
+        result.setEditCode(editCode);
         return result;
+    }
+
+    public static ProblemSolution mockInstance() {
+        return withEditCode(ProblemMother.mockInstance(), EDIT_CODE);
     }
 }

@@ -27,13 +27,13 @@ public class ProblemSetRevision extends AbstractEntity {
 
     @NotNull
     @NonNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private ProblemSet problemSet;
 
-    @OneToMany(mappedBy = "problemSetRevision", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "problemSetRevision", cascade = CascadeType.ALL)
     private List<Problem> problems = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "replaced_by")
     private ProblemSetRevision replacedBy;
 

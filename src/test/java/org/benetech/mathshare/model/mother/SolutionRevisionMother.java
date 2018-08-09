@@ -5,31 +5,27 @@ import org.benetech.mathshare.model.entity.SolutionRevision;
 
 public abstract class SolutionRevisionMother {
 
-    public static SolutionRevision validInstance() {
-        ProblemSolution problemSolution = ProblemSolutionMother.validInstance();
+    public static SolutionRevision validInstance(ProblemSolution problemSolution) {
         return new SolutionRevision(problemSolution);
     }
 
-    public static SolutionRevision createNewRevisionOfValidInstance(ProblemSolution problemSolution) {
+    public static SolutionRevision revisionOf(ProblemSolution problemSolution) {
         return new SolutionRevision(problemSolution);
     }
 
-    public static SolutionRevision withShareCode(long code) {
-        SolutionRevision result = validInstance();
+    public static SolutionRevision withShareCode(ProblemSolution problemSolution, long code) {
+        SolutionRevision result = validInstance(problemSolution);
         result.setShareCode(code);
         return result;
     }
 
-    public static SolutionRevision withShareCodeAndEditCode(long shareCode, long editCode) {
-        ProblemSolution problemSolution = ProblemSolutionMother.withEditCode(editCode);
-        SolutionRevision result = new SolutionRevision(problemSolution);
-        result.setShareCode(shareCode);
+    public static SolutionRevision withSteps(ProblemSolution problemSolution, int size) {
+        SolutionRevision result = validInstance(problemSolution);
+        result.setSteps(SolutionStepMother.createValidStepsList(result, size));
         return result;
     }
 
-    public static SolutionRevision withSteps(int size) {
-        SolutionRevision result = validInstance();
-        result.setSteps(SolutionStepMother.createValidStepsList(size));
-        return result;
+    public static SolutionRevision mockInstance() {
+        return validInstance(ProblemSolutionMother.mockInstance());
     }
 }

@@ -25,6 +25,9 @@ public class SolutionStep extends AbstractEntity {
     @Lob
     private String explanation;
 
+    @OneToOne(mappedBy = "step", cascade = CascadeType.ALL)
+    private Scratchpad scratchpad;
+
     @Lob
     @NotNull
     @NonNull
@@ -32,14 +35,14 @@ public class SolutionStep extends AbstractEntity {
 
     @NotNull
     @NonNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private SolutionRevision solutionRevision;
 
     @NotNull
     @NonNull
     private Boolean deleted;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "replaced_by")
     private SolutionStep replacedBy;
 

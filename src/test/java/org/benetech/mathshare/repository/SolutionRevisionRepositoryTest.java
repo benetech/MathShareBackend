@@ -1,7 +1,14 @@
 package org.benetech.mathshare.repository;
 
+import org.benetech.mathshare.model.entity.Problem;
+import org.benetech.mathshare.model.entity.ProblemSet;
+import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.SolutionRevision;
+import org.benetech.mathshare.model.mother.ProblemMother;
+import org.benetech.mathshare.model.mother.ProblemSetMother;
+import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
+import org.benetech.mathshare.model.mother.ProblemSolutionMother;
 import org.benetech.mathshare.model.mother.SolutionRevisionMother;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,20 +33,37 @@ public class SolutionRevisionRepositoryTest {
     @Autowired
     private ProblemSolutionRepository problemSolutionRepository;
 
+    @Autowired
+    private ProblemSetRepository problemSetRepository;
+
+    @Autowired
+    private ProblemRepository problemRepository;
+
+    @Autowired
+    private ProblemSetRevisionRepository problemSetRevisionRepository;
+
     @PersistenceContext
     private EntityManager em;
 
     @Test
     public void shouldSaveSolutionRevision() {
         int dbSizeBeforeSave = solutionRevisionRepository.findAll().size();
-        solutionRevisionRepository.saveAndFlush(SolutionRevisionMother.validInstance());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision revision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        Problem problem = problemRepository.save(ProblemMother.validInstance(revision));
+        ProblemSolution problemSolution = problemSolutionRepository.save(ProblemSolutionMother.validInstance(problem));
+        solutionRevisionRepository.saveAndFlush(SolutionRevisionMother.validInstance(problemSolution));
         int dbSizeAfterSave = solutionRevisionRepository.findAll().size();
         Assert.assertEquals(dbSizeBeforeSave + 1, dbSizeAfterSave);
     }
 
     @Test
     public void shouldFindSolutionRevisionByShareCode() {
-        SolutionRevision saved = solutionRevisionRepository.save(SolutionRevisionMother.validInstance());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision revision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        Problem problem = problemRepository.save(ProblemMother.validInstance(revision));
+        ProblemSolution problemSolution = problemSolutionRepository.save(ProblemSolutionMother.validInstance(problem));
+        SolutionRevision saved = solutionRevisionRepository.save(SolutionRevisionMother.validInstance(problemSolution));
         em.refresh(saved);
         SolutionRevision solutionRevision = solutionRevisionRepository.findOneByShareCode(saved.getShareCode());
         Assert.assertNotNull(solutionRevision.getShareCode());
@@ -48,11 +72,15 @@ public class SolutionRevisionRepositoryTest {
 
     @Test
     public void shouldFindByProblemSolutionAndReplacedBy() {
-        SolutionRevision saved = solutionRevisionRepository.save(SolutionRevisionMother.validInstance());
-        ProblemSolution problemSolution = problemSolutionRepository.findAll().get(0);
-        SolutionRevision solutionRevision = solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(problemSolution, null);
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision revision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        Problem problem = problemRepository.save(ProblemMother.validInstance(revision));
+        ProblemSolution problemSolution = problemSolutionRepository.save(ProblemSolutionMother.validInstance(problem));
+        SolutionRevision saved = solutionRevisionRepository.save(SolutionRevisionMother.validInstance(problemSolution));
+        ProblemSolution problemSolutionFromDB = problemSolutionRepository.findAll().get(0);
+        SolutionRevision solutionRevision = solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(problemSolutionFromDB, null);
         Assert.assertEquals(saved.getShareCode(), solutionRevision.getShareCode());
-        SolutionRevision newRevision = solutionRevisionRepository.save(SolutionRevisionMother.createNewRevisionOfValidInstance(problemSolution));
+        SolutionRevision newRevision = solutionRevisionRepository.save(SolutionRevisionMother.revisionOf(problemSolutionFromDB));
         Assert.assertEquals(saved.getShareCode(), newRevision.getShareCode());
     }
 }
