@@ -22,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -52,7 +54,11 @@ public class ProblemSetControllerTest {
 
     private static final String VIEW_ENDPOINT = BASE_ENDPOINT + "view/";
 
+    private static final String EDIT_ENDPOINT = BASE_ENDPOINT + "edit/";
+
     private static final String CREATE_ENDPOINT = BASE_ENDPOINT + "new/";
+
+    private static final String CREATE_UPDATE_ENDPOINT = BASE_ENDPOINT + "createOrUpdate/";
 
     private static final Long SHARE_CODE = 13L;
 
@@ -115,7 +121,7 @@ public class ProblemSetControllerTest {
     @Test
     public void shouldReturn201IfCreated() throws Exception {
         ProblemSet toSave = ProblemSetMother.validInstance();
-        when(problemSetService.saveNewVersionOfProblemSet(toSave)).thenReturn(null);
+        when(problemSetService.saveNewProblemSet(toSave)).thenReturn(null);
         mockMvc.perform(createProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
     }
@@ -126,7 +132,7 @@ public class ProblemSetControllerTest {
         ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode(problemSet, SHARE_CODE);
         ProblemSet toSave = revision.getProblemSet();
         toSave.setEditCode(EDIT_CODE);
-        when(problemSetService.saveNewVersionOfProblemSet(any())).thenReturn(revision);
+        when(problemSetService.saveNewProblemSet(any())).thenReturn(revision);
 
         String response = mockMvc.perform(createProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
@@ -135,6 +141,35 @@ public class ProblemSetControllerTest {
         Assert.assertEquals(UrlCodeConverter.toUrlCode(EDIT_CODE), result.getEditCode());
         Assert.assertEquals(UrlCodeConverter.toUrlCode(SHARE_CODE), result.getShareCode());
     }
+
+    @Test
+    public void putShouldReturn201IfCreated() throws Exception {
+        ProblemSet toSave = ProblemSetMother.validInstance();
+        when(problemSetService.createOrUpdateProblemSet(toSave)).thenReturn(Pair.of(true, ProblemSetRevisionMother.validInstance(toSave)));
+        mockMvc.perform(createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+    }
+
+    @Test
+    public void putShouldReturn200IfUpdated() throws Exception {
+        ProblemSet toSave = ProblemSetMother.validInstance();
+        when(problemSetService.createOrUpdateProblemSet(toSave)).thenReturn(Pair.of(false, ProblemSetRevisionMother.validInstance(toSave)));
+        mockMvc.perform(createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+    }
+
+    @Test
+    public void shouldReturnProblemSetDTOForEditing() throws Exception {
+        ProblemSet problemSet = ProblemSetMother.validInstance();
+        List<ProblemDTO> problems = ProblemMother.createValidProblemsList(ProblemSetRevisionMother.validInstance(problemSet), 3).stream()
+                .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
+        when(problemSetService.getLatestProblemSetForEditing(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE)));
+        String response = mockMvc.perform(getLatestProblemSet(true))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
+        Assert.assertEquals(problems, result.getProblems());
+    }
+
 
     @Test
     public void shouldReturn400WhenFailedToParseProblemSet() throws Exception {
@@ -148,8 +183,18 @@ public class ProblemSetControllerTest {
         return get(VIEW_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
     }
 
+    private static MockHttpServletRequestBuilder getLatestProblemSet(boolean validCode) {
+        return get(EDIT_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
+    }
+
     private static MockHttpServletRequestBuilder createProblemSet(ProblemSetDTO problemSet) throws JsonProcessingException {
         return post(CREATE_ENDPOINT)
+                .content(new ObjectMapper().writeValueAsString(problemSet))
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
+    private static MockHttpServletRequestBuilder createOrUpdateProblemSet(ProblemSetDTO problemSet) throws JsonProcessingException {
+        return put(CREATE_UPDATE_ENDPOINT)
                 .content(new ObjectMapper().writeValueAsString(problemSet))
                 .contentType(MediaType.APPLICATION_JSON);
     }
