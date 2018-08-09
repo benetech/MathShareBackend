@@ -63,9 +63,8 @@ public class ProblemSetController {
         try {
             Pair<Boolean, ProblemSetRevision> saved = problemSetService.createOrUpdateProblemSet(
                     ProblemMapper.INSTANCE.fromDto(problemSet));
-            return saved.getFirst().booleanValue() ?
-                    new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved.getSecond()), HttpStatus.CREATED)
-                    : new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved.getSecond()), HttpStatus.OK);
+            HttpStatus status = saved.getFirst().booleanValue() ? HttpStatus.CREATED : HttpStatus.OK;
+            return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved.getSecond()), status);
         } catch (HttpMessageNotReadableException e) {
             logger.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -160,11 +160,10 @@ public class ProblemSetControllerTest {
 
     @Test
     public void shouldReturnProblemSetDTOForEditing() throws Exception {
-        long editCode = 34L;
         ProblemSet problemSet = ProblemSetMother.validInstance();
         List<ProblemDTO> problems = ProblemMother.createValidProblemsList(ProblemSetRevisionMother.validInstance(problemSet), 3).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        when(problemSetService.getLatestProblemSetForEditing(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(editCode)));
+        when(problemSetService.getLatestProblemSetForEditing(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE)));
         String response = mockMvc.perform(getLatestProblemSet(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
