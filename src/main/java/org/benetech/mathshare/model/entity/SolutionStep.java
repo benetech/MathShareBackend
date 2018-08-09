@@ -42,7 +42,7 @@ public class SolutionStep extends AbstractEntity {
     @NonNull
     private Boolean deleted;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "replaced_by")
     private SolutionStep replacedBy;
 

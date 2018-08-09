@@ -30,7 +30,7 @@ public interface ProblemMapper {
     ProblemSetDTO toProblemSetDTO(ProblemSetRevision revision);
 
     @Named("toCode")
-    default String mapShareCode(Long shareCode) {
+    default String toCode(Long shareCode) {
         return shareCode == null ? null : UrlCodeConverter.toUrlCode(shareCode);
     }
 }

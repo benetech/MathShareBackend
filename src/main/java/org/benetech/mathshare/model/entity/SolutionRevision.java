@@ -40,7 +40,7 @@ public class SolutionRevision extends AbstractEntity {
     @ManyToOne
     private ProblemSolution problemSolution;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "replaced_by")
     private SolutionRevision replacedBy;
 
