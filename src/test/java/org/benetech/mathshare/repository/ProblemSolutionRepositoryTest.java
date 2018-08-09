@@ -1,6 +1,12 @@
 package org.benetech.mathshare.repository;
 
+import org.benetech.mathshare.model.entity.Problem;
+import org.benetech.mathshare.model.entity.ProblemSet;
+import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.entity.ProblemSolution;
+import org.benetech.mathshare.model.mother.ProblemMother;
+import org.benetech.mathshare.model.mother.ProblemSetMother;
+import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.benetech.mathshare.model.mother.ProblemSolutionMother;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,20 +28,35 @@ public class ProblemSolutionRepositoryTest {
     @Autowired
     private ProblemSolutionRepository problemSolutionRepository;
 
+    @Autowired
+    private ProblemSetRepository problemSetRepository;
+
+    @Autowired
+    private ProblemSetRevisionRepository problemSetRevisionRepository;
+
+    @Autowired
+    private ProblemRepository problemRepository;
+
     @PersistenceContext
     private EntityManager em;
 
     @Test
     public void shouldSaveProblemSolution() {
         int dbSizeBeforeSave = problemSolutionRepository.findAll().size();
-        problemSolutionRepository.saveAndFlush(ProblemSolutionMother.validInstance());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision revision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        Problem problem = problemRepository.save(ProblemMother.validInstance(revision));
+        problemSolutionRepository.saveAndFlush(ProblemSolutionMother.validInstance(problem));
         int dbSizeAfterSave = problemSolutionRepository.findAll().size();
         Assert.assertEquals(dbSizeBeforeSave + 1, dbSizeAfterSave);
     }
 
     @Test
     public void shouldFindByEditCode() {
-        ProblemSolution saved = problemSolutionRepository.save(ProblemSolutionMother.validInstance());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision revision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        Problem problem = problemRepository.save(ProblemMother.validInstance(revision));
+        ProblemSolution saved = problemSolutionRepository.save(ProblemSolutionMother.validInstance(problem));
         em.refresh(saved);
         ProblemSolution problemSolutionFromDB = problemSolutionRepository.findOneByEditCode(saved.getEditCode());
         Assert.assertNotNull(problemSolutionFromDB);

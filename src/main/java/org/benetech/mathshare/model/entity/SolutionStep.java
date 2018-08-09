@@ -25,6 +25,9 @@ public class SolutionStep extends AbstractEntity {
     @Lob
     private String explanation;
 
+    @OneToOne(mappedBy = "step", cascade = CascadeType.ALL)
+    private Scratchpad scratchpad;
+
     @Lob
     @NotNull
     @NonNull
@@ -32,7 +35,7 @@ public class SolutionStep extends AbstractEntity {
 
     @NotNull
     @NonNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private SolutionRevision solutionRevision;
 
     @NotNull

@@ -12,14 +12,13 @@ public abstract class SolutionStepMother {
     public static final String DEFAULT_STEP_VALUE = "step value";
     public static final Boolean DEFAULT_DELETED_VALUE = false;
 
-    public static SolutionStep validInstance() {
-        SolutionRevision solutionRevision = SolutionRevisionMother.validInstance();
-        return new SolutionStep(DEFAULT_STEP_VALUE, solutionRevision, DEFAULT_DELETED_VALUE);
+    public static SolutionStep validInstance(SolutionRevision revision) {
+        return new SolutionStep(DEFAULT_STEP_VALUE, revision, DEFAULT_DELETED_VALUE);
     }
 
-    public static List<SolutionStep> createValidStepsList(int size) {
+    public static List<SolutionStep> createValidStepsList(SolutionRevision revision, int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> validInstance())
+                .mapToObj(i -> validInstance(revision))
                 .collect(Collectors.toList());
     }
 }

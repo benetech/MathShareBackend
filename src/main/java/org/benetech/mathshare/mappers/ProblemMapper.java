@@ -25,17 +25,12 @@ public interface ProblemMapper {
     ProblemSetDTO toDto(ProblemSet problemSet);
 
     @Mappings({
-            @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "shareCode"),
-            @Mapping(source = "problemSet.editCode", target = "editCode", qualifiedByName = "editCode")})
+            @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "toCode"),
+            @Mapping(source = "problemSet.editCode", target = "editCode", qualifiedByName = "toCode")})
     ProblemSetDTO toProblemSetDTO(ProblemSetRevision revision);
 
-    @Named("shareCode")
-    default String mapShareCode(Long shareCode) {
+    @Named("toCode")
+    default String toCode(Long shareCode) {
         return shareCode == null ? null : UrlCodeConverter.toUrlCode(shareCode);
-    }
-
-    @Named("editCode")
-    default String mapEditCode(Long editCode) {
-        return editCode == null ? null : UrlCodeConverter.toUrlCode(editCode);
     }
 }

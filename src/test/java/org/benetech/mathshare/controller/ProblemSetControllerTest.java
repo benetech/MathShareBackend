@@ -12,6 +12,7 @@ import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.mother.ProblemMother;
 import org.benetech.mathshare.model.mother.ProblemSetMother;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
+import org.benetech.mathshare.repository.ProblemSetRepository;
 import org.benetech.mathshare.service.ProblemSetService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,6 +54,10 @@ public class ProblemSetControllerTest {
 
     private static final String CREATE_ENDPOINT = BASE_ENDPOINT + "new/";
 
+    private static final Long SHARE_CODE = 13L;
+
+    private static final Long EDIT_CODE = 87L;
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -64,6 +69,9 @@ public class ProblemSetControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private ProblemSetRepository problemSetRepository;
 
     @Before
     public void setUp() {
@@ -94,10 +102,10 @@ public class ProblemSetControllerTest {
 
     @Test
     public void shouldReturnProblemSetDTOWithProblemsList() throws Exception {
-        long editCode = 34L;
-        List<ProblemDTO> problems = ProblemMother.createValidProblemsList(3).stream()
+        ProblemSetRevision revision = ProblemSetRevisionMother.mockInstance();
+        List<ProblemDTO> problems = ProblemMother.createValidProblemsList(revision, 3).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        when(problemSetService.findProblemsByUrlCode(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(editCode)));
+        when(problemSetService.findProblemsByUrlCode(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE)));
         String response = mockMvc.perform(getProblemSet(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
@@ -114,19 +122,18 @@ public class ProblemSetControllerTest {
 
     @Test
     public void shouldReturnProblemSetWithShareAndEditCodes() throws Exception {
-        long editCode = 54L;
-        long shareCode = 32L;
-        ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode(shareCode);
+        ProblemSet problemSet = ProblemSetMother.mockInstance();
+        ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode(problemSet, SHARE_CODE);
         ProblemSet toSave = revision.getProblemSet();
-        toSave.setEditCode(editCode);
+        toSave.setEditCode(EDIT_CODE);
         when(problemSetService.saveNewVersionOfProblemSet(any())).thenReturn(revision);
 
         String response = mockMvc.perform(createProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
 
-        Assert.assertEquals(UrlCodeConverter.toUrlCode(editCode), result.getEditCode());
-        Assert.assertEquals(UrlCodeConverter.toUrlCode(shareCode), result.getShareCode());
+        Assert.assertEquals(UrlCodeConverter.toUrlCode(EDIT_CODE), result.getEditCode());
+        Assert.assertEquals(UrlCodeConverter.toUrlCode(SHARE_CODE), result.getShareCode());
     }
 
     @Test

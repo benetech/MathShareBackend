@@ -7,5 +7,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProblemDTO {
 
+    private String problemSetEditCode;
+
     private String text;
+
+    private String title;
 }

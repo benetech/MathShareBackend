@@ -5,8 +5,7 @@ import org.benetech.mathshare.model.entity.SolutionStep;
 
 public abstract class ScratchpadMother {
 
-    public static Scratchpad validInstance() {
-        SolutionStep step = SolutionStepMother.validInstance();
+    public static Scratchpad validInstance(SolutionStep step) {
         return new Scratchpad(step);
     }
 }

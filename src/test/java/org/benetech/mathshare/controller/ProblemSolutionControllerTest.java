@@ -9,6 +9,7 @@ import org.benetech.mathshare.mappers.SolutionMapper;
 import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.SolutionDTO;
 import org.benetech.mathshare.model.dto.SolutionStepDTO;
+import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.mother.ProblemMother;
@@ -32,7 +33,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +56,10 @@ public class ProblemSolutionControllerTest {
     private static final String VIEW_ENDPOINT = BASE_ENDPOINT + "view/";
 
     private static final String CREATE_ENDPOINT = BASE_ENDPOINT + "new/";
+
+    private static final Long SHARE_CODE = 19L;
+
+    private static final Long EDIT_CODE = 31L;
 
     private MockMvc mockMvc;
 
@@ -98,16 +102,14 @@ public class ProblemSolutionControllerTest {
 
     @Test
     public void shouldReturnProblemSetDTOWithProblemsList() throws Exception {
-        long editCode = 34L;
-        SolutionRevision solutionRevision = SolutionRevisionMother.withShareCodeAndEditCode(editCode, editCode);
-        ProblemDTO problem = Arrays.asList(ProblemMother.validInstance()).stream()
-                .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList()).get(0);
-        List<SolutionStepDTO> solutionStepList = SolutionStepMother.createValidStepsList(3).stream()
+        SolutionRevision solutionRevision = SolutionRevisionMother.mockInstance();
+        ProblemSetRevision problemSetRevision = new ProblemSetRevision();
+        ProblemDTO problem = ProblemMapper.INSTANCE.toDto(ProblemMother.validInstance(problemSetRevision));
+        List<SolutionStepDTO> solutionStepList = SolutionStepMother.createValidStepsList(solutionRevision, 3).stream()
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
-
         when(problemSolutionService.findSolutionByUrlCode(VALID_CODE)).thenReturn(
-                new SolutionDTO(problem, solutionStepList, UrlCodeConverter.toUrlCode(editCode)));
+                new SolutionDTO(problem, solutionStepList, UrlCodeConverter.toUrlCode(EDIT_CODE)));
         String response = mockMvc.perform(getSolution(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         SolutionDTO result = new ObjectMapper().readValue(response, SolutionDTO.class);
@@ -116,31 +118,30 @@ public class ProblemSolutionControllerTest {
 
     @Test
     public void shouldReturn201IfCreated() throws Exception {
-        ProblemSolution toSave = ProblemSolutionMother.validInstance();
+        ProblemSolution toSave = ProblemSolutionMother.mockInstance();
         when(problemSolutionService.saveNewVersionOfSolution(toSave)).thenReturn(null);
-        mockMvc.perform(createProblemSet(SolutionMapper.INSTANCE.toDto(toSave)))
+        mockMvc.perform(createProblemSolution(SolutionMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated());
     }
 
     @Test
     public void shouldReturnProblemSolutionWithShareAndEditCodes() throws Exception {
-        long editCode = 49L;
-        long shareCode = 10L;
-        SolutionRevision revision = SolutionRevisionMother.withShareCode(shareCode);
+        ProblemSolution problemSolution = ProblemSolutionMother.mockInstance();
+        SolutionRevision revision = SolutionRevisionMother.withShareCode(problemSolution, SHARE_CODE);
         ProblemSolution toSave = revision.getProblemSolution();
-        toSave.setEditCode(editCode);
+        toSave.setEditCode(EDIT_CODE);
         when(problemSolutionService.saveNewVersionOfSolution(any())).thenReturn(revision);
 
-        String response = mockMvc.perform(createProblemSet(SolutionMapper.INSTANCE.toDto(toSave)))
+        String response = mockMvc.perform(createProblemSolution(SolutionMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         SolutionDTO result = new ObjectMapper().readValue(response, SolutionDTO.class);
 
-        Assert.assertEquals(UrlCodeConverter.toUrlCode(editCode), result.getEditCode());
-        Assert.assertNotNull(UrlCodeConverter.toUrlCode(shareCode), result.getShareCode());
+        Assert.assertEquals(UrlCodeConverter.toUrlCode(EDIT_CODE), result.getEditCode());
+        Assert.assertNotNull(UrlCodeConverter.toUrlCode(SHARE_CODE), result.getShareCode());
     }
 
     @Test
-    public void shouldReturn400WhenFailedToParseProblemSet() throws Exception {
+    public void shouldReturn400WhenFailedToParseProblemSolution() throws Exception {
         mockMvc.perform(post(CREATE_ENDPOINT)
                 .content("not a problem solution")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -151,8 +152,7 @@ public class ProblemSolutionControllerTest {
         return get(VIEW_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
     }
 
-
-    private static MockHttpServletRequestBuilder createProblemSet(SolutionDTO solution) throws JsonProcessingException {
+    private static MockHttpServletRequestBuilder createProblemSolution(SolutionDTO solution) throws JsonProcessingException {
         return post(CREATE_ENDPOINT)
                 .content(new ObjectMapper().writeValueAsString(solution))
                 .contentType(MediaType.APPLICATION_JSON);

@@ -28,7 +28,7 @@ public class Problem extends AbstractEntity {
 
     @NotNull
     @NonNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private ProblemSetRevision problemSetRevision;
 
     @OneToOne(cascade = CascadeType.PERSIST)
@@ -39,6 +39,10 @@ public class Problem extends AbstractEntity {
     @NotNull
     @NonNull
     private String problemText;
+
+    @NotNull
+    @NonNull
+    private String title;
 
     @CreationTimestamp
     @Getter(AccessLevel.NONE)

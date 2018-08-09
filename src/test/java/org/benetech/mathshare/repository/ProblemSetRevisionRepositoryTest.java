@@ -2,6 +2,7 @@ package org.benetech.mathshare.repository;
 
 import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
+import org.benetech.mathshare.model.mother.ProblemSetMother;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,21 +38,24 @@ public class ProblemSetRevisionRepositoryTest {
     @Test
     public void shouldSaveProblemSetRevision() {
         int dbSizeBeforeSave = problemSetRevisionRepository.findAll().size();
-        problemSetRevisionRepository.saveAndFlush(ProblemSetRevisionMother.validInstance());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        problemSetRevisionRepository.saveAndFlush(ProblemSetRevisionMother.validInstance(problemSet));
         int dbSizeAfterSave = problemSetRevisionRepository.findAll().size();
         Assert.assertEquals(dbSizeBeforeSave + 1, dbSizeAfterSave);
     }
 
     @Test
     public void shouldFindOneByShareCode() {
-        ProblemSetRevision saved = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision saved = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
         em.refresh(saved);
         Assert.assertNotNull(problemSetRevisionRepository.findOneByShareCode(saved.getShareCode()));
     }
 
     @Test
     public void shouldFindProblemSetRevisionByShareCode() {
-        ProblemSetRevision saved = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision saved = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
         em.refresh(saved);
         ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findOneByShareCode(saved.getShareCode());
         Assert.assertNotNull(problemSetRevision);
@@ -60,20 +64,20 @@ public class ProblemSetRevisionRepositoryTest {
 
     @Test
     public void shouldFindByProblemSetAndReplacedBy() {
-        ProblemSetRevision saved = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance());
-        em.refresh(saved);
-        ProblemSet problemSet = problemSetRepository.findAll().get(0);
-        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null);
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        ProblemSet problemSetFromDB = problemSetRepository.findAll().get(0);
+        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSetFromDB, null);
         Assert.assertNotNull(problemSetRevision);
-        ProblemSetRevision newRevision = problemSetRevisionRepository.save(ProblemSetRevisionMother.createNewRevisionOfValidInstance(problemSet));
+        ProblemSetRevision newRevision = problemSetRevisionRepository.save(ProblemSetRevisionMother.revisionOf(problemSetFromDB));
         Assert.assertNotNull(newRevision);
     }
 
     @Test
-    public void shouldSaveProblemSetRevisonAndAllItsProblems() {
+    public void shouldSaveProblemSetRevisionAndAllItsProblems() {
         int problemsBeforeSave = problemRepository.findAll().size();
-        ProblemSetRevision saved = problemSetRevisionRepository.save(ProblemSetRevisionMother.withProblems(3));
-        em.refresh(saved);
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        problemSetRevisionRepository.save(ProblemSetRevisionMother.withProblems(problemSet, 3));
         Assert.assertEquals(problemsBeforeSave + 3, problemRepository.findAll().size());
     }
 }

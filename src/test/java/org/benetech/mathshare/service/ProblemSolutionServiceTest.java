@@ -4,6 +4,8 @@ import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.mappers.SolutionMapper;
 import org.benetech.mathshare.model.dto.SolutionDTO;
 import org.benetech.mathshare.model.entity.Problem;
+import org.benetech.mathshare.model.entity.ProblemSetRevision;
+import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
 import org.benetech.mathshare.model.mother.ProblemMother;
@@ -67,28 +69,31 @@ public class ProblemSolutionServiceTest {
 
     @Test
     public void shouldGetProblemSolution() {
-        given(this.solutionRevisionRepository.findOneByShareCode(CODE))
-                .willReturn(SolutionRevisionMother.validInstance());
+        SolutionRevision revision = SolutionRevisionMother.mockInstance();
+        given(this.solutionRevisionRepository.findOneByShareCode(CODE)).willReturn(revision);
         SolutionRevision solutionRevisionFromDB = problemSolutionService.getSolutionRevisionByShareUrl(CODE);
-        Assert.assertEquals(SolutionRevisionMother.validInstance(), solutionRevisionFromDB);
+        Assert.assertEquals(revision, solutionRevisionFromDB);
     }
 
     @Test
     public void shouldGetNewestProblemSet() {
-        given(this.problemSolutionRepository.findOneByEditCode(CODE)).willReturn(ProblemSolutionMother.validInstance());
-        given(this.solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(ProblemSolutionMother.validInstance(), null))
-                .willReturn(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.validInstance()));
+        ProblemSolution solution = ProblemSolutionMother.mockInstance();
+        given(this.problemSolutionRepository.findOneByEditCode(CODE)).willReturn(solution);
+        given(this.solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(solution, null))
+                .willReturn(SolutionRevisionMother.revisionOf(solution));
         SolutionRevision solutionRevisionFromDB = problemSolutionService.getLatestSolutionRevision(CODE);
-        Assert.assertEquals(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.validInstance()), solutionRevisionFromDB);
+        Assert.assertEquals(SolutionRevisionMother.revisionOf(solution), solutionRevisionFromDB);
     }
 
     @Test
     public void shouldSaveNewProblemSetRevision() {
-        given(this.solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(ProblemSolutionMother.validInstance(), null))
-                .willReturn(SolutionRevisionMother.createNewRevisionOfValidInstance(ProblemSolutionMother.validInstance()));
-        given(this.solutionRevisionRepository.save(new SolutionRevision(ProblemSolutionMother.validInstance())))
-                .willReturn(new SolutionRevision(ProblemSolutionMother.validInstance()));
-        problemSolutionService.saveNewVersionOfSolution(ProblemSolutionMother.validInstance());
+        ProblemSolution solution = ProblemSolutionMother.mockInstance();
+        SolutionRevision revision = SolutionRevisionMother.revisionOf(solution);
+        given(this.solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(solution, null))
+                .willReturn(SolutionRevisionMother.revisionOf(solution));
+        given(this.solutionRevisionRepository.save(revision))
+                .willReturn(revision);
+        problemSolutionService.saveNewVersionOfSolution(solution);
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
         verify(this.solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
 
@@ -97,9 +102,10 @@ public class ProblemSolutionServiceTest {
 
     @Test
     public void shouldReturnSolutionByUrlCode() {
-        SolutionRevision solutionRevision = SolutionRevisionMother.withShareCodeAndEditCode(CODE, CODE);
-        Problem problem = ProblemMother.validInstance();
-        List<SolutionStep> solutionStepList = SolutionStepMother.createValidStepsList(3);
+        SolutionRevision solutionRevision = SolutionRevisionMother.mockInstance();
+        ProblemSetRevision revision1 = new ProblemSetRevision();
+        Problem problem = ProblemMother.validInstance(revision1);
+        List<SolutionStep> solutionStepList = SolutionStepMother.createValidStepsList(solutionRevision, 3);
 
         when(solutionRevisionRepository.findOneByShareCode(CODE)).thenReturn(solutionRevision);
         when(problemRepository.findById(solutionRevision.getProblemSolution().getId())).thenReturn(Optional.of(problem));

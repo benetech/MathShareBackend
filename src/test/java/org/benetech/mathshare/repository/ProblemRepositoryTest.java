@@ -1,8 +1,10 @@
 package org.benetech.mathshare.repository;
 
 import org.benetech.mathshare.model.entity.Problem;
+import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.mother.ProblemMother;
+import org.benetech.mathshare.model.mother.ProblemSetMother;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,19 +23,30 @@ public class ProblemRepositoryTest {
     @Autowired
     private ProblemRepository problemRepository;
 
+    @Autowired
+    private ProblemSetRepository problemSetRepository;
+
+    @Autowired
+    private ProblemSetRevisionRepository problemSetRevisionRepository;
+
     @Test
     public void shouldSaveProblem() {
-        problemRepository.save(ProblemMother.validInstance());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision revision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        problemRepository.save(ProblemMother.validInstance(revision));
         Problem problemFromDB = problemRepository.findAll().get(0);
         Assert.assertEquals(ProblemMother.DEFAULT_PROBLEM_TEXT, problemFromDB.getProblemText());
+        Assert.assertEquals(ProblemMother.DEFAULT_PROBLEM_TITLE, problemFromDB.getTitle());
     }
 
     @Test
     public void shouldFindAllByProblemSet() {
-        ProblemSetRevision commonProblemSet = ProblemSetRevisionMother.validInstance();
-        problemRepository.save(ProblemMother.validInstance(commonProblemSet));
-        problemRepository.save(ProblemMother.validInstance(commonProblemSet));
-        problemRepository.save(ProblemMother.validInstance());
-        Assert.assertEquals(2, problemRepository.findAllByProblemSetRevision(commonProblemSet).size());
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision uniqueRevision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        ProblemSetRevision commonRevision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        problemRepository.save(ProblemMother.validInstance(commonRevision));
+        problemRepository.save(ProblemMother.validInstance(commonRevision));
+        problemRepository.save(ProblemMother.validInstance(uniqueRevision));
+        Assert.assertEquals(2, problemRepository.findAllByProblemSetRevision(commonRevision).size());
     }
 }

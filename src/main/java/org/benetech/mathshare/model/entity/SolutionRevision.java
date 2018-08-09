@@ -4,7 +4,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -22,18 +24,20 @@ import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SolutionRevision extends AbstractEntity {
 
     @Column(insertable = false)
     private Long shareCode;
 
-    @OneToMany(mappedBy = "solutionRevision", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "solutionRevision", cascade = CascadeType.ALL)
     private List<SolutionStep> steps = new ArrayList<>();
 
     @NotNull
     @NonNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private ProblemSolution problemSolution;
 
     @OneToOne(cascade = CascadeType.PERSIST)

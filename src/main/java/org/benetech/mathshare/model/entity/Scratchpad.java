@@ -22,7 +22,7 @@ public class Scratchpad extends AbstractEntity {
 
     @NotNull
     @NonNull
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     private SolutionStep step;
 
     @Lob
