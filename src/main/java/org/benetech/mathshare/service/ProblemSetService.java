@@ -3,6 +3,7 @@ package org.benetech.mathshare.service;
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
 import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
+import org.springframework.data.util.Pair;
 
 public interface ProblemSetService {
 
@@ -10,7 +11,11 @@ public interface ProblemSetService {
 
     ProblemSetRevision getProblemSetByShareUrl(long shareUrl);
 
-    ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) throws IllegalArgumentException;
+    ProblemSetRevision saveNewProblemSet(ProblemSet problemSet) throws IllegalArgumentException;
 
     ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException;
+
+    Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(ProblemSet problemSet);
+
+    ProblemSetDTO getLatestProblemSetForEditing(String code);
 }

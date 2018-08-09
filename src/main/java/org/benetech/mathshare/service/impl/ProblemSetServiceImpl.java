@@ -11,6 +11,7 @@ import org.benetech.mathshare.repository.ProblemSetRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.service.ProblemSetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,15 +45,13 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
-    public ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) throws IllegalArgumentException {
+    public ProblemSetRevision saveNewProblemSet(ProblemSet problemSet) throws IllegalArgumentException {
         if (problemSet.getId() != null) {
             throw new IllegalArgumentException("Id must be null for the new problem set");
         }
+        ProblemSet savedProblemSet = problemSetRepository.save(problemSet);
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(
-                new ProblemSetRevision(problemSet));
-        ProblemSetRevision oldRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null);
-        oldRevision.setReplacedBy(newRevision);
-        problemSetRevisionRepository.save(oldRevision);
+                new ProblemSetRevision(savedProblemSet));
         return newRevision;
     }
 
@@ -61,6 +60,35 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     public ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
                 UrlCodeConverter.fromUrlCode(code));
+        if (revision == null) {
+            return null;
+        }
+        List<ProblemDTO> problems = problemRepository.findAllByProblemSetRevision(revision)
+                .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
+        return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()));
+    }
+
+    @Override
+    public Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(ProblemSet problemSet) {
+        ProblemSet saved = problemSet;
+        if (problemSet.getId() == null) {
+            saved = problemSetRepository.save(problemSet);
+        }
+        ProblemSetRevision newRevision = problemSetRevisionRepository.save(
+                new ProblemSetRevision(saved));
+        boolean newSolution = true;
+        if (problemSet.getId() != null) {
+            ProblemSetRevision oldRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(saved, null);
+            oldRevision.setReplacedBy(newRevision);
+            problemSetRevisionRepository.save(oldRevision);
+            newSolution = false;
+        }
+        return Pair.of(newSolution, newRevision);
+    }
+
+    @Override
+    public ProblemSetDTO getLatestProblemSetForEditing(String code) {
+        ProblemSetRevision revision = this.getLatestProblemSet(UrlCodeConverter.fromUrlCode(code));
         if (revision == null) {
             return null;
         }

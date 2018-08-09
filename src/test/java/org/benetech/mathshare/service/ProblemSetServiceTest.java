@@ -88,18 +88,20 @@ public class ProblemSetServiceTest {
                 .willReturn(ProblemSetRevisionMother.revisionOf(problemSet));
         given(this.problemSetRevisionRepository.save(new ProblemSetRevision(problemSet)))
                 .willReturn(new ProblemSetRevision(problemSet));
-        problemSetService.saveNewVersionOfProblemSet(problemSet);
+        given(this.problemSetRepository.save(problemSet))
+                .willReturn(ProblemSetMother.validInstance());
+        problemSetService.saveNewProblemSet(problemSet);
+        ArgumentCaptor<ProblemSet> problemSetCaptor = ArgumentCaptor.forClass(ProblemSet.class);
+        verify(this.problemSetRepository, times(1)).save(problemSetCaptor.capture());
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
-        verify(this.problemSetRevisionRepository, times(2)).save(revisionCaptor.capture());
-
-        Assert.assertNotNull(revisionCaptor.getAllValues().get(1).getReplacedBy());
+        verify(this.problemSetRevisionRepository, times(1)).save(revisionCaptor.capture());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentExceptionForNotNullId() {
         ProblemSet toSave = new ProblemSet();
         toSave.setId(1);
-        problemSetService.saveNewVersionOfProblemSet(toSave);
+        problemSetService.saveNewProblemSet(toSave);
     }
 
     @Test
@@ -129,5 +131,59 @@ public class ProblemSetServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentExceptionWhenCodeIsInvalid() {
         problemSetService.findProblemsByUrlCode(INVALID_CODE);
+    }
+
+    @Test
+    public void shouldReturnProblemsListByEditUrlCode() {
+        ProblemSetRevision problemSetRevision = ProblemSetRevisionMother.validInstance(
+                ProblemSetMother.withEditCode(UrlCodeConverter.fromUrlCode(VALID_CODE)));
+        List<Problem> problems = ProblemMother.createValidProblemsList(problemSetRevision, 3);
+
+        when(problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(VALID_CODE)))
+                .thenReturn(problemSetRevision.getProblemSet());
+        when(problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSetRevision.getProblemSet(), null))
+                .thenReturn(problemSetRevision);
+        when(problemRepository.findAllByProblemSetRevision(problemSetRevision))
+                .thenReturn(problems);
+
+        ProblemSetDTO result = problemSetService.getLatestProblemSetForEditing(VALID_CODE);
+        Assert.assertEquals(problems.stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList()),
+                result.getProblems());
+    }
+
+    @Test
+    public void shouldCreateProblemSet() {
+        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.validInstance(), null))
+                .willReturn(ProblemSetRevisionMother.revisionOf(ProblemSetMother.validInstance()));
+        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.validInstance())))
+                .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance()));
+        given(this.problemSetRepository.save(ProblemSetMother.validInstance()))
+                .willReturn(ProblemSetMother.validInstance());
+        problemSetService.createOrUpdateProblemSet(ProblemSetMother.validInstance());
+        ArgumentCaptor<ProblemSet> problemSetCaptor = ArgumentCaptor.forClass(ProblemSet.class);
+        verify(this.problemSetRepository, times(1)).save(problemSetCaptor.capture());
+        ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
+        verify(this.problemSetRevisionRepository, times(1)).save(revisionCaptor.capture());
+
+        Assert.assertNull(revisionCaptor.getAllValues().get(0).getReplacedBy());
+    }
+
+    @Test
+    public void shouldUpdateProblemSet() {
+        ProblemSet problemSet = ProblemSetMother.validInstance();
+        problemSet.setId(1);
+        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
+                .willReturn(ProblemSetRevisionMother.revisionOf(problemSet));
+        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(problemSet)))
+                .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance()));
+        ProblemSetRevision rev = ProblemSetRevisionMother.revisionOf(ProblemSetMother.validInstance());
+        rev.setReplacedBy(new ProblemSetRevision(ProblemSetMother.validInstance()));
+        given(this.problemSetRevisionRepository.save(rev))
+                .willReturn(rev);
+        problemSetService.createOrUpdateProblemSet(problemSet);
+        ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
+        verify(this.problemSetRevisionRepository, times(2)).save(revisionCaptor.capture());
+
+        Assert.assertNotNull(revisionCaptor.getAllValues().get(1).getReplacedBy());
     }
 }
