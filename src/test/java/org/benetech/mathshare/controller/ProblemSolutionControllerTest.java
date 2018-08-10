@@ -25,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -43,6 +44,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -54,6 +56,8 @@ public class ProblemSolutionControllerTest {
     private static final String BASE_ENDPOINT = "/solution/";
 
     private static final String VIEW_ENDPOINT = BASE_ENDPOINT + "view/";
+
+    private static final String EDIT_ENDPOINT = BASE_ENDPOINT + "edit/";
 
     private static final String CREATE_ENDPOINT = BASE_ENDPOINT + "new/";
 
@@ -141,6 +145,37 @@ public class ProblemSolutionControllerTest {
     }
 
     @Test
+    public void putShouldReturn201IfCreated() throws Exception {
+        ProblemSolution toSave = ProblemSolutionMother.mockInstance();
+        when(problemSolutionService.createOrUpdateProblemSolution(any())).thenReturn(Pair.of(true, SolutionRevisionMother.validInstance(toSave)));
+        mockMvc.perform(createOrUpdateProblemSolution(SolutionMapper.INSTANCE.toDto(toSave)))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+    }
+
+    @Test
+    public void putShouldReturn200IfUpdated() throws Exception {
+        ProblemSolution toSave = ProblemSolutionMother.mockInstance();
+        when(problemSolutionService.createOrUpdateProblemSolution(any())).thenReturn(Pair.of(false, SolutionRevisionMother.validInstance(toSave)));
+        mockMvc.perform(createOrUpdateProblemSolution(SolutionMapper.INSTANCE.toDto(toSave)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+    }
+
+    @Test
+    public void shouldReturnProblemSetDTOForEditing() throws Exception {
+        List<SolutionStepDTO> steps = SolutionStepMother.createValidStepsList(SolutionRevisionMother.mockInstance(), 3)
+                .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
+
+        ProblemDTO problem = ProblemMapper.INSTANCE.toDto(ProblemMother.mockInstance());
+
+        when(problemSolutionService.getLatestProblemSolutionForEditing(VALID_CODE)).thenReturn(
+                new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(EDIT_CODE)));
+        String response = mockMvc.perform(getLatestProblemSolution(true))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        SolutionDTO result = new ObjectMapper().readValue(response, SolutionDTO.class);
+        Assert.assertEquals(steps, result.getSteps());
+    }
+
+    @Test
     public void shouldReturn400WhenFailedToParseProblemSolution() throws Exception {
         mockMvc.perform(post(CREATE_ENDPOINT)
                 .content("not a problem solution")
@@ -152,8 +187,18 @@ public class ProblemSolutionControllerTest {
         return get(VIEW_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
     }
 
+    private static MockHttpServletRequestBuilder getLatestProblemSolution(boolean validCode) {
+        return get(EDIT_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
+    }
+
     private static MockHttpServletRequestBuilder createProblemSolution(SolutionDTO solution) throws JsonProcessingException {
         return post(CREATE_ENDPOINT)
+                .content(new ObjectMapper().writeValueAsString(solution))
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
+    private static MockHttpServletRequestBuilder createOrUpdateProblemSolution(SolutionDTO solution) throws JsonProcessingException {
+        return put(BASE_ENDPOINT)
                 .content(new ObjectMapper().writeValueAsString(solution))
                 .contentType(MediaType.APPLICATION_JSON);
     }

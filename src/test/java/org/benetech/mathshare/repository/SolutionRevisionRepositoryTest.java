@@ -78,7 +78,7 @@ public class SolutionRevisionRepositoryTest {
         ProblemSolution problemSolution = problemSolutionRepository.save(ProblemSolutionMother.validInstance(problem));
         SolutionRevision saved = solutionRevisionRepository.save(SolutionRevisionMother.validInstance(problemSolution));
         ProblemSolution problemSolutionFromDB = problemSolutionRepository.findAll().get(0);
-        SolutionRevision solutionRevision = solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(problemSolutionFromDB, null);
+        SolutionRevision solutionRevision = solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(problemSolutionFromDB, null);
         Assert.assertEquals(saved.getShareCode(), solutionRevision.getShareCode());
         SolutionRevision newRevision = solutionRevisionRepository.save(SolutionRevisionMother.revisionOf(problemSolutionFromDB));
         Assert.assertEquals(saved.getShareCode(), newRevision.getShareCode());

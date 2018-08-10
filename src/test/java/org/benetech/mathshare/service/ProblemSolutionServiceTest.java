@@ -79,7 +79,7 @@ public class ProblemSolutionServiceTest {
     public void shouldGetNewestProblemSet() {
         ProblemSolution solution = ProblemSolutionMother.mockInstance();
         given(problemSolutionRepository.findOneByEditCode(CODE)).willReturn(solution);
-        given(solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(solution, null))
+        given(solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(solution, null))
                 .willReturn(SolutionRevisionMother.revisionOf(solution));
         SolutionRevision solutionRevisionFromDB = problemSolutionService.getLatestSolutionRevision(CODE);
         Assert.assertEquals(SolutionRevisionMother.revisionOf(solution), solutionRevisionFromDB);
@@ -89,7 +89,7 @@ public class ProblemSolutionServiceTest {
     public void shouldSaveNewProblemSetRevision() {
         ProblemSolution solution = ProblemSolutionMother.mockInstance();
         SolutionRevision revision = SolutionRevisionMother.revisionOf(solution);
-        given(solutionRevisionRepository.findAllByProblemSolutionAndReplacedBy(solution, null))
+        given(solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(solution, null))
                 .willReturn(SolutionRevisionMother.revisionOf(solution));
         given(solutionRevisionRepository.save(revision))
                 .willReturn(revision);
@@ -126,5 +126,58 @@ public class ProblemSolutionServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentExceptionWhenCodeIsInvalid() {
         problemSolutionService.findSolutionByUrlCode(INVALID_CODE);
+    }
+
+    @Test
+    public void shouldReturnStepListByEditUrlCode() {
+        SolutionRevision revision = SolutionRevisionMother.mockInstance();
+        List<SolutionStep> steps = SolutionStepMother.createValidStepsList(revision, 3);
+
+        when(problemSolutionRepository.findOneByEditCode(CODE))
+                .thenReturn(revision.getProblemSolution());
+        when(solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(revision.getProblemSolution(), null))
+                .thenReturn(revision);
+        when(solutionStepRepository.findAllBySolutionRevision(revision))
+                .thenReturn(steps);
+
+        SolutionDTO result = problemSolutionService.getLatestProblemSolutionForEditing(UrlCodeConverter.toUrlCode(CODE));
+        Assert.assertEquals(steps.stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList()),
+                result.getSteps());
+    }
+
+    @Test
+    public void shouldCreateProblemSolution() {
+        given(this.solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(ProblemSolutionMother.mockInstance(), null))
+                .willReturn(SolutionRevisionMother.mockInstance());
+        given(this.problemSolutionRepository.save(ProblemSolutionMother.mockInstance()))
+                .willReturn(ProblemSolutionMother.mockInstance());
+        given(this.solutionRevisionRepository.save(SolutionRevisionMother.mockInstance()))
+                .willReturn(SolutionRevisionMother.mockInstance());
+        problemSolutionService.createOrUpdateProblemSolution(ProblemSolutionMother.mockInstance());
+        ArgumentCaptor<ProblemSolution> problemSolutionCaptor = ArgumentCaptor.forClass(ProblemSolution.class);
+        verify(this.problemSolutionRepository, times(1)).save(problemSolutionCaptor.capture());
+        ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
+        verify(this.solutionRevisionRepository, times(1)).save(revisionCaptor.capture());
+
+        Assert.assertNull(revisionCaptor.getAllValues().get(0).getReplacedBy());
+    }
+
+    @Test
+    public void shouldUpdateProblemSolution() {
+        ProblemSolution problemSolution = ProblemSolutionMother.mockInstance();
+        problemSolution.setId(1);
+        given(this.solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(problemSolution, null))
+                .willReturn(SolutionRevisionMother.mockInstance());
+        given(this.solutionRevisionRepository.save(new SolutionRevision(problemSolution)))
+                .willReturn(SolutionRevisionMother.mockInstance());
+        SolutionRevision rev = SolutionRevisionMother.mockInstance();
+        rev.setReplacedBy(new SolutionRevision(ProblemSolutionMother.mockInstance()));
+        given(this.solutionRevisionRepository.save(rev))
+                .willReturn(rev);
+        problemSolutionService.createOrUpdateProblemSolution(problemSolution);
+        ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
+        verify(this.solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
+
+        Assert.assertNotNull(revisionCaptor.getAllValues().get(1).getReplacedBy());
     }
 }
