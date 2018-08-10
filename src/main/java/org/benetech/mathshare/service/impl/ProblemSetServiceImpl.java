@@ -57,6 +57,12 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
+    public String getDefaultProblemSetRevisionCode() {
+        ProblemSetRevision revision = problemSetRevisionRepository.findFirstByOrderByDateCreatedAsc();
+        return revision == null ? null : UrlCodeConverter.toUrlCode(revision.getShareCode());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(

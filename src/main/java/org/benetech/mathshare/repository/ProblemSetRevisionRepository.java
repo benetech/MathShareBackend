@@ -11,4 +11,6 @@ public interface ProblemSetRevisionRepository extends JpaRepository<ProblemSetRe
     ProblemSetRevision findOneByProblemSetAndReplacedBy(ProblemSet problemSet, ProblemSetRevision replacedBy);
 
     ProblemSetRevision findOneByShareCode(long code);
+
+    ProblemSetRevision findFirstByOrderByDateCreatedAsc();
 }

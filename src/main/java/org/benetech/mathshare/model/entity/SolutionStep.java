@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
@@ -23,6 +24,7 @@ import java.sql.Timestamp;
 public class SolutionStep extends AbstractEntity {
 
     @Lob
+    @Type(type = "text")
     private String explanation;
 
     @OneToOne(mappedBy = "step", cascade = CascadeType.ALL)
@@ -31,6 +33,7 @@ public class SolutionStep extends AbstractEntity {
     @Lob
     @NotNull
     @NonNull
+    @Type(type = "text")
     private String stepValue;
 
     @NotNull

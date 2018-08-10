@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 
@@ -32,7 +33,7 @@ public abstract class UrlCodeConverter {
         validateCode(code);
         try {
             return convertByteArrayToLong(new Base32().decode(code));
-        } catch (BufferOverflowException e) {
+        } catch (BufferOverflowException | BufferUnderflowException e) {
             getLogger().error(e.getMessage(), e);
         }
         throw new IllegalArgumentException("Code is probably too long");

@@ -18,3 +18,5 @@ logging:
 
   path: logs
 
+cross-origin:
+  allowed-origins: ${CROSS_ORIGIN_ALLOWED_ORIGINS:http://localhost:3000}

@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -38,6 +39,7 @@ public class Problem extends AbstractEntity {
     @Lob
     @NotNull
     @NonNull
+    @Type(type = "text")
     private String problemText;
 
     @NotNull

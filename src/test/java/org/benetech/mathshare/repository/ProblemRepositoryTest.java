@@ -33,8 +33,8 @@ public class ProblemRepositoryTest {
     public void shouldSaveProblem() {
         ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
         ProblemSetRevision revision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
-        problemRepository.save(ProblemMother.validInstance(revision));
-        Problem problemFromDB = problemRepository.findAll().get(0);
+        Problem saved = problemRepository.save(ProblemMother.validInstance(revision));
+        Problem problemFromDB = problemRepository.findById(saved.getId()).get();
         Assert.assertEquals(ProblemMother.DEFAULT_PROBLEM_TEXT, problemFromDB.getProblemText());
         Assert.assertEquals(ProblemMother.DEFAULT_PROBLEM_TITLE, problemFromDB.getTitle());
     }

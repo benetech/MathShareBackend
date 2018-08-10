@@ -13,4 +13,6 @@ public interface ProblemSetService {
     ProblemSetRevision saveNewVersionOfProblemSet(ProblemSet problemSet) throws IllegalArgumentException;
 
     ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException;
+
+    String getDefaultProblemSetRevisionCode();
 }
