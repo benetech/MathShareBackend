@@ -64,7 +64,7 @@ public class ProblemSetServiceTest {
     public void shouldGetProblemSet() {
         ProblemSet problemSet = ProblemSetMother.mockInstance();
         ProblemSetRevision revision = ProblemSetRevisionMother.validInstance(problemSet);
-        given(this.problemSetRevisionRepository.findOneByShareCode(CODE))
+        given(problemSetRevisionRepository.findOneByShareCode(CODE))
                 .willReturn(revision);
         ProblemSetRevision problemSetRevisionFromDB = problemSetService.getProblemSetByShareUrl(CODE);
         Assert.assertEquals(revision, problemSetRevisionFromDB);
@@ -74,8 +74,8 @@ public class ProblemSetServiceTest {
     public void shouldGetNewestProblemSet() {
         ProblemSet problemSet = ProblemSetMother.mockInstance();
         ProblemSetRevision revision = ProblemSetRevisionMother.revisionOf(problemSet);
-        given(this.problemSetRepository.findOneByEditCode(CODE)).willReturn(problemSet);
-        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
+        given(problemSetRepository.findOneByEditCode(CODE)).willReturn(problemSet);
+        given(problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
                 .willReturn(revision);
         ProblemSetRevision problemSetRevisionFromDB = problemSetService.getLatestProblemSet(CODE);
         Assert.assertEquals(revision, problemSetRevisionFromDB);
@@ -84,15 +84,15 @@ public class ProblemSetServiceTest {
     @Test
     public void shouldSaveNewProblemSetRevision() {
         ProblemSet problemSet = ProblemSetMother.mockInstance();
-        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
+        given(problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
                 .willReturn(ProblemSetRevisionMother.revisionOf(problemSet));
-        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(problemSet)))
+        given(problemSetRevisionRepository.save(new ProblemSetRevision(problemSet)))
                 .willReturn(new ProblemSetRevision(problemSet));
-        given(this.problemSetRepository.save(problemSet))
+        given(problemSetRepository.save(problemSet))
                 .willReturn(ProblemSetMother.validInstance());
         problemSetService.saveNewProblemSet(problemSet);
         ArgumentCaptor<ProblemSet> problemSetCaptor = ArgumentCaptor.forClass(ProblemSet.class);
-        verify(this.problemSetRepository, times(1)).save(problemSetCaptor.capture());
+        verify(problemSetRepository, times(1)).save(problemSetCaptor.capture());
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
         verify(this.problemSetRevisionRepository, times(1)).save(revisionCaptor.capture());
     }

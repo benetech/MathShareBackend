@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ProblemSetRevision extends AbstractEntity {
 
@@ -44,10 +46,6 @@ public class ProblemSetRevision extends AbstractEntity {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
-
-    public ProblemSetRevision() {
-
-    }
 
     public ProblemSetRevision(@NotNull ProblemSet problemSet) {
         this.problemSet = problemSet;

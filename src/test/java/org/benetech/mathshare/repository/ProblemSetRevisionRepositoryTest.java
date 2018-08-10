@@ -74,6 +74,18 @@ public class ProblemSetRevisionRepositoryTest {
     }
 
     @Test
+    public void shouldFindOldestOne() {
+        problemSetRevisionRepository.deleteAll();
+        ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
+        ProblemSetRevision first = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+        problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
+
+        ProblemSetRevision result = problemSetRevisionRepository.findFirstByOrderByDateCreatedAsc();
+        Assert.assertNotNull(result);
+        Assert.assertEquals(first.getId(), result.getId());
+    }
+
+    @Test
     public void shouldSaveProblemSetRevisionAndAllItsProblems() {
         int problemsBeforeSave = problemRepository.findAll().size();
         ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());

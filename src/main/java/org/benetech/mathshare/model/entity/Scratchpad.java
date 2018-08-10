@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
@@ -26,6 +27,7 @@ public class Scratchpad extends AbstractEntity {
     private SolutionStep step;
 
     @Lob
+    @Type(type = "text")
     private String content;
 
     @UpdateTimestamp

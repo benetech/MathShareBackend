@@ -18,4 +18,6 @@ public interface ProblemSetService {
     Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(ProblemSet problemSet);
 
     ProblemSetDTO getLatestProblemSetForEditing(String code);
+
+    String getDefaultProblemSetRevisionCode();
 }

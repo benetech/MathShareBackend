@@ -70,7 +70,7 @@ public class ProblemSolutionServiceTest {
     @Test
     public void shouldGetProblemSolution() {
         SolutionRevision revision = SolutionRevisionMother.mockInstance();
-        given(this.solutionRevisionRepository.findOneByShareCode(CODE)).willReturn(revision);
+        given(solutionRevisionRepository.findOneByShareCode(CODE)).willReturn(revision);
         SolutionRevision solutionRevisionFromDB = problemSolutionService.getSolutionRevisionByShareUrl(CODE);
         Assert.assertEquals(revision, solutionRevisionFromDB);
     }
@@ -78,8 +78,8 @@ public class ProblemSolutionServiceTest {
     @Test
     public void shouldGetNewestProblemSet() {
         ProblemSolution solution = ProblemSolutionMother.mockInstance();
-        given(this.problemSolutionRepository.findOneByEditCode(CODE)).willReturn(solution);
-        given(this.solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(solution, null))
+        given(problemSolutionRepository.findOneByEditCode(CODE)).willReturn(solution);
+        given(solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(solution, null))
                 .willReturn(SolutionRevisionMother.revisionOf(solution));
         SolutionRevision solutionRevisionFromDB = problemSolutionService.getLatestSolutionRevision(CODE);
         Assert.assertEquals(SolutionRevisionMother.revisionOf(solution), solutionRevisionFromDB);
@@ -89,13 +89,13 @@ public class ProblemSolutionServiceTest {
     public void shouldSaveNewProblemSetRevision() {
         ProblemSolution solution = ProblemSolutionMother.mockInstance();
         SolutionRevision revision = SolutionRevisionMother.revisionOf(solution);
-        given(this.solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(solution, null))
+        given(solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(solution, null))
                 .willReturn(SolutionRevisionMother.revisionOf(solution));
-        given(this.solutionRevisionRepository.save(revision))
+        given(solutionRevisionRepository.save(revision))
                 .willReturn(revision);
         problemSolutionService.saveNewVersionOfSolution(solution);
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
-        verify(this.solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
+        verify(solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
 
         Assert.assertNotNull(revisionCaptor.getAllValues().get(1).getReplacedBy());
     }

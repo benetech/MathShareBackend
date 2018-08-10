@@ -46,6 +46,21 @@ public class ProblemSetController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @GetMapping("/default")
+    ResponseEntity<String> getDefaultProblemSetCode() {
+        try {
+            String result = problemSetService.getDefaultProblemSetRevisionCode();
+            if (result != null) {
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                logger.error("Default problem set wasn't found");
+            }
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     @PostMapping(path = "/new")
     ResponseEntity<ProblemSetDTO> createProblemSet(@RequestBody ProblemSetDTO problemSet) {
         try {

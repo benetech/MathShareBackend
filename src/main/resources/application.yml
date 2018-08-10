@@ -17,3 +17,6 @@ logging:
     org.hibernate: ${LOGGING_LEVEL_ORG_HIBERNATE:ERROR}
 
   path: ${LOGGING_PATH:logs}
+
+cross-origin:
+  allowed-origins: ${CROSS_ORIGIN_ALLOWED_ORIGINS:http://localhost:3000}
