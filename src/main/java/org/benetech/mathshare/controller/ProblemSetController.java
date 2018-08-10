@@ -58,7 +58,7 @@ public class ProblemSetController {
         }
     }
 
-    @PutMapping(path = "/createOrUpdate")
+    @PutMapping(path = "/")
     ResponseEntity<ProblemSetDTO> createOrUpdateProblemSet(@RequestBody ProblemSetDTO problemSet) {
         try {
             Pair<Boolean, ProblemSetRevision> saved = problemSetService.createOrUpdateProblemSet(

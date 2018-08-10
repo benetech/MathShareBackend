@@ -61,8 +61,6 @@ public class ProblemSolutionControllerTest {
 
     private static final String CREATE_ENDPOINT = BASE_ENDPOINT + "new/";
 
-    private static final String CREATE_UPDATE_ENDPOINT = BASE_ENDPOINT + "createOrUpdate/";
-
     private static final Long SHARE_CODE = 19L;
 
     private static final Long EDIT_CODE = 31L;
@@ -200,7 +198,7 @@ public class ProblemSolutionControllerTest {
     }
 
     private static MockHttpServletRequestBuilder createOrUpdateProblemSolution(SolutionDTO solution) throws JsonProcessingException {
-        return put(CREATE_UPDATE_ENDPOINT)
+        return put(BASE_ENDPOINT)
                 .content(new ObjectMapper().writeValueAsString(solution))
                 .contentType(MediaType.APPLICATION_JSON);
     }

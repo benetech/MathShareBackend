@@ -58,7 +58,7 @@ public class ProblemSolutionController {
         }
     }
 
-    @PutMapping(path = "/createOrUpdate")
+    @PutMapping(path = "/")
     ResponseEntity<SolutionDTO> createOrUpdateSolution(@RequestBody SolutionDTO solution) {
         try {
             Pair<Boolean, SolutionRevision> saved = problemSolutionService.createOrUpdateProblemSolution(
