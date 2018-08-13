@@ -9,10 +9,12 @@ import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
 import org.benetech.mathshare.model.mother.ProblemMother;
+import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.benetech.mathshare.model.mother.ProblemSolutionMother;
 import org.benetech.mathshare.model.mother.SolutionRevisionMother;
 import org.benetech.mathshare.model.mother.SolutionStepMother;
 import org.benetech.mathshare.repository.ProblemRepository;
+import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.repository.ProblemSolutionRepository;
 import org.benetech.mathshare.repository.SolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionStepRepository;
@@ -23,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -30,6 +33,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,6 +47,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL, replace = AutoConfigureTestDatabase.Replace.NONE)
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class ProblemSolutionServiceTest {
 
     private static final Long CODE = 1L;
@@ -59,8 +64,14 @@ public class ProblemSolutionServiceTest {
     @MockBean
     private SolutionStepRepository solutionStepRepository;
 
+    @MockBean
+    private ProblemSetRevisionRepository problemSetRevisionRepository;
+
     @InjectMocks
     private ProblemSolutionServiceImpl problemSolutionService;
+
+    @Mock
+    private EntityManager em;
 
     @Before
     public void setUp() {
@@ -93,7 +104,16 @@ public class ProblemSolutionServiceTest {
                 .willReturn(SolutionRevisionMother.revisionOf(solution));
         given(solutionRevisionRepository.save(revision))
                 .willReturn(revision);
-        problemSolutionService.saveNewVersionOfSolution(solution);
+        Problem problem = revision.getProblemSolution().getProblem();
+        given(problemSolutionRepository.save(new ProblemSolution(problem))).willReturn(revision.getProblemSolution());
+        given(problemSetRevisionRepository.findOneByShareCode(
+                UrlCodeConverter.fromUrlCode(ProblemSetRevisionMother.VALID_CODE)))
+                .willReturn(problem.getProblemSetRevision());
+        given(problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(
+                ProblemMother.DEFAULT_PROBLEM_TITLE, ProblemMother.DEFAULT_PROBLEM_TEXT, problem.getProblemSetRevision()))
+                .willReturn(problem);
+
+        problemSolutionService.saveNewVersionOfSolution(SolutionMapper.INSTANCE.toDto(solution));
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
         verify(solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
 

@@ -6,9 +6,12 @@ import org.benetech.mathshare.mappers.SolutionMapper;
 import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.SolutionDTO;
 import org.benetech.mathshare.model.dto.SolutionStepDTO;
+import org.benetech.mathshare.model.entity.Problem;
+import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.repository.ProblemRepository;
+import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.repository.ProblemSolutionRepository;
 import org.benetech.mathshare.repository.SolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionStepRepository;
@@ -18,6 +21,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +42,12 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     @Autowired
     private SolutionStepRepository solutionStepRepository;
 
+    @Autowired
+    private ProblemSetRevisionRepository problemSetRevisionRepository;
+
+    @PersistenceContext
+    private EntityManager em;
+
     @Override
     @Transactional(readOnly = true)
     public SolutionRevision getLatestSolutionRevision(long editUrl) {
@@ -51,14 +62,13 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution) {
-        SolutionRevision newRevision = solutionRevisionRepository.save(
-                new SolutionRevision(problemSolution));
-        SolutionRevision oldRevision = solutionRevisionRepository
-                .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
-        oldRevision.setReplacedBy(newRevision);
-        solutionRevisionRepository.save(oldRevision);
-        return newRevision;
+    public SolutionRevision saveNewVersionOfSolution(SolutionDTO solution) {
+        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findOneByShareCode(
+                UrlCodeConverter.fromUrlCode(solution.getProblem().getProblemSetRevisionShareCode()));
+        Problem problem = problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(
+                solution.getProblem().getTitle(), solution.getProblem().getText(), problemSetRevision);
+        ProblemSolution problemSolution = problemSolutionRepository.save(new ProblemSolution(problem));
+        return saveNewVersionOfSolution(problemSolution);
     }
 
     @Override
@@ -107,5 +117,16 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new SolutionDTO(ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()),
                 steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()));
+    }
+
+    private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution) {
+        SolutionRevision newRevision = solutionRevisionRepository.save(
+                new SolutionRevision(problemSolution));
+        SolutionRevision oldRevision = solutionRevisionRepository
+                .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
+        em.refresh(newRevision);
+        oldRevision.setReplacedBy(newRevision);
+        solutionRevisionRepository.save(oldRevision);
+        return newRevision;
     }
 }

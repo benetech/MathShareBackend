@@ -12,4 +12,6 @@ public interface ProblemRepository extends JpaRepository<Problem, Integer> {
 
     List<Problem> findAllByProblemSetRevision(ProblemSetRevision problemSetRevision);
 
+    Problem findOneByTitleAndProblemTextAndProblemSetRevision(String title, String problemText,
+                                                              ProblemSetRevision problemSetRevision);
 }

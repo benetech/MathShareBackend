@@ -11,7 +11,7 @@ public interface ProblemSolutionService {
 
     SolutionRevision getSolutionRevisionByShareUrl(long shareUrl);
 
-    SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution);
+    SolutionRevision saveNewVersionOfSolution(SolutionDTO solution);
 
     SolutionDTO findSolutionByUrlCode(String code) throws IllegalArgumentException;
 
