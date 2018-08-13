@@ -33,6 +33,8 @@ public interface SolutionMapper {
 
     SolutionStepDTO toDto(SolutionStep solutionStep);
 
+    SolutionStep fromDto(SolutionStepDTO solutionStep);
+
     @Mappings({
             @Mapping(source = "problemSolution.problem", target = "problem", qualifiedByName = "problem"),
             @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "shareCode"),

@@ -52,7 +52,7 @@ public class SolutionStepRepositoryTest {
         ProblemSolution problemSolution = problemSolutionRepository.save(ProblemSolutionMother.validInstance(problem));
         SolutionRevision solutionRevision = solutionRevisionRepository.save(SolutionRevisionMother.validInstance(problemSolution));
         solutionStepRepository.save(SolutionStepMother.validInstance(solutionRevision));
-        SolutionStep solutionStepFromDB = solutionStepRepository.findAll().get(0);
+        SolutionStep solutionStepFromDB = solutionStepRepository.findAllBySolutionRevision(solutionRevision).get(0);
         Assert.assertEquals(SolutionStepMother.DEFAULT_STEP_VALUE, solutionStepFromDB.getStepValue());
         Assert.assertEquals(SolutionStepMother.DEFAULT_DELETED_VALUE, solutionStepFromDB.getDeleted());
     }

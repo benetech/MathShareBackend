@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,7 +18,7 @@ public class SolutionDTO {
 
     private String shareCode;
 
-    private List<SolutionStepDTO> steps;
+    private List<SolutionStepDTO> steps = new ArrayList<>();
 
     public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode) {
         this.problem = problem;
