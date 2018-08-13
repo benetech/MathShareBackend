@@ -76,11 +76,14 @@ public class SolutionRevisionRepositoryTest {
         ProblemSetRevision revision = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
         Problem problem = problemRepository.save(ProblemMother.validInstance(revision));
         ProblemSolution problemSolution = problemSolutionRepository.save(ProblemSolutionMother.validInstance(problem));
+        em.refresh(problemSolution);
         SolutionRevision saved = solutionRevisionRepository.save(SolutionRevisionMother.validInstance(problemSolution));
-        ProblemSolution problemSolutionFromDB = problemSolutionRepository.findAll().get(0);
+        ProblemSolution problemSolutionFromDB = problemSolutionRepository.findOneByEditCode(problemSolution.getEditCode());
         SolutionRevision solutionRevision = solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(problemSolutionFromDB, null);
+        em.refresh(solutionRevision);
         Assert.assertEquals(saved.getShareCode(), solutionRevision.getShareCode());
         SolutionRevision newRevision = solutionRevisionRepository.save(SolutionRevisionMother.revisionOf(problemSolutionFromDB));
-        Assert.assertEquals(saved.getShareCode(), newRevision.getShareCode());
+        em.refresh(newRevision);
+        Assert.assertNotEquals(saved.getShareCode(), newRevision.getShareCode());
     }
 }

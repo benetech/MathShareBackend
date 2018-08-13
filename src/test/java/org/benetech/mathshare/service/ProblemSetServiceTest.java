@@ -108,6 +108,7 @@ public class ProblemSetServiceTest {
     public void shouldReturnProblemsListByUrlCode() {
         ProblemSet problemSet = ProblemSetMother.mockInstance();
         ProblemSetRevision revision = ProblemSetRevisionMother.revisionOf(problemSet);
+        revision.setShareCode(UrlCodeConverter.fromUrlCode(ProblemSetRevisionMother.REVISION_CODE));
         List<Problem> problems = ProblemMother.createValidProblemsList(revision, 3);
 
         when(problemSetRevisionRepository.findOneByShareCode(UrlCodeConverter.fromUrlCode(VALID_CODE)))

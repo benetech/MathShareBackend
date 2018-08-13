@@ -49,8 +49,7 @@ public class ProblemSolutionController {
     @PostMapping(path = "/new")
     ResponseEntity<SolutionDTO> createProblemSolution(@RequestBody SolutionDTO solution) {
         try {
-            SolutionRevision saved = problemSolutionService.saveNewVersionOfSolution(
-                    SolutionMapper.INSTANCE.fromDto(solution));
+            SolutionRevision saved = problemSolutionService.saveNewVersionOfSolution(solution);
             return new ResponseEntity<>(SolutionMapper.INSTANCE.toSolutionDTO(saved), HttpStatus.CREATED);
         } catch (HttpMessageNotReadableException e) {
             logger.error(e.getMessage(), e);

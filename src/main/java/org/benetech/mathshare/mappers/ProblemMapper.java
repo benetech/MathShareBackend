@@ -17,7 +17,10 @@ public interface ProblemMapper {
 
     ProblemMapper INSTANCE = Mappers.getMapper(ProblemMapper.class);
 
-    @Mapping(source = "problemText", target = "text")
+    @Mappings({
+            @Mapping(source = "problemText", target = "text"),
+            @Mapping(source = "problemSetRevision.shareCode", target = "problemSetRevisionShareCode",
+                    qualifiedByName = "toCode")})
     ProblemDTO toDto(Problem problem);
 
     ProblemSet fromDto(ProblemSetDTO problemSet);

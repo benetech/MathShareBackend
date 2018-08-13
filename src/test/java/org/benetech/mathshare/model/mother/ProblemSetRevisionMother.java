@@ -1,5 +1,6 @@
 package org.benetech.mathshare.model.mother;
 
+import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
@@ -9,6 +10,8 @@ import java.util.List;
 public abstract class ProblemSetRevisionMother {
 
     public static final String VALID_CODE = "777777V4A43EE";
+
+    public static final String REVISION_CODE = "AAAAAABAKTWFG";
 
     public static final String INVALID_CODE = "1777777V4A43EE";
 
@@ -34,6 +37,8 @@ public abstract class ProblemSetRevisionMother {
     }
 
     public static ProblemSetRevision mockInstance() {
-        return validInstance(ProblemSetMother.mockInstance());
+        ProblemSetRevision result = validInstance(ProblemSetMother.mockInstance());
+        result.setShareCode(UrlCodeConverter.fromUrlCode(VALID_CODE));
+        return result;
     }
 }

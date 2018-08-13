@@ -32,6 +32,12 @@ public class ProblemSetRevisionRepositoryTest {
     @Autowired
     private ProblemRepository problemRepository;
 
+    @Autowired
+    private ProblemSolutionRepository problemSolutionRepository;
+
+    @Autowired
+    private SolutionRevisionRepository solutionRevisionRepository;
+
     @PersistenceContext
     private EntityManager em;
 
@@ -75,11 +81,12 @@ public class ProblemSetRevisionRepositoryTest {
 
     @Test
     public void shouldFindOldestOne() {
+        solutionRevisionRepository.deleteAll();
+        problemSolutionRepository.deleteAll();
         problemSetRevisionRepository.deleteAll();
         ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
         ProblemSetRevision first = problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
         problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
-
         ProblemSetRevision result = problemSetRevisionRepository.findFirstByOrderByDateCreatedAsc();
         Assert.assertNotNull(result);
         Assert.assertEquals(first.getId(), result.getId());

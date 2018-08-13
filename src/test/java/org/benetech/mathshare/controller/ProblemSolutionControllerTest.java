@@ -123,7 +123,7 @@ public class ProblemSolutionControllerTest {
     @Test
     public void shouldReturn201IfCreated() throws Exception {
         ProblemSolution toSave = ProblemSolutionMother.mockInstance();
-        when(problemSolutionService.saveNewVersionOfSolution(toSave)).thenReturn(null);
+        when(problemSolutionService.saveNewVersionOfSolution(SolutionMapper.INSTANCE.toDto(toSave))).thenReturn(null);
         mockMvc.perform(createProblemSolution(SolutionMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated());
     }

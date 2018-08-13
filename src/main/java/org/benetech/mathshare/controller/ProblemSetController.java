@@ -32,7 +32,7 @@ public class ProblemSetController {
     private ProblemSetService problemSetService;
 
     @GetMapping("/view/{code}")
-    ResponseEntity<ProblemSetDTO> getProblemSet(@PathVariable String code) {
+    ResponseEntity<ProblemSetDTO> getProblemSetRevision(@PathVariable String code) {
         try {
             ProblemSetDTO body = problemSetService.findProblemsByUrlCode(code);
             if (body != null) {
@@ -47,7 +47,7 @@ public class ProblemSetController {
     }
 
     @GetMapping("/default")
-    ResponseEntity<String> getDefaultProblemSetCode() {
+    ResponseEntity<String> getDefaultProblemSetRevisionCode() {
         try {
             String result = problemSetService.getDefaultProblemSetRevisionCode();
             if (result != null) {
