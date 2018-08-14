@@ -28,7 +28,8 @@ public interface SolutionMapper {
     @Mappings({
         @Mapping(source = "problem.text", target = "problem.problemText"),
         @Mapping(source = "problem.problemSetRevisionShareCode", target = "problem.problemSetRevision.shareCode",
-                qualifiedByName = "fromCode")})
+                qualifiedByName = "fromCode"),
+        @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")})
     ProblemSolution fromDto(SolutionDTO solution);
 
     SolutionStepDTO toDto(SolutionStep solutionStep);
@@ -37,7 +38,7 @@ public interface SolutionMapper {
 
     @Mappings({
             @Mapping(source = "problemSolution.problem", target = "problem", qualifiedByName = "problem"),
-            @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "shareCode"),
+            @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "toCode"),
             @Mapping(source = "problemSolution.editCode", target = "editCode", qualifiedByName = "toCode")})
     SolutionDTO toSolutionDTO(SolutionRevision revision);
 

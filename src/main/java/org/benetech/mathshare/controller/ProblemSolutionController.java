@@ -61,7 +61,7 @@ public class ProblemSolutionController {
     ResponseEntity<SolutionDTO> createOrUpdateSolution(@RequestBody SolutionDTO solution) {
         try {
             Pair<Boolean, SolutionRevision> saved = problemSolutionService.createOrUpdateProblemSolution(
-                    SolutionMapper.INSTANCE.fromDto(solution));
+                    solution);
             HttpStatus status = saved.getFirst() ? HttpStatus.CREATED : HttpStatus.OK;
             return new ResponseEntity<>(SolutionMapper.INSTANCE.toSolutionDTO(saved.getSecond()), status);
         } catch (HttpMessageNotReadableException e) {

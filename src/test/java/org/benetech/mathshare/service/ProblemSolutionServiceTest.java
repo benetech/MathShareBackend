@@ -173,7 +173,7 @@ public class ProblemSolutionServiceTest {
                 .willReturn(ProblemSolutionMother.mockInstance());
         given(this.solutionRevisionRepository.save(SolutionRevisionMother.mockInstance()))
                 .willReturn(SolutionRevisionMother.mockInstance());
-        problemSolutionService.createOrUpdateProblemSolution(ProblemSolutionMother.mockInstance());
+        problemSolutionService.createOrUpdateProblemSolution(SolutionMapper.INSTANCE.toDto(ProblemSolutionMother.mockInstance()));
         ArgumentCaptor<ProblemSolution> problemSolutionCaptor = ArgumentCaptor.forClass(ProblemSolution.class);
         verify(this.problemSolutionRepository, times(1)).save(problemSolutionCaptor.capture());
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
@@ -194,7 +194,7 @@ public class ProblemSolutionServiceTest {
         rev.setReplacedBy(new SolutionRevision(ProblemSolutionMother.mockInstance()));
         given(this.solutionRevisionRepository.save(rev))
                 .willReturn(rev);
-        problemSolutionService.createOrUpdateProblemSolution(problemSolution);
+        problemSolutionService.createOrUpdateProblemSolution(SolutionMapper.INSTANCE.toDto(problemSolution));
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
         verify(this.solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
 
