@@ -48,4 +48,9 @@ public class SolutionRevision extends AbstractEntity {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
+
+    public SolutionRevision(@NotNull ProblemSolution problemSolution, List<SolutionStep> steps) {
+        this.problemSolution = problemSolution;
+        this.steps = steps;
+    }
 }

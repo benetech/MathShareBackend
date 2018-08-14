@@ -13,5 +13,5 @@ public class SolutionStepDTO {
 
     private String stepValue;
 
-    private Boolean deleted;
+    private boolean deleted;
 }

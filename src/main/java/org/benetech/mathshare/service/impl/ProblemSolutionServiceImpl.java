@@ -10,6 +10,7 @@ import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.SolutionRevision;
+import org.benetech.mathshare.model.entity.SolutionStep;
 import org.benetech.mathshare.repository.ProblemRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.repository.ProblemSolutionRepository;
@@ -68,7 +69,12 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         Problem problem = problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(
                 solution.getProblem().getTitle(), solution.getProblem().getText(), problemSetRevision);
         ProblemSolution problemSolution = problemSolutionRepository.save(new ProblemSolution(problem));
-        return saveNewVersionOfSolution(problemSolution);
+        em.refresh(problemSolution);
+
+        List<SolutionStep> steps = solution.getSteps()
+                .stream().map(SolutionMapper.INSTANCE::fromDto)
+                .collect(Collectors.toList());
+        return saveNewVersionOfSolution(problemSolution, steps);
     }
 
     @Override
@@ -80,7 +86,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         }
 
         ProblemDTO problem = ProblemMapper.INSTANCE.toDto(
-                problemRepository.findById(revision.getProblemSolution().getId()).get());
+                problemRepository.findById(revision.getProblemSolution().getProblem().getId()).get());
 
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision)
                 .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
@@ -119,9 +125,11 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()));
     }
 
-    private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution) {
+    private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps) {
         SolutionRevision newRevision = solutionRevisionRepository.save(
                 new SolutionRevision(problemSolution));
+        steps.forEach(s -> s.setSolutionRevision(newRevision));
+        solutionStepRepository.saveAll(steps);
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
         em.refresh(newRevision);
