@@ -18,7 +18,7 @@ This is a repository for MathShare backend server. MathShare is a step by step e
 
 ## Building the app
 
-First, we need to run s PostgreSQL database, the most convenient way to run it is to use Docker.
+First, we need to run a PostgreSQL database, the most convenient way to run it is to use Docker.
 The following command will create a Docker container with all properties configured (database and user).
 
 ##### DB initialization
