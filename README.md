@@ -40,6 +40,7 @@ You could also build and run the app from your favourite IDE, we recommend Intel
 It is recommended to use pgadmin4 to connect to PostgreSQL database.
 
 ## Dockerized environment
+
 There is a possibility to run MathShareBackend application in an environment based on Docker. This environment consists of two images:
  - server - MathShareBackend application
  - postgresql - PostgreSQL database image
@@ -47,10 +48,10 @@ There is a possibility to run MathShareBackend application in an environment bas
 Using this approach allows to run the application in an environment independent of a host. It simplifies a potential configuration and provides a possibilty to clean restart the application.
  
 Currently, there is a need to build an application image using PostgreSQL database (the test are executed while build).
-If a database is not running you can execute the following command:
+If a database **is not running** you can execute the following command:
 
 ```bash
-docker start postgres
+docker stop postgres && docker start postgres
 ```
 
 ### Building a docker image
