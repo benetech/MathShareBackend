@@ -17,6 +17,7 @@ This is a repository for MathShare backend server. MathShare is a step by step e
 
 
 ## Building the app
+
 First, we need to run s PostgreSQL database, the most convenient way to run it is to use Docker.
 The following command will create a Docker container with all properties configured (database and user).
 
@@ -27,6 +28,7 @@ docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=mysecretpassword -e
 ```
 
 ##### Next DB runs
+
 ```bash
 docker stop postgres && docker start postgres
 ```
@@ -51,13 +53,15 @@ If a database is not running you can execute the following command:
 docker start postgres
 ```
 ### Building a docker image
+
 To build an image run the command below in the root project directory:
 
 ```bash
 mvn clean package docker:build
 ```
 ### Running the environment
-If the process completes with success, a new docker image should be created. Now it is possible to run the whole docker environment (the command should be executed in the root project directory - a docker-compose.yml file should be visible there)
+
+If the process completes with success, a new docker image should be created. Now it is possible to run the whole docker environment (the command should be executed in the root project directory - a docker-compose.yml file should be visible there).
 
 ```bash
 docker-compose up
@@ -69,7 +73,7 @@ In general application development a common case for the next runs is that the d
 docker-compose down && docker-compose up
 ```
 
-Optionally, you can also remove the non-volatile database storage by removing the related docker volumes. This may be executed by the following command:
+Optionally, you can also remove the non-volatile database storage by removing the related docker volumes. This may be executed by the following command.
 
 ```bash
 docker-compose down -v && docker-compose up
@@ -77,4 +81,4 @@ docker-compose down -v && docker-compose up
 ### Docker variables
 
 The properties (such as a database user login/password) are possible to be injected via a global environment variables functionality. A specification of using these properties in a dockerized environment may be found there: 
- https://github.com/benetech/MathShare/wiki/Configuration-variables---MathShareBackend
+- https://github.com/benetech/MathShare/wiki/Configuration-variables---MathShareBackend
