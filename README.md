@@ -52,6 +52,7 @@ If a database is not running you can execute the following command:
 ```bash
 docker start postgres
 ```
+
 ### Building a docker image
 
 To build an image run the command below in the root project directory:
@@ -59,6 +60,7 @@ To build an image run the command below in the root project directory:
 ```bash
 mvn clean package docker:build
 ```
+
 ### Running the environment
 
 If the process completes with success, a new docker image should be created. Now it is possible to run the whole docker environment (the command should be executed in the root project directory - a docker-compose.yml file should be visible there).
@@ -78,6 +80,7 @@ Optionally, you can also remove the non-volatile database storage by removing th
 ```bash
 docker-compose down -v && docker-compose up
 ```
+
 ### Docker variables
 
 The properties (such as a database user login/password) are possible to be injected via a global environment variables functionality. A specification of using these properties in a dockerized environment may be found there: 
