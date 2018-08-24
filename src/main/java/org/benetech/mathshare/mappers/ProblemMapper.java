@@ -23,8 +23,16 @@ public interface ProblemMapper {
                     qualifiedByName = "toCode")})
     ProblemDTO toDto(Problem problem);
 
+    @Mappings({
+            @Mapping(source = "text", target = "problemText"),
+            @Mapping(source = "problemSetRevisionShareCode", target = "problemSetRevision.shareCode",
+                    qualifiedByName = "fromCode")})
+    Problem fromDto(ProblemDTO problem);
+
+    @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")
     ProblemSet fromDto(ProblemSetDTO problemSet);
 
+    @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")
     ProblemSetDTO toDto(ProblemSet problemSet);
 
     @Mappings({
@@ -35,5 +43,10 @@ public interface ProblemMapper {
     @Named("toCode")
     default String toCode(Long shareCode) {
         return shareCode == null ? null : UrlCodeConverter.toUrlCode(shareCode);
+    }
+
+    @Named("fromCode")
+    default Long fromCode(String editCode) {
+        return editCode == null ? null : UrlCodeConverter.fromUrlCode(editCode);
     }
 }

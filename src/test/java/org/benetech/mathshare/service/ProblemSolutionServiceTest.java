@@ -1,23 +1,27 @@
 package org.benetech.mathshare.service;
 
 import org.benetech.mathshare.converters.UrlCodeConverter;
+import org.benetech.mathshare.mappers.ProblemMapper;
 import org.benetech.mathshare.mappers.SolutionMapper;
+import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.SolutionDTO;
-import org.benetech.mathshare.model.entity.Problem;
-import org.benetech.mathshare.model.entity.ProblemSetRevision;
-import org.benetech.mathshare.model.entity.ProblemSolution;
+import org.benetech.mathshare.model.dto.SolutionStepDTO;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
+import org.benetech.mathshare.model.entity.Problem;
+import org.benetech.mathshare.model.entity.ProblemSolution;
+import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.mother.ProblemMother;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.benetech.mathshare.model.mother.ProblemSolutionMother;
 import org.benetech.mathshare.model.mother.SolutionRevisionMother;
+import org.benetech.mathshare.model.mother.ProblemSetMother;
 import org.benetech.mathshare.model.mother.SolutionStepMother;
-import org.benetech.mathshare.repository.ProblemRepository;
-import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.repository.ProblemSolutionRepository;
 import org.benetech.mathshare.repository.SolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionStepRepository;
+import org.benetech.mathshare.repository.ProblemRepository;
+import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.service.impl.ProblemSolutionServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,6 +38,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,7 +52,6 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL, replace = AutoConfigureTestDatabase.Replace.NONE)
-@SuppressWarnings("PMD.UnusedPrivateField")
 public class ProblemSolutionServiceTest {
 
     private static final Long CODE = 1L;
@@ -71,6 +75,7 @@ public class ProblemSolutionServiceTest {
     private ProblemSolutionServiceImpl problemSolutionService;
 
     @Mock
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private EntityManager em;
 
     @Before
@@ -167,13 +172,33 @@ public class ProblemSolutionServiceTest {
 
     @Test
     public void shouldCreateProblemSolution() {
-        given(this.solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(ProblemSolutionMother.mockInstance(), null))
-                .willReturn(SolutionRevisionMother.mockInstance());
-        given(this.problemSolutionRepository.save(ProblemSolutionMother.mockInstance()))
+        SolutionDTO solutionDTO = SolutionMapper.INSTANCE.toDto(ProblemSolutionMother.mockInstance());
+        ProblemDTO problemDTO = ProblemMapper.INSTANCE.toDto(ProblemMother.mockInstance());
+        problemDTO.setProblemSetRevisionShareCode(ProblemSetRevisionMother.VALID_CODE);
+        solutionDTO.setProblem(problemDTO);
+        solutionDTO.setEditCode(UrlCodeConverter.toUrlCode(ProblemSolutionMother.EDIT_CODE));
+        List<SolutionStepDTO> steps = new ArrayList<>();
+        solutionDTO.setSteps(steps);
+        given(this.problemSolutionRepository.findOneByEditCode(ProblemSolutionMother.EDIT_CODE))
+                .willReturn(null);
+        given(this.problemSetRevisionRepository.findOneByShareCode(UrlCodeConverter
+                .fromUrlCode(ProblemSetRevisionMother.VALID_CODE)))
+                .willReturn(ProblemSetRevisionMother.mockInstance());
+        given(this.problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(solutionDTO.getProblem().getTitle(),
+                solutionDTO.getProblem().getText(), ProblemSetRevisionMother.mockInstance()))
+                .willReturn(ProblemMother.mockInstance());
+        given(this.problemSolutionRepository.save(new ProblemSolution(ProblemMother.mockInstance())))
+                .willReturn(new ProblemSolution(ProblemMother.validInstance(ProblemSetRevisionMother
+                        .withShareCode(ProblemSetMother.mockInstance(), CODE))));
+        given(this.problemSolutionRepository.findOneByEditCode(CODE))
                 .willReturn(ProblemSolutionMother.mockInstance());
-        given(this.solutionRevisionRepository.save(SolutionRevisionMother.mockInstance()))
+
+        given(this.solutionRevisionRepository.save(new SolutionRevision(
+                new ProblemSolution(ProblemMother.validInstance(ProblemSetRevisionMother
+                        .withShareCode(ProblemSetMother.mockInstance(), CODE))))))
                 .willReturn(SolutionRevisionMother.mockInstance());
-        problemSolutionService.createOrUpdateProblemSolution(SolutionMapper.INSTANCE.toDto(ProblemSolutionMother.mockInstance()));
+
+        problemSolutionService.createOrUpdateProblemSolution(solutionDTO);
         ArgumentCaptor<ProblemSolution> problemSolutionCaptor = ArgumentCaptor.forClass(ProblemSolution.class);
         verify(this.problemSolutionRepository, times(1)).save(problemSolutionCaptor.capture());
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
@@ -184,17 +209,25 @@ public class ProblemSolutionServiceTest {
 
     @Test
     public void shouldUpdateProblemSolution() {
-        ProblemSolution problemSolution = ProblemSolutionMother.mockInstance();
-        problemSolution.setId(1);
-        given(this.solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(problemSolution, null))
+        SolutionDTO solutionDTO = SolutionMapper.INSTANCE.toDto(ProblemSolutionMother.mockInstance());
+        ProblemDTO problemDTO = ProblemMapper.INSTANCE.toDto(ProblemMother.mockInstance());
+        problemDTO.setProblemSetRevisionShareCode(ProblemSetRevisionMother.VALID_CODE);
+        solutionDTO.setProblem(problemDTO);
+        solutionDTO.setEditCode(UrlCodeConverter.toUrlCode(ProblemSolutionMother.EDIT_CODE));
+        List<SolutionStepDTO> steps = new ArrayList<>();
+        solutionDTO.setSteps(steps);
+        given(this.problemSolutionRepository.findOneByEditCode(ProblemSolutionMother.EDIT_CODE))
+                .willReturn(ProblemSolutionMother.mockInstance());
+        given(this.solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(ProblemSolutionMother.mockInstance(), null))
                 .willReturn(SolutionRevisionMother.mockInstance());
-        given(this.solutionRevisionRepository.save(new SolutionRevision(problemSolution)))
+        given(this.solutionRevisionRepository.save(new SolutionRevision(ProblemSolutionMother.mockInstance())))
                 .willReturn(SolutionRevisionMother.mockInstance());
         SolutionRevision rev = SolutionRevisionMother.mockInstance();
         rev.setReplacedBy(new SolutionRevision(ProblemSolutionMother.mockInstance()));
         given(this.solutionRevisionRepository.save(rev))
                 .willReturn(rev);
-        problemSolutionService.createOrUpdateProblemSolution(SolutionMapper.INSTANCE.toDto(problemSolution));
+
+        problemSolutionService.createOrUpdateProblemSolution(solutionDTO);
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
         verify(this.solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
 

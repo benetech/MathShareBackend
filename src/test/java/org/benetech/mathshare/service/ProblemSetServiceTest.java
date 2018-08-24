@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -26,6 +27,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +54,10 @@ public class ProblemSetServiceTest {
 
     @MockBean
     private ProblemRepository problemRepository;
+
+    @SuppressWarnings("PMD.UnusedPrivateField")
+    @Mock
+    private EntityManager em;
 
     @InjectMocks
     private ProblemSetServiceImpl problemSetService;
@@ -136,8 +143,8 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldReturnProblemsListByEditUrlCode() {
-        ProblemSetRevision problemSetRevision = ProblemSetRevisionMother.validInstance(
-                ProblemSetMother.withEditCode(UrlCodeConverter.fromUrlCode(VALID_CODE)));
+        ProblemSetRevision problemSetRevision = ProblemSetRevisionMother.withShareCode(
+                ProblemSetMother.withEditCode(UrlCodeConverter.fromUrlCode(VALID_CODE)), UrlCodeConverter.fromUrlCode(VALID_CODE));
         List<Problem> problems = ProblemMother.createValidProblemsList(problemSetRevision, 3);
 
         when(problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(VALID_CODE)))
@@ -154,36 +161,51 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldCreateProblemSet() {
-        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.validInstance(), null))
-                .willReturn(ProblemSetRevisionMother.revisionOf(ProblemSetMother.validInstance()));
+        ProblemSetDTO problemSetDTO = ProblemMapper.INSTANCE.toDto(ProblemSetMother.mockInstance());
+        problemSetDTO.setProblems(new ArrayList<>());
+        given(this.problemSetRepository.findOneByEditCode(ProblemSetMother.EDIT_CODE))
+                .willReturn(null);
+        given(this.problemSetRepository.save(ProblemMapper.INSTANCE.fromDto(problemSetDTO)))
+                .willReturn(ProblemSetMother.validInstance());
         given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.validInstance())))
                 .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance()));
-        given(this.problemSetRepository.save(ProblemSetMother.validInstance()))
-                .willReturn(ProblemSetMother.validInstance());
-        problemSetService.createOrUpdateProblemSet(ProblemSetMother.validInstance());
+        given(this.problemSetRevisionRepository.save(ProblemSetRevisionMother.withProblems(ProblemSetMother.validInstance(), 3)))
+                .willReturn(ProblemSetRevisionMother.withProblems(ProblemSetMother.validInstance(), 3));
+
+        problemSetService.createOrUpdateProblemSet(problemSetDTO);
         ArgumentCaptor<ProblemSet> problemSetCaptor = ArgumentCaptor.forClass(ProblemSet.class);
         verify(this.problemSetRepository, times(1)).save(problemSetCaptor.capture());
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
-        verify(this.problemSetRevisionRepository, times(1)).save(revisionCaptor.capture());
+        verify(this.problemSetRevisionRepository, times(2)).save(revisionCaptor.capture());
 
         Assert.assertNull(revisionCaptor.getAllValues().get(0).getReplacedBy());
     }
 
     @Test
     public void shouldUpdateProblemSet() {
-        ProblemSet problemSet = ProblemSetMother.validInstance();
-        problemSet.setId(1);
-        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
-                .willReturn(ProblemSetRevisionMother.revisionOf(problemSet));
-        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(problemSet)))
-                .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance()));
-        ProblemSetRevision rev = ProblemSetRevisionMother.revisionOf(ProblemSetMother.validInstance());
-        rev.setReplacedBy(new ProblemSetRevision(ProblemSetMother.validInstance()));
-        given(this.problemSetRevisionRepository.save(rev))
-                .willReturn(rev);
-        problemSetService.createOrUpdateProblemSet(problemSet);
+        ProblemSetDTO problemSetDTO = ProblemMapper.INSTANCE.toDto(ProblemSetMother.mockInstance());
+        problemSetDTO.setProblems(new ArrayList<>());
+        ProblemSetRevision revision = ProblemSetRevisionMother.revisionOf(ProblemSetMother.mockInstance());
+        given(this.problemSetRepository.findOneByEditCode(ProblemSetMother.EDIT_CODE))
+                .willReturn(ProblemSetMother.mockInstance());
+        given(this.problemSetRepository.findOneByEditCode(ProblemSetMother.EDIT_CODE))
+                .willReturn(ProblemSetMother.mockInstance());
+        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.mockInstance(), null))
+                .willReturn(revision);
+        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.mockInstance())))
+                .willReturn(revision);
+        ProblemSetRevision withProblems = revision;
+        withProblems.setProblems(new ArrayList<>());
+        given(this.problemRepository.findAllByProblemSetRevision(revision))
+                .willReturn(new ArrayList<>());
+        given(this.problemSetRevisionRepository.save(revision))
+                .willReturn(withProblems);
+        given(this.problemSetRevisionRepository.save(revision))
+                .willReturn(withProblems);
+
+        problemSetService.createOrUpdateProblemSet(problemSetDTO);
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
-        verify(this.problemSetRevisionRepository, times(2)).save(revisionCaptor.capture());
+        verify(this.problemSetRevisionRepository, times(3)).save(revisionCaptor.capture());
 
         Assert.assertNotNull(revisionCaptor.getAllValues().get(1).getReplacedBy());
     }

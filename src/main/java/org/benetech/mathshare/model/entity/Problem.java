@@ -50,4 +50,10 @@ public class Problem extends AbstractEntity {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
+
+    public Problem(String problemText, String title, ProblemSetRevision problemSetRevision) {
+        this.problemSetRevision = problemSetRevision;
+        this.title = title;
+        this.problemText = problemText;
+    }
 }
