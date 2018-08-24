@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
-@SuppressWarnings({"PMD.SignatureDeclareThrowsException", "PMD.UnusedPrivateField"})
+@SuppressWarnings("PMD.SignatureDeclareThrowsException")
 public class ProblemSolutionControllerTest {
 
     private static final String BASE_ENDPOINT = "/solution/";
@@ -69,6 +69,7 @@ public class ProblemSolutionControllerTest {
 
     @Autowired
     @InjectMocks
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private ProblemSolutionController problemSolutionController;
 
     @Mock

@@ -29,12 +29,10 @@ public interface ProblemMapper {
                     qualifiedByName = "fromCode")})
     Problem fromDto(ProblemDTO problem);
 
-    @Mappings({
-            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")})
+    @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")
     ProblemSet fromDto(ProblemSetDTO problemSet);
 
-    @Mappings({
-            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")})
+    @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")
     ProblemSetDTO toDto(ProblemSet problemSet);
 
     @Mappings({

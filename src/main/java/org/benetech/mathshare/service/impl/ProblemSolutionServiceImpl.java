@@ -97,17 +97,18 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     @Override
     public Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(SolutionDTO solutionDTO) {
         ProblemSolution solution = SolutionMapper.INSTANCE.fromDto(solutionDTO);
-        if (problemSolutionRepository.findOneByEditCode(solution.getEditCode()) == null) {
+        ProblemSolution fromDB = problemSolutionRepository.findOneByEditCode(solution.getEditCode());
+        if (fromDB == null) {
             Problem problem = problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(
                     solution.getProblem().getTitle(),
                     solution.getProblem().getProblemText(), problemSetRevisionRepository.findOneByShareCode(
                             UrlCodeConverter.fromUrlCode(solutionDTO.getProblem().getProblemSetRevisionShareCode())));
-            solution = problemSolutionRepository.save(new ProblemSolution(problem));
+            fromDB = problemSolutionRepository.save(new ProblemSolution(problem));
         }
         List<SolutionStep> steps = solutionDTO.getSteps()
                 .stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        SolutionRevision newRevision = saveNewVersionOfSolution(solution, steps);
+        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps);
         boolean newSolution = problemSolutionRepository.findOneByEditCode(SolutionMapper.INSTANCE
                 .fromDto(solutionDTO).getEditCode()) == null;
         em.refresh(newRevision);

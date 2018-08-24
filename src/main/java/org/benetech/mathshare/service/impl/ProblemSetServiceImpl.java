@@ -98,31 +98,41 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         ProblemSetRevision result;
         boolean newSet;
         if (saved == null) {
-            ProblemSet set = problemSetRepository.save(problemSet);
-            ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
-            for (Problem problem : problems) {
-                savedProblems.add(createOrUpdateProblem(problem, revision));
-            }
-            revision.setProblems(savedProblems);
-            result = problemSetRevisionRepository.save(revision);
+            result = createProblemSet(savedProblems, problems, problemSet);
             newSet = true;
         } else {
-            ProblemSet set = problemSetRepository.findOneByEditCode(problemSet.getEditCode());
-            ProblemSetRevision oldRevision = problemSetRevisionRepository
-                    .findOneByProblemSetAndReplacedBy(set, null);
-            ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
-            for (Problem problem : problems) {
-                savedProblems.add(createOrUpdateProblem(problem, revision));
-            }
-            revision.setProblems(savedProblems);
-            oldRevision.setProblems(this.problemRepository.findAllByProblemSetRevision(oldRevision));
-            result = problemSetRevisionRepository.save(revision);
-            oldRevision.setReplacedBy(result);
-            problemSetRevisionRepository.save(oldRevision);
+            result = updateProblemSet(savedProblems, problems, problemSet);
             newSet = false;
         }
         em.refresh(result);
         return Pair.of(newSet, result);
+    }
+
+    private ProblemSetRevision createProblemSet(List<Problem> savedProblems, List<Problem> problems, ProblemSet problemSet) {
+        ProblemSet set = problemSetRepository.save(problemSet);
+        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
+        for (Problem problem : problems) {
+            savedProblems.add(createOrUpdateProblem(problem, revision));
+        }
+        revision.setProblems(savedProblems);
+        return problemSetRevisionRepository.save(revision);
+    }
+
+    private ProblemSetRevision updateProblemSet(List<Problem> savedProblems, List<Problem> problems, ProblemSet problemSet) {
+        ProblemSetRevision result;
+        ProblemSet set = problemSetRepository.findOneByEditCode(problemSet.getEditCode());
+        ProblemSetRevision oldRevision = problemSetRevisionRepository
+                .findOneByProblemSetAndReplacedBy(set, null);
+        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
+        for (Problem problem : problems) {
+            savedProblems.add(createOrUpdateProblem(problem, revision));
+        }
+        revision.setProblems(savedProblems);
+        oldRevision.setProblems(this.problemRepository.findAllByProblemSetRevision(oldRevision));
+        result = problemSetRevisionRepository.save(revision);
+        oldRevision.setReplacedBy(result);
+        problemSetRevisionRepository.save(oldRevision);
+        return result;
     }
 
     private Problem createOrUpdateProblem(Problem problem, ProblemSetRevision problemSetRevision) {
