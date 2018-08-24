@@ -15,9 +15,11 @@ public interface ProblemSetService {
 
     ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException;
 
-    Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(ProblemSet problemSet);
+    Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(ProblemSetDTO problemSet);
 
     ProblemSetDTO getLatestProblemSetForEditing(String code);
 
     String getDefaultProblemSetRevisionCode();
+
+    String getDefaultProblemSetCode();
 }

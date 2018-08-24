@@ -22,8 +22,9 @@ public interface SolutionMapper {
     @Mappings({
             @Mapping(source = "problem.problemText", target = "problem.text"),
             @Mapping(source = "problem.problemSetRevision.shareCode", target = "problem.problemSetRevisionShareCode",
-                    qualifiedByName = "toCode")})
-    SolutionDTO toDto(ProblemSolution solution);
+                    qualifiedByName = "toCode"),
+            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")})
+        SolutionDTO toDto(ProblemSolution solution);
 
     @Mappings({
         @Mapping(source = "problem.text", target = "problem.problemText"),

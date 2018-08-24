@@ -109,7 +109,7 @@ public class ProblemSetControllerTest {
         ProblemSetRevision revision = ProblemSetRevisionMother.mockInstance();
         List<ProblemDTO> problems = ProblemMother.createValidProblemsList(revision, 3).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        when(problemSetService.findProblemsByUrlCode(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE)));
+        when(problemSetService.findProblemsByUrlCode(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE), UrlCodeConverter.toUrlCode(SHARE_CODE)));
         String response = mockMvc.perform(getProblemSet(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
@@ -143,7 +143,7 @@ public class ProblemSetControllerTest {
     @Test
     public void putShouldReturn201IfCreated() throws Exception {
         ProblemSet toSave = ProblemSetMother.validInstance();
-        when(problemSetService.createOrUpdateProblemSet(toSave)).thenReturn(Pair.of(true, ProblemSetRevisionMother.validInstance(toSave)));
+        when(problemSetService.createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave))).thenReturn(Pair.of(true, ProblemSetRevisionMother.validInstance(toSave)));
         mockMvc.perform(createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
     }
@@ -151,7 +151,7 @@ public class ProblemSetControllerTest {
     @Test
     public void putShouldReturn200IfUpdated() throws Exception {
         ProblemSet toSave = ProblemSetMother.validInstance();
-        when(problemSetService.createOrUpdateProblemSet(toSave)).thenReturn(Pair.of(false, ProblemSetRevisionMother.validInstance(toSave)));
+        when(problemSetService.createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave))).thenReturn(Pair.of(false, ProblemSetRevisionMother.validInstance(toSave)));
         mockMvc.perform(createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }
@@ -161,7 +161,7 @@ public class ProblemSetControllerTest {
         ProblemSet problemSet = ProblemSetMother.validInstance();
         List<ProblemDTO> problems = ProblemMother.createValidProblemsList(ProblemSetRevisionMother.validInstance(problemSet), 3).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        when(problemSetService.getLatestProblemSetForEditing(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE)));
+        when(problemSetService.getLatestProblemSetForEditing(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE), UrlCodeConverter.toUrlCode(SHARE_CODE)));
         String response = mockMvc.perform(getLatestProblemSet(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);

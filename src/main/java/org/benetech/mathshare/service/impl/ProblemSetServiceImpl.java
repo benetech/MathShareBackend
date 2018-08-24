@@ -4,6 +4,7 @@ import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.mappers.ProblemMapper;
 import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
+import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.repository.ProblemRepository;
@@ -15,6 +16,9 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +34,9 @@ public class ProblemSetServiceImpl implements ProblemSetService {
 
     @Autowired
     private ProblemRepository problemRepository;
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
     @Transactional(readOnly = true)
@@ -62,6 +69,12 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
+    public String getDefaultProblemSetCode() {
+        ProblemSet set = problemSetRevisionRepository.findFirstByOrderByDateCreatedAsc().getProblemSet();
+        return set == null ? null : UrlCodeConverter.toUrlCode(set.getEditCode());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
@@ -71,25 +84,60 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         }
         List<ProblemDTO> problems = problemRepository.findAllByProblemSetRevision(revision)
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getShareCode()));
+        return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
+                UrlCodeConverter.toUrlCode(revision.getShareCode()));
     }
 
     @Override
-    public Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(ProblemSet problemSet) {
-        ProblemSet saved = problemSet;
-        if (problemSet.getId() == null) {
-            saved = problemSetRepository.save(problemSet);
-        }
-        ProblemSetRevision newRevision = problemSetRevisionRepository.save(
-                new ProblemSetRevision(saved));
-        boolean newSolution = true;
-        if (problemSet.getId() != null) {
-            ProblemSetRevision oldRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(saved, null);
-            oldRevision.setReplacedBy(newRevision);
+    public Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(ProblemSetDTO problemSetDTO) {
+        ProblemSet problemSet = ProblemMapper.INSTANCE.fromDto(problemSetDTO);
+        ProblemSet saved = problemSetRepository.findOneByEditCode(problemSet.getEditCode());
+        List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
+                .collect(Collectors.toList());
+        List<Problem> savedProblems = new ArrayList<>();
+        ProblemSetRevision result;
+        boolean newSet;
+        if (saved == null) {
+            ProblemSet set = problemSetRepository.save(problemSet);
+            ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
+            for (Problem problem : problems) {
+                savedProblems.add(createOrUpdateProblem(problem, revision));
+            }
+            revision.setProblems(savedProblems);
+            result = problemSetRevisionRepository.save(revision);
+            newSet = true;
+        } else {
+            ProblemSet set = problemSetRepository.findOneByEditCode(problemSet.getEditCode());
+            ProblemSetRevision oldRevision = problemSetRevisionRepository
+                    .findOneByProblemSetAndReplacedBy(set, null);
+            ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
+            for (Problem problem : problems) {
+                savedProblems.add(createOrUpdateProblem(problem, revision));
+            }
+            revision.setProblems(savedProblems);
+            oldRevision.setProblems(this.problemRepository.findAllByProblemSetRevision(oldRevision));
+            result = problemSetRevisionRepository.save(revision);
+            oldRevision.setReplacedBy(result);
             problemSetRevisionRepository.save(oldRevision);
-            newSolution = false;
+            newSet = false;
         }
-        return Pair.of(newSolution, newRevision);
+        em.refresh(result);
+        return Pair.of(newSet, result);
+    }
+
+    private Problem createOrUpdateProblem(Problem problem, ProblemSetRevision problemSetRevision) {
+        Problem saved = this.problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(problem.getTitle(),
+                problem.getProblemText(), problemSetRevision);
+        if (saved == null) {
+            problem.setProblemSetRevision(problemSetRevision);
+            return problemRepository.save(problem);
+        } else {
+            Problem newVersion = new Problem(saved.getProblemText(), saved.getTitle(), problemSetRevision);
+            newVersion = problemRepository.save(newVersion);
+            saved.setReplacedBy(newVersion);
+            problemRepository.save(saved);
+            return newVersion;
+        }
     }
 
     @Override
@@ -100,6 +148,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         }
         List<ProblemDTO> problems = problemRepository.findAllByProblemSetRevision(revision)
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()));
+        return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
+                UrlCodeConverter.toUrlCode(revision.getShareCode()));
     }
 }

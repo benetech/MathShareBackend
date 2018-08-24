@@ -46,10 +46,25 @@ public class ProblemSetController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/default")
+    @GetMapping("/defaultRevision")
     ResponseEntity<String> getDefaultProblemSetRevisionCode() {
         try {
             String result = problemSetService.getDefaultProblemSetRevisionCode();
+            if (result != null) {
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                logger.error("Default problem set wasn't found");
+            }
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/default")
+    ResponseEntity<String> getDefaultProblemSetCode() {
+        try {
+            String result = problemSetService.getDefaultProblemSetCode();
             if (result != null) {
                 return new ResponseEntity<>(result, HttpStatus.OK);
             } else {
@@ -76,8 +91,7 @@ public class ProblemSetController {
     @PutMapping(path = "/")
     ResponseEntity<ProblemSetDTO> createOrUpdateProblemSet(@RequestBody ProblemSetDTO problemSet) {
         try {
-            Pair<Boolean, ProblemSetRevision> saved = problemSetService.createOrUpdateProblemSet(
-                    ProblemMapper.INSTANCE.fromDto(problemSet));
+            Pair<Boolean, ProblemSetRevision> saved = problemSetService.createOrUpdateProblemSet(problemSet);
             HttpStatus status = saved.getFirst().booleanValue() ? HttpStatus.CREATED : HttpStatus.OK;
             return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved.getSecond()), status);
         } catch (HttpMessageNotReadableException e) {

@@ -71,13 +71,13 @@ public class ProblemSolutionController {
     }
 
     @GetMapping("/edit/{code}")
-    ResponseEntity<SolutionDTO> editProblemSet(@PathVariable String code) {
+    ResponseEntity<SolutionDTO> editProblemSolution(@PathVariable String code) {
         try {
             SolutionDTO body = problemSolutionService.getLatestProblemSolutionForEditing(code);
             if (body != null) {
                 return new ResponseEntity<>(body, HttpStatus.OK);
             } else {
-                logger.error("ProblemSet with code {} wasn't found", code);
+                logger.error("ProblemSolution with code {} wasn't found", code);
             }
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage(), e);

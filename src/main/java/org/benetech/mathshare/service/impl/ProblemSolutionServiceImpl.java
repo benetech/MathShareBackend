@@ -95,23 +95,21 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(SolutionDTO solution) {
-        ProblemSolution saved = SolutionMapper.INSTANCE.fromDto(solution);
-        if (saved.getId() == null) {
-            Problem problem = problemSolutionRepository.findOneByEditCode(saved.getEditCode()).getProblem();
-            saved = problemSolutionRepository.save(new ProblemSolution(problem));
+    public Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(SolutionDTO solutionDTO) {
+        ProblemSolution solution = SolutionMapper.INSTANCE.fromDto(solutionDTO);
+        if (problemSolutionRepository.findOneByEditCode(solution.getEditCode()) == null) {
+            Problem problem = problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(
+                    solution.getProblem().getTitle(),
+                    solution.getProblem().getProblemText(), problemSetRevisionRepository.findOneByShareCode(
+                            UrlCodeConverter.fromUrlCode(solutionDTO.getProblem().getProblemSetRevisionShareCode())));
+            solution = problemSolutionRepository.save(new ProblemSolution(problem));
         }
-        List<SolutionStep> steps = solution.getSteps()
+        List<SolutionStep> steps = solutionDTO.getSteps()
                 .stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        SolutionRevision newRevision = saveNewVersionOfSolution(saved, steps);
-        boolean newSolution = true;
-        if (SolutionMapper.INSTANCE.fromDto(solution).getId() != null) {
-            SolutionRevision oldRevision = solutionRevisionRepository.findOneByProblemSolutionAndReplacedBy(saved, null);
-            oldRevision.setReplacedBy(newRevision);
-            solutionRevisionRepository.save(oldRevision);
-            newSolution = false;
-        }
+        SolutionRevision newRevision = saveNewVersionOfSolution(solution, steps);
+        boolean newSolution = problemSolutionRepository.findOneByEditCode(SolutionMapper.INSTANCE
+                .fromDto(solutionDTO).getEditCode()) == null;
         em.refresh(newRevision);
         return Pair.of(newSolution, newRevision);
     }
@@ -130,15 +128,17 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps) {
+        SolutionRevision oldRevision = solutionRevisionRepository
+                .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
         SolutionRevision newRevision = solutionRevisionRepository.save(
                 new SolutionRevision(problemSolution));
         steps.forEach(s -> s.setSolutionRevision(newRevision));
         solutionStepRepository.saveAll(steps);
-        SolutionRevision oldRevision = solutionRevisionRepository
-                .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
         em.refresh(newRevision);
-        oldRevision.setReplacedBy(newRevision);
-        solutionRevisionRepository.save(oldRevision);
+        if (oldRevision != null) {
+            oldRevision.setReplacedBy(newRevision);
+            solutionRevisionRepository.save(oldRevision);
+        }
         return newRevision;
     }
 }
