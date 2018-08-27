@@ -1,7 +1,7 @@
 version: '3'
 services:
     server:
-        image: benetech/mathshare.server
+        image: benetech/mathshare-server
         env_file: .env
         ports:
             - 8080:8080
