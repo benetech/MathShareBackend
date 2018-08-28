@@ -44,7 +44,7 @@ public class ProblemSetController {
         if (result != null) {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
-            logger.error("Default problem set wasn't found");
+            logger.error("Default problem set revision wasn't found");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

@@ -1,6 +1,5 @@
 package org.benetech.mathshare.mappers;
 
-import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.SolutionDTO;
 import org.benetech.mathshare.model.dto.SolutionStepDTO;
@@ -20,17 +19,13 @@ public interface SolutionMapper {
     SolutionMapper INSTANCE = Mappers.getMapper(SolutionMapper.class);
 
     @Mappings({
-            @Mapping(source = "problem.problemText", target = "problem.text"),
-            @Mapping(source = "problem.problemSetRevision.shareCode", target = "problem.problemSetRevisionShareCode",
-                    qualifiedByName = "toCode"),
+            @Mapping(source = "problem", target = "problem", qualifiedByName = "toProblemDto"),
             @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")})
         SolutionDTO toDto(ProblemSolution solution);
 
     @Mappings({
-        @Mapping(source = "problem.text", target = "problem.problemText"),
-        @Mapping(source = "problem.problemSetRevisionShareCode", target = "problem.problemSetRevision.shareCode",
-                qualifiedByName = "fromCode"),
-        @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")})
+            @Mapping(source = "problem", target = "problem", qualifiedByName = "fromProblemDto"),
+            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")})
     ProblemSolution fromDto(SolutionDTO solution);
 
     SolutionStepDTO toDto(SolutionStep solutionStep);
@@ -44,17 +39,22 @@ public interface SolutionMapper {
     SolutionDTO toSolutionDTO(SolutionRevision revision);
 
     @Named("toCode")
-    default String toCode(Long editCode) {
-        return editCode == null ? null : UrlCodeConverter.toUrlCode(editCode);
+    default String toCode(Long shareCode) {
+        return MapperUtils.toCode(shareCode);
     }
 
     @Named("fromCode")
     default Long fromCode(String editCode) {
-        return editCode == null ? null : UrlCodeConverter.fromUrlCode(editCode);
+        return MapperUtils.fromCode(editCode);
     }
 
-    @Named("problem")
-    default ProblemDTO mapProblem(Problem problem) {
+    @Named("toProblemDto")
+    default ProblemDTO toProblemDto(Problem problem) {
         return ProblemMapper.INSTANCE.toDto(problem);
+    }
+
+    @Named("fromProblemDto")
+    default Problem fromProblemDto(ProblemDTO problem) {
+        return ProblemMapper.INSTANCE.fromDto(problem);
     }
 }

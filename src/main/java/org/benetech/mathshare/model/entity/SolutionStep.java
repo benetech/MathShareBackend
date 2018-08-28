@@ -31,7 +31,7 @@ public class SolutionStep extends AbstractEntity {
     @Type(type = "text")
     private String explanation;
 
-    @OneToOne(mappedBy = "step", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Scratchpad scratchpad;
 
     @Lob
