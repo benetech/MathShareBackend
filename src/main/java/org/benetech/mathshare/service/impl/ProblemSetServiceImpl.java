@@ -57,9 +57,8 @@ public class ProblemSetServiceImpl implements ProblemSetService {
             throw new IllegalArgumentException("Id must be null for the new problem set");
         }
         ProblemSet savedProblemSet = problemSetRepository.save(problemSet);
-        ProblemSetRevision newRevision = problemSetRevisionRepository.save(
+        return problemSetRevisionRepository.save(
                 new ProblemSetRevision(savedProblemSet));
-        return newRevision;
     }
 
     @Override

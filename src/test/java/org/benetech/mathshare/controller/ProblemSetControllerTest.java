@@ -12,7 +12,6 @@ import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.mother.ProblemMother;
 import org.benetech.mathshare.model.mother.ProblemSetMother;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
-import org.benetech.mathshare.repository.ProblemSetRepository;
 import org.benetech.mathshare.service.ProblemSetService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -74,10 +73,6 @@ public class ProblemSetControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    @SuppressWarnings("PMD.UnusedPrivateField")
-    private ProblemSetRepository problemSetRepository;
 
     @Before
     public void setUp() {
