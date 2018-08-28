@@ -46,6 +46,9 @@ public class Problem extends AbstractEntity {
     @NonNull
     private String title;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private Scratchpad scratchpad;
+
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)

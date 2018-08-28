@@ -1,11 +1,12 @@
 package org.benetech.mathshare.model.mother;
 
 import org.benetech.mathshare.model.entity.Scratchpad;
-import org.benetech.mathshare.model.entity.SolutionStep;
 
 public abstract class ScratchpadMother {
 
-    public static Scratchpad validInstance(SolutionStep step) {
-        return new Scratchpad(step);
+    public static final String CONTENT = "content";
+
+    public static Scratchpad validInstance() {
+        return new Scratchpad(CONTENT);
     }
 }
