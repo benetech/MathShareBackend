@@ -55,11 +55,7 @@ public class ProblemSolutionControllerTest {
 
     private static final String BASE_ENDPOINT = "/solution/";
 
-    private static final String VIEW_ENDPOINT = BASE_ENDPOINT + "view/";
-
-    private static final String EDIT_ENDPOINT = BASE_ENDPOINT + "edit/";
-
-    private static final String CREATE_ENDPOINT = BASE_ENDPOINT + "new/";
+    private static final String REVISION_PARAM = "/revision/";
 
     private static final Long SHARE_CODE = 19L;
 
@@ -148,7 +144,7 @@ public class ProblemSolutionControllerTest {
     @Test
     public void putShouldReturn201IfCreated() throws Exception {
         ProblemSolution toSave = ProblemSolutionMother.mockInstance();
-        when(problemSolutionService.createOrUpdateProblemSolution(any())).thenReturn(Pair.of(true, SolutionRevisionMother.validInstance(toSave)));
+        when(problemSolutionService.createOrUpdateProblemSolution(any(), any())).thenReturn(Pair.of(true, SolutionRevisionMother.validInstance(toSave)));
         mockMvc.perform(createOrUpdateProblemSolution(SolutionMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
     }
@@ -156,7 +152,7 @@ public class ProblemSolutionControllerTest {
     @Test
     public void putShouldReturn200IfUpdated() throws Exception {
         ProblemSolution toSave = ProblemSolutionMother.mockInstance();
-        when(problemSolutionService.createOrUpdateProblemSolution(any())).thenReturn(Pair.of(false, SolutionRevisionMother.validInstance(toSave)));
+        when(problemSolutionService.createOrUpdateProblemSolution(any(), any())).thenReturn(Pair.of(false, SolutionRevisionMother.validInstance(toSave)));
         mockMvc.perform(createOrUpdateProblemSolution(SolutionMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }
@@ -178,28 +174,28 @@ public class ProblemSolutionControllerTest {
 
     @Test
     public void shouldReturn400WhenFailedToParseProblemSolution() throws Exception {
-        mockMvc.perform(post(CREATE_ENDPOINT)
+        mockMvc.perform(post(BASE_ENDPOINT)
                 .content("not a problem solution")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     private static MockHttpServletRequestBuilder getSolution(boolean validCode) {
-        return get(VIEW_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
+        return get(BASE_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE) + REVISION_PARAM + (validCode ? VALID_CODE : INVALID_CODE));
     }
 
     private static MockHttpServletRequestBuilder getLatestProblemSolution(boolean validCode) {
-        return get(EDIT_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
+        return get(BASE_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
     }
 
     private static MockHttpServletRequestBuilder createProblemSolution(SolutionDTO solution) throws JsonProcessingException {
-        return post(CREATE_ENDPOINT)
+        return post(BASE_ENDPOINT)
                 .content(new ObjectMapper().writeValueAsString(solution))
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
     private static MockHttpServletRequestBuilder createOrUpdateProblemSolution(SolutionDTO solution) throws JsonProcessingException {
-        return put(BASE_ENDPOINT)
+        return put(BASE_ENDPOINT + solution.getEditCode())
                 .content(new ObjectMapper().writeValueAsString(solution))
                 .contentType(MediaType.APPLICATION_JSON);
     }

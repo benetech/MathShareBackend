@@ -27,13 +27,13 @@ public class ProblemSetController {
     @Autowired
     private ProblemSetService problemSetService;
 
-    @GetMapping("/view/{code}")
-    ResponseEntity<ProblemSetDTO> getProblemSetRevision(@PathVariable String code) {
-        ProblemSetDTO body = problemSetService.findProblemsByUrlCode(code);
+    @GetMapping("/{editCode}/revision/{shareCode}")
+    ResponseEntity<ProblemSetDTO> getProblemSetRevision(@PathVariable String shareCode) {
+        ProblemSetDTO body = problemSetService.findProblemsByUrlCode(shareCode);
         if (body != null) {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } else {
-            logger.error("ProblemSet with code {} wasn't found", code);
+            logger.error("ProblemSet with code {} wasn't found", shareCode);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -60,21 +60,22 @@ public class ProblemSetController {
         }
     }
 
-    @PostMapping(path = "/new")
+    @PostMapping(path = "/")
     ResponseEntity<ProblemSetDTO> createProblemSet(@RequestBody ProblemSetDTO problemSet) {
         ProblemSetRevision saved = problemSetService.saveNewProblemSet(
                 ProblemMapper.INSTANCE.fromDto(problemSet));
         return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved), HttpStatus.CREATED);
     }
 
-    @PutMapping(path = "/")
-    ResponseEntity<ProblemSetDTO> createOrUpdateProblemSet(@RequestBody ProblemSetDTO problemSet) {
-        Pair<Boolean, ProblemSetRevision> saved = problemSetService.createOrUpdateProblemSet(problemSet);
+    @PutMapping(path = "/{code}")
+    ResponseEntity<ProblemSetDTO> createOrUpdateProblemSet(@PathVariable String code,
+                                                           @RequestBody ProblemSetDTO problemSet) {
+        Pair<Boolean, ProblemSetRevision> saved = problemSetService.createOrUpdateProblemSet(code, problemSet);
         HttpStatus status = saved.getFirst() ? HttpStatus.CREATED : HttpStatus.OK;
         return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved.getSecond()), status);
     }
 
-    @GetMapping("/edit/{code}")
+    @GetMapping("/{code}")
     ResponseEntity<ProblemSetDTO> editProblemSet(@PathVariable String code) {
         ProblemSetDTO body = problemSetService.getLatestProblemSetForEditing(code);
         if (body != null) {

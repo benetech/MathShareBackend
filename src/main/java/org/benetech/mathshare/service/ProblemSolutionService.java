@@ -14,7 +14,7 @@ public interface ProblemSolutionService {
 
     SolutionDTO findSolutionByUrlCode(String code) throws IllegalArgumentException;
 
-    Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(SolutionDTO solution);
+    Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(String code, SolutionDTO solution);
 
     SolutionDTO getLatestProblemSolutionForEditing(String code);
 }

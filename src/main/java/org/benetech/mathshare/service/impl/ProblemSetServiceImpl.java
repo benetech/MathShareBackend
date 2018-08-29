@@ -88,9 +88,9 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
-    public Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(ProblemSetDTO problemSetDTO) {
+    public Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(String code, ProblemSetDTO problemSetDTO) {
         ProblemSet problemSet = ProblemMapper.INSTANCE.fromDto(problemSetDTO);
-        ProblemSet saved = problemSetRepository.findOneByEditCode(problemSet.getEditCode());
+        ProblemSet saved = problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(code));
         List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         List<Problem> savedProblems = new ArrayList<>();
