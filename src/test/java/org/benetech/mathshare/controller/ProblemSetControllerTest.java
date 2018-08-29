@@ -49,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("PMD.SignatureDeclareThrowsException")
 public class ProblemSetControllerTest {
 
-    private static final String BASE_ENDPOINT = "/set/";
+    private static final String BASE_ENDPOINT = "/problemSet/";
 
     private static final String VIEW_ENDPOINT = BASE_ENDPOINT + "view/";
 

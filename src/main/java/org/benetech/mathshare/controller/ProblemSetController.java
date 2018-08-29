@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/set")
+@RequestMapping("/problemSet")
 public class ProblemSetController {
 
     private final Logger logger = LoggerFactory.getLogger(ProblemSetController.class);
