@@ -51,7 +51,7 @@ public class ProblemSetControllerTest {
 
     private static final String BASE_ENDPOINT = "/problemSet/";
 
-    private static final String REVISION_PARAM = "/revision/";
+    private static final String REVISION_ENDPOINT = "/problemSet/revision/";
 
     private static final Long SHARE_CODE = 13L;
 
@@ -173,7 +173,7 @@ public class ProblemSetControllerTest {
     }
 
     private static MockHttpServletRequestBuilder getProblemSet(boolean validCode) {
-        return get(BASE_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE) + REVISION_PARAM + (validCode ? VALID_CODE : INVALID_CODE));
+        return get(REVISION_ENDPOINT + (validCode ? VALID_CODE : INVALID_CODE));
     }
 
     private static MockHttpServletRequestBuilder getLatestProblemSet(boolean validCode) {

@@ -27,7 +27,7 @@ public class ProblemSetController {
     @Autowired
     private ProblemSetService problemSetService;
 
-    @GetMapping("/{editCode}/revision/{shareCode}")
+    @GetMapping("/revision/{shareCode}")
     ResponseEntity<ProblemSetDTO> getProblemSetRevision(@PathVariable String shareCode) {
         ProblemSetDTO body = problemSetService.findProblemsByUrlCode(shareCode);
         if (body != null) {

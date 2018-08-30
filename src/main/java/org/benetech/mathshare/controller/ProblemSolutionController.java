@@ -27,7 +27,7 @@ public class ProblemSolutionController {
     @Autowired
     private ProblemSolutionService problemSolutionService;
 
-    @GetMapping("/{editCode}/revision/{shareCode}")
+    @GetMapping("/revision/{shareCode}")
     ResponseEntity<SolutionDTO> getProblemSolution(@PathVariable String shareCode) {
         SolutionDTO body = problemSolutionService.findSolutionByUrlCode(shareCode);
         if (body != null) {
