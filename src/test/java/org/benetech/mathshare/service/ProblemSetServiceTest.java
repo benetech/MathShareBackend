@@ -172,7 +172,7 @@ public class ProblemSetServiceTest {
         given(this.problemSetRevisionRepository.save(ProblemSetRevisionMother.withProblems(ProblemSetMother.validInstance(), 3)))
                 .willReturn(ProblemSetRevisionMother.withProblems(ProblemSetMother.validInstance(), 3));
 
-        problemSetService.createOrUpdateProblemSet(problemSetDTO);
+        problemSetService.createOrUpdateProblemSet(problemSetDTO.getEditCode(), problemSetDTO);
         ArgumentCaptor<ProblemSet> problemSetCaptor = ArgumentCaptor.forClass(ProblemSet.class);
         verify(this.problemSetRepository, times(1)).save(problemSetCaptor.capture());
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
@@ -203,7 +203,7 @@ public class ProblemSetServiceTest {
         given(this.problemSetRevisionRepository.save(revision))
                 .willReturn(withProblems);
 
-        problemSetService.createOrUpdateProblemSet(problemSetDTO);
+        problemSetService.createOrUpdateProblemSet(problemSetDTO.getEditCode(), problemSetDTO);
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
         verify(this.problemSetRevisionRepository, times(3)).save(revisionCaptor.capture());
 

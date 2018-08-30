@@ -198,7 +198,7 @@ public class ProblemSolutionServiceTest {
                         .withShareCode(ProblemSetMother.mockInstance(), CODE))))))
                 .willReturn(SolutionRevisionMother.mockInstance());
 
-        problemSolutionService.createOrUpdateProblemSolution(solutionDTO);
+        problemSolutionService.createOrUpdateProblemSolution(solutionDTO.getEditCode(), solutionDTO);
         ArgumentCaptor<ProblemSolution> problemSolutionCaptor = ArgumentCaptor.forClass(ProblemSolution.class);
         verify(this.problemSolutionRepository, times(1)).save(problemSolutionCaptor.capture());
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
@@ -227,7 +227,7 @@ public class ProblemSolutionServiceTest {
         given(this.solutionRevisionRepository.save(rev))
                 .willReturn(rev);
 
-        problemSolutionService.createOrUpdateProblemSolution(solutionDTO);
+        problemSolutionService.createOrUpdateProblemSolution(solutionDTO.getEditCode(), solutionDTO);
         ArgumentCaptor<SolutionRevision> revisionCaptor = ArgumentCaptor.forClass(SolutionRevision.class);
         verify(this.solutionRevisionRepository, times(2)).save(revisionCaptor.capture());
 

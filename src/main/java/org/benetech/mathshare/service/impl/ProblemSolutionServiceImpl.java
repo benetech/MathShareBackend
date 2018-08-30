@@ -95,9 +95,9 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(SolutionDTO solutionDTO) {
+    public Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(String code, SolutionDTO solutionDTO) {
         ProblemSolution solution = SolutionMapper.INSTANCE.fromDto(solutionDTO);
-        ProblemSolution fromDB = problemSolutionRepository.findOneByEditCode(solution.getEditCode());
+        ProblemSolution fromDB = problemSolutionRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(code));
         if (fromDB == null) {
             Problem problem = problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(
                     solution.getProblem().getTitle(),

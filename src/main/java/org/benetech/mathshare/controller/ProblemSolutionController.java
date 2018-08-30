@@ -27,32 +27,32 @@ public class ProblemSolutionController {
     @Autowired
     private ProblemSolutionService problemSolutionService;
 
-    @GetMapping("/view/{code}")
-    ResponseEntity<SolutionDTO> getProblemSolution(@PathVariable String code) {
-        SolutionDTO body = problemSolutionService.findSolutionByUrlCode(code);
+    @GetMapping("/revision/{shareCode}")
+    ResponseEntity<SolutionDTO> getProblemSolution(@PathVariable String shareCode) {
+        SolutionDTO body = problemSolutionService.findSolutionByUrlCode(shareCode);
         if (body != null) {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } else {
-            logger.error("ProblemSet with code {} wasn't found", code);
+            logger.error("ProblemSet with code {} wasn't found", shareCode);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PostMapping(path = "/new")
+    @PostMapping(path = "/")
     ResponseEntity<SolutionDTO> createProblemSolution(@RequestBody SolutionDTO solution) {
         SolutionRevision saved = problemSolutionService.saveNewVersionOfSolution(solution);
         return new ResponseEntity<>(SolutionMapper.INSTANCE.toSolutionDTO(saved), HttpStatus.CREATED);
     }
 
-    @PutMapping(path = "/")
-    ResponseEntity<SolutionDTO> createOrUpdateSolution(@RequestBody SolutionDTO solution) {
+    @PutMapping(path = "/{code}")
+    ResponseEntity<SolutionDTO> createOrUpdateSolution(@PathVariable String code, @RequestBody SolutionDTO solution) {
         Pair<Boolean, SolutionRevision> saved = problemSolutionService.createOrUpdateProblemSolution(
-                solution);
+                code, solution);
         HttpStatus status = saved.getFirst() ? HttpStatus.CREATED : HttpStatus.OK;
         return new ResponseEntity<>(SolutionMapper.INSTANCE.toSolutionDTO(saved.getSecond()), status);
     }
 
-    @GetMapping("/edit/{code}")
+    @GetMapping("/{code}")
     ResponseEntity<SolutionDTO> editProblemSolution(@PathVariable String code) {
         SolutionDTO body = problemSolutionService.getLatestProblemSolutionForEditing(code);
         if (body != null) {
