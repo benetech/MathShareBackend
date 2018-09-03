@@ -12,6 +12,11 @@ import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Mapper
 public interface ProblemMapper {
 
@@ -38,6 +43,7 @@ public interface ProblemMapper {
     ProblemSetDTO toDto(ProblemSet problemSet);
 
     @Mappings({
+            @Mapping(source = "problems", target = "problems", qualifiedByName = "sortProblems"),
             @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "toCode"),
             @Mapping(source = "problemSet.editCode", target = "editCode", qualifiedByName = "toCode")})
     ProblemSetDTO toProblemSetDTO(ProblemSetRevision revision);
@@ -60,5 +66,11 @@ public interface ProblemMapper {
     @Named("toScratchpad")
     default Scratchpad toScratchpad(String content) {
         return content == null ? null : new Scratchpad(content);
+    }
+
+    @Named("sortProblems")
+    default List<ProblemDTO> sortProblems(List<Problem> problems) {
+        return problems.stream().sorted(Comparator.comparing(Problem::getPosition))
+                .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 }
