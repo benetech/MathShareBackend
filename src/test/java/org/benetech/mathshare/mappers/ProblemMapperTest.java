@@ -48,6 +48,22 @@ public class ProblemMapperTest {
     }
 
     @Test
+    public void shouldSortProblemsByPosition() {
+        int problemsSize = 3;
+        ProblemSet problemSet = ProblemSetMother.mockInstance();
+        ProblemSetRevision revision = ProblemSetRevisionMother.withProblems(problemSet, problemsSize);
+        revision.getProblems().get(0).setPosition(1);
+        revision.getProblems().get(1).setPosition(2);
+        revision.getProblems().get(2).setPosition(0);
+
+        ProblemSetDTO mapped = ProblemMapper.INSTANCE.toProblemSetDTO(revision);
+
+        Assert.assertEquals(0, mapped.getProblems().get(0).getPosition());
+        Assert.assertEquals(1, mapped.getProblems().get(1).getPosition());
+        Assert.assertEquals(2, mapped.getProblems().get(2).getPosition());
+    }
+
+    @Test
     public void shouldMapScratchPadFromDto() {
         ProblemDTO problemDTO = ProblemMapper.INSTANCE.toDto(ProblemMother.mockInstance());
         problemDTO.setScratchpad(SCRATCHPAD_CONTENT);

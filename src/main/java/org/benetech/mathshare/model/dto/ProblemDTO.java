@@ -14,4 +14,6 @@ public class ProblemDTO {
     private String title;
 
     private String scratchpad;
+
+    private int position;
 }
