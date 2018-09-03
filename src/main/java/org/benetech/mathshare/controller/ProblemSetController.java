@@ -62,8 +62,7 @@ public class ProblemSetController {
 
     @PostMapping(path = "/")
     ResponseEntity<ProblemSetDTO> createProblemSet(@RequestBody ProblemSetDTO problemSet) {
-        ProblemSetRevision saved = problemSetService.saveNewProblemSet(
-                ProblemMapper.INSTANCE.fromDto(problemSet));
+        ProblemSetRevision saved = problemSetService.saveNewProblemSet(problemSet);
         return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved), HttpStatus.CREATED);
     }
 

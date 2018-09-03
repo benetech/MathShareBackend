@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,7 +103,8 @@ public class ProblemSetControllerTest {
         ProblemSetRevision revision = ProblemSetRevisionMother.mockInstance();
         List<ProblemDTO> problems = ProblemMother.createValidProblemsList(revision, 3).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        when(problemSetService.findProblemsByUrlCode(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE), UrlCodeConverter.toUrlCode(SHARE_CODE)));
+        when(problemSetService.findProblemsByUrlCode(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE),
+                UrlCodeConverter.toUrlCode(SHARE_CODE), new ArrayList<>()));
         String response = mockMvc.perform(getProblemSet(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
@@ -112,7 +114,7 @@ public class ProblemSetControllerTest {
     @Test
     public void shouldReturn201IfCreated() throws Exception {
         ProblemSet toSave = ProblemSetMother.validInstance();
-        when(problemSetService.saveNewProblemSet(toSave)).thenReturn(null);
+        when(problemSetService.saveNewProblemSet(ProblemMapper.INSTANCE.toDto(toSave))).thenReturn(null);
         mockMvc.perform(createProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
     }
@@ -156,7 +158,8 @@ public class ProblemSetControllerTest {
         ProblemSet problemSet = ProblemSetMother.validInstance();
         List<ProblemDTO> problems = ProblemMother.createValidProblemsList(ProblemSetRevisionMother.validInstance(problemSet), 3).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-        when(problemSetService.getLatestProblemSetForEditing(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE), UrlCodeConverter.toUrlCode(SHARE_CODE)));
+        when(problemSetService.getLatestProblemSetForEditing(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE),
+                UrlCodeConverter.toUrlCode(SHARE_CODE),  new ArrayList<>()));
         String response = mockMvc.perform(getLatestProblemSet(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);

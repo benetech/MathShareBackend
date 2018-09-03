@@ -52,13 +52,21 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
-    public ProblemSetRevision saveNewProblemSet(ProblemSet problemSet) throws IllegalArgumentException {
-        if (problemSet.getId() != null) {
-            throw new IllegalArgumentException("Id must be null for the new problem set");
+    public ProblemSetRevision saveNewProblemSet(ProblemSetDTO problemSetDTO) throws IllegalArgumentException {
+        ProblemSet problemSet = ProblemMapper.INSTANCE.fromDto(problemSetDTO);
+        List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
+                .collect(Collectors.toList());
+        List<Problem> savedProblems = new ArrayList<>();
+
+        ProblemSet set = problemSetRepository.save(problemSet);
+        em.refresh(set);
+        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
+        for (Problem problem : problems) {
+            savedProblems.add(createOrUpdateProblem(problem, revision));
         }
-        ProblemSet savedProblemSet = problemSetRepository.save(problemSet);
-        return problemSetRevisionRepository.save(
-                new ProblemSetRevision(savedProblemSet));
+        revision.setProblems(savedProblems);
+        em.refresh(revision);
+        return problemSetRevisionRepository.save(revision);
     }
 
     @Override
@@ -84,7 +92,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<ProblemDTO> problems = problemRepository.findAllByProblemSetRevision(revision)
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
-                UrlCodeConverter.toUrlCode(revision.getShareCode()));
+                UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes());
     }
 
     @Override
@@ -158,6 +166,6 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<ProblemDTO> problems = problemRepository.findAllByProblemSetRevision(revision)
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
-                UrlCodeConverter.toUrlCode(revision.getShareCode()));
+                UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes());
     }
 }

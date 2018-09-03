@@ -20,9 +20,12 @@ public class SolutionDTO {
 
     private List<SolutionStepDTO> steps = new ArrayList<>();
 
-    public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode) {
+    private List<String> palettes;
+
+    public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode, List<String> palettes) {
         this.problem = problem;
         this.steps = steps;
         this.editCode = editCode;
+        this.palettes = palettes;
     }
 }

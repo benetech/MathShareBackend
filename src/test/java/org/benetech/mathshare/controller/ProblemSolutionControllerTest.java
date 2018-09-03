@@ -34,6 +34,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,7 +111,7 @@ public class ProblemSolutionControllerTest {
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
         when(problemSolutionService.findSolutionByUrlCode(VALID_CODE)).thenReturn(
-                new SolutionDTO(problem, solutionStepList, UrlCodeConverter.toUrlCode(EDIT_CODE)));
+                new SolutionDTO(problem, solutionStepList, UrlCodeConverter.toUrlCode(EDIT_CODE), new ArrayList<>()));
         String response = mockMvc.perform(getSolution(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         SolutionDTO result = new ObjectMapper().readValue(response, SolutionDTO.class);
@@ -165,7 +166,7 @@ public class ProblemSolutionControllerTest {
         ProblemDTO problem = ProblemMapper.INSTANCE.toDto(ProblemMother.mockInstance());
 
         when(problemSolutionService.getLatestProblemSolutionForEditing(VALID_CODE)).thenReturn(
-                new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(EDIT_CODE)));
+                new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(EDIT_CODE), new ArrayList<>()));
         String response = mockMvc.perform(getLatestProblemSolution(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         SolutionDTO result = new ObjectMapper().readValue(response, SolutionDTO.class);
