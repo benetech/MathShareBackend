@@ -46,6 +46,24 @@ There is a possibility to run MathShareBackend application in an environment bas
  - postgresql - PostgreSQL database image
  
 Using this approach allows to run the application in an environment independent of a host. It simplifies a potential configuration and provides a possibilty to clean restart the application.
+
+### Windows
+On Windows, there are two options for runninng Docker:
+* based on Hyper-V (requires Windows 10 Pro or higher)
+* based on Virtual Machine - installed by Docker Toolbox
+
+Both requires BIOS supported virtualization. This guide has been prepared using Docker based on Virtual Machine version. It is important to notice that Docker for Windows based on Virtual Machine uses a **different IP** (eg. 192.168.99.100) so there may be a need to change the server properties configuration.
+
+You can get the IP by opening Docker Quickstart Terminal - the URL should be displayed as a welcome message. 
+
+If the URL differs from a default one (default: ```localhost```), you should change the test application database url (this change is needed until internal H2 database is implemented). In ```src/test/resources/application.yml``` set:
+```
+spring:
+  datasource:
+    url: jdbc:postgresql://<ip address>:5432/mathshare
+```
+
+### Running database for tests
  
 Currently, there is a need to build an application image using PostgreSQL database (the test are executed while build).
 If a database **is not running** you can execute the following command:
