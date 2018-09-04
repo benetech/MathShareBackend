@@ -90,25 +90,23 @@ public class ProblemSetServiceTest {
 
     @Test
     public void shouldSaveNewProblemSetRevision() {
-        ProblemSet problemSet = ProblemSetMother.mockInstance();
-        given(problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
-                .willReturn(ProblemSetRevisionMother.revisionOf(problemSet));
-        given(problemSetRevisionRepository.save(new ProblemSetRevision(problemSet)))
-                .willReturn(new ProblemSetRevision(problemSet));
+        ProblemSetDTO problemSetDTO = ProblemMapper.INSTANCE.toProblemSetDTO(ProblemSetRevisionMother.revisionOf(ProblemSetMother.mockInstance()));
+        ProblemSet problemSet = ProblemMapper.INSTANCE.fromDto(problemSetDTO);
         given(problemSetRepository.save(problemSet))
-                .willReturn(ProblemSetMother.validInstance());
-        problemSetService.saveNewProblemSet(problemSet);
+                .willReturn(problemSet);
+        ProblemSetRevision revision = new ProblemSetRevision(problemSet);
+        given(problemSetRevisionRepository.save(revision))
+                .willReturn(revision);
+        revision.setProblems(new ArrayList<>());
+
+        given(problemSetRevisionRepository.save(revision))
+                .willReturn(revision);
+
+        problemSetService.saveNewProblemSet(ProblemMapper.INSTANCE.toProblemSetDTO(ProblemSetRevisionMother.revisionOf(problemSet)));
         ArgumentCaptor<ProblemSet> problemSetCaptor = ArgumentCaptor.forClass(ProblemSet.class);
         verify(problemSetRepository, times(1)).save(problemSetCaptor.capture());
         ArgumentCaptor<ProblemSetRevision> revisionCaptor = ArgumentCaptor.forClass(ProblemSetRevision.class);
-        verify(this.problemSetRevisionRepository, times(1)).save(revisionCaptor.capture());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegalArgumentExceptionForNotNullId() {
-        ProblemSet toSave = new ProblemSet();
-        toSave.setId(1);
-        problemSetService.saveNewProblemSet(toSave);
+        verify(this.problemSetRevisionRepository, times(2)).save(revisionCaptor.capture());
     }
 
     @Test

@@ -91,7 +91,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision)
                 .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
-        return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()));
+        return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
+                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
     }
 
     @Override
@@ -125,7 +126,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision)
                 .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new SolutionDTO(ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()),
-                steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()));
+                steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
+                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
     }
 
     private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps) {
