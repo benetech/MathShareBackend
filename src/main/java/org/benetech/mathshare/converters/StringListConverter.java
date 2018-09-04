@@ -8,6 +8,7 @@ import java.util.List;
 
 @Converter
 public class StringListConverter implements AttributeConverter<List<String>, String> {
+
     private static final String SPLIT_CHAR = ";";
 
     @Override
@@ -17,7 +18,7 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
 
     @Override
     public List<String> convertToEntityAttribute(String string) {
-        if(string == null) {
+        if (string == null) {
             return new ArrayList<String>();
         }
         return Arrays.asList(string.split(SPLIT_CHAR));

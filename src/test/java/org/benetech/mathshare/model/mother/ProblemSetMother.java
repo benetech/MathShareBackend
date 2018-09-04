@@ -7,10 +7,11 @@ import java.util.Arrays;
 public abstract class ProblemSetMother {
 
     public static final Long EDIT_CODE = 49L;
+    public static final String PALETTE = "Geometry";
 
     public static ProblemSet validInstance() {
         ProblemSet set = new ProblemSet();
-        set.setPalettes(Arrays.asList("Geometry"));
+        set.setPalettes(Arrays.asList(PALETTE));
         return set;
     }
 
