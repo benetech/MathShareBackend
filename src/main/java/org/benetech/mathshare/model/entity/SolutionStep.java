@@ -53,6 +53,10 @@ public class SolutionStep extends AbstractEntity {
     @JoinColumn(name = "replaced_by")
     private SolutionStep replacedBy;
 
+    @Lob
+    @Type(type = "text")
+    private String cleanup;
+
     @UpdateTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)

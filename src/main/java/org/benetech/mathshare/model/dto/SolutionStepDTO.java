@@ -14,4 +14,6 @@ public class SolutionStepDTO {
     private String stepValue;
 
     private boolean deleted;
+
+    private String cleanup;
 }
