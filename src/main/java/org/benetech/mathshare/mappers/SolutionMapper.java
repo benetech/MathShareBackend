@@ -21,7 +21,7 @@ public interface SolutionMapper {
     @Mappings({
             @Mapping(source = "problem", target = "problem", qualifiedByName = "toProblemDto"),
             @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")})
-        SolutionDTO toDto(ProblemSolution solution);
+    SolutionDTO toDto(ProblemSolution solution);
 
     @Mappings({
             @Mapping(source = "problem", target = "problem", qualifiedByName = "fromProblemDto"),
