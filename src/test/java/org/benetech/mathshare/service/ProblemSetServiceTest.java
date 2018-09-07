@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL, replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2, replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ProblemSetServiceTest {
 
     private static final Long CODE = 1L;

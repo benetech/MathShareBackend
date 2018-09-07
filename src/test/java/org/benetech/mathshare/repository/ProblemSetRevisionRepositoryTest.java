@@ -18,7 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @RunWith(SpringRunner.class)
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL, replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2, replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 @Transactional
 public class ProblemSetRevisionRepositoryTest {
