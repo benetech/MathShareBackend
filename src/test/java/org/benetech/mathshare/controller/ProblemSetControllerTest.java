@@ -159,7 +159,7 @@ public class ProblemSetControllerTest {
         List<ProblemDTO> problems = ProblemMother.createValidProblemsList(ProblemSetRevisionMother.validInstance(problemSet), 3).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         when(problemSetService.getLatestProblemSetForEditing(VALID_CODE)).thenReturn(new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(EDIT_CODE),
-                UrlCodeConverter.toUrlCode(SHARE_CODE),  new ArrayList<>()));
+                UrlCodeConverter.toUrlCode(SHARE_CODE), new ArrayList<>()));
         String response = mockMvc.perform(getLatestProblemSet(true))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);

@@ -72,5 +72,6 @@ public abstract class UrlCodeConverter {
         return LoggerFactory.getLogger(UrlCodeConverter.class);
     }
 
-    private UrlCodeConverter() { }
+    private UrlCodeConverter() {
+    }
 }
