@@ -5,6 +5,7 @@ import org.benetech.mathshare.model.dto.SolutionDTO;
 import org.benetech.mathshare.model.dto.SolutionStepDTO;
 import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSolution;
+import org.benetech.mathshare.model.entity.Scratchpad;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
 import org.mapstruct.Mapper;
@@ -28,8 +29,10 @@ public interface SolutionMapper {
             @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")})
     ProblemSolution fromDto(SolutionDTO solution);
 
+    @Mapping(source = "scratchpad", target = "scratchpad", qualifiedByName = "fromScratchpad")
     SolutionStepDTO toDto(SolutionStep solutionStep);
 
+    @Mapping(source = "scratchpad", target = "scratchpad", qualifiedByName = "toScratchpad")
     SolutionStep fromDto(SolutionStepDTO solutionStep);
 
     @Mappings({
@@ -46,6 +49,16 @@ public interface SolutionMapper {
     @Named("fromCode")
     default Long fromCode(String editCode) {
         return MapperUtils.fromCode(editCode);
+    }
+
+    @Named("fromScratchpad")
+    default String fromScratchpad(Scratchpad scratchpad) {
+        return MapperUtils.fromScratchpad(scratchpad);
+    }
+
+    @Named("toScratchpad")
+    default Scratchpad toScratchpad(String content) {
+        return MapperUtils.toScratchpad(content);
     }
 
     @Named("toProblemDto")
