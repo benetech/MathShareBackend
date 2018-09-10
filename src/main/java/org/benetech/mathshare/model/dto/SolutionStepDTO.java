@@ -16,4 +16,6 @@ public class SolutionStepDTO {
     private boolean deleted;
 
     private String cleanup;
+
+    private String scratchpad;
 }

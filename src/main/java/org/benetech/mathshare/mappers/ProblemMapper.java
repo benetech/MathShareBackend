@@ -59,12 +59,12 @@ public interface ProblemMapper {
 
     @Named("fromScratchpad")
     default String fromScratchpad(Scratchpad scratchpad) {
-        return scratchpad == null ? null : scratchpad.getContent();
+        return MapperUtils.fromScratchpad(scratchpad);
     }
 
     @Named("toScratchpad")
     default Scratchpad toScratchpad(String content) {
-        return content == null ? null : new Scratchpad(content);
+        return MapperUtils.toScratchpad(content);
     }
 
     @Named("sortProblems")
