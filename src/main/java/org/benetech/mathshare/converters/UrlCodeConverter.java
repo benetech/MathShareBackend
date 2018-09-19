@@ -19,6 +19,8 @@ import java.util.Locale;
         justification = "We need Logger to contain not-constant data to be valuable")
 public abstract class UrlCodeConverter {
 
+    private static final int PROPER_NUMBER_OF_CHARS = 13;
+
     public static String toUrlCode(long number) {
         try {
             byte[] bytes = longToByteArray(number);
@@ -36,7 +38,7 @@ public abstract class UrlCodeConverter {
         } catch (BufferOverflowException | BufferUnderflowException e) {
             getLogger().error(e.getMessage(), e);
         }
-        throw new IllegalArgumentException("Code is probably too long");
+        throw new IllegalArgumentException("Code is not valid");
     }
 
     private static void validateCode(String code) {
@@ -45,7 +47,16 @@ public abstract class UrlCodeConverter {
         } else if (code.isEmpty()) {
             throw new IllegalArgumentException("Code can't be empty");
         } else if (!code.matches("[a-zA-Z2-7]*")) {
-            throw new IllegalArgumentException("Code is not valid");
+            throw new IllegalArgumentException("Code contains not-allowed characters");
+        }
+        validateCodeLength(code);
+    }
+
+    private static void validateCodeLength(String code) {
+        if (code.length() < PROPER_NUMBER_OF_CHARS) {
+            throw new IllegalArgumentException("Code is too short");
+        } else if (code.length() > PROPER_NUMBER_OF_CHARS) {
+            throw new IllegalArgumentException("Code is too long");
         }
     }
 

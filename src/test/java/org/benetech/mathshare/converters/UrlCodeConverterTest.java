@@ -19,6 +19,11 @@ public class UrlCodeConverterTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void fromUrlCodeMethodShouldThrowIllegalArgumentExceptionForTooShortString() {
+        UrlCodeConverter.fromUrlCode("E4AM5WE4AM5W");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void fromUrlCodeMethodShouldThrowIllegalArgumentExceptionForEmptyString() {
         UrlCodeConverter.fromUrlCode("");
     }
@@ -33,7 +38,6 @@ public class UrlCodeConverterTest {
         long result = UrlCodeConverter.fromUrlCode("AAAAAABAKTWFG");
         Assert.assertEquals(542436435L, result);
     }
-
     @Test
     public void fromUrlCodeMethodShouldConvertCodeToNotBoundaryMinusLongValueWithBase32() {
         long result = UrlCodeConverter.fromUrlCode("777777V4A43EE");
