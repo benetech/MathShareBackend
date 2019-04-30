@@ -19,25 +19,6 @@ This is a repository for MathShare backend server. MathShare is a step by step e
 
 ## Building the app
 
-### Dockerized environment
-
-There is a possibility to run MathShareBackend application in an environment based on Docker. This environment consists of two images:
- - server - MathShareBackend application
- - postgresql - PostgreSQL database image
- 
-Using this approach allows to run the application in an environment independent of a host. It simplifies a potential configuration and provides a possibilty to clean restart the application.
-
-#### Windows
-On Windows, there are two options for runninng Docker:
-* based on Hyper-V (requires Windows 10 Pro or higher)
-* based on Virtual Machine - installed by Docker Toolbox
-
-Both requires BIOS supported virtualization. This guide has been prepared using Docker based on Virtual Machine version. It is important to notice that Docker for Windows based on Virtual Machine uses a **different IP** (eg. 192.168.99.100) so the MathShareBackend server application may be different.
-
-You can get the IP by opening Docker Quickstart Terminal - the URL should be displayed as a welcome message.
-
-### Without docker-compose
-
 First, we need to run a PostgreSQL database, the most convenient way to run it is to use Docker.
 The following command will create a Docker container with all properties configured (database and user).
 
@@ -59,11 +40,34 @@ After running the command ```bash  ./mvnw clean install ``` (for Unix systems) o
 You could also build and run the app from your favourite IDE, we recommend IntelliJ IDEA.
 It is recommended to use pgadmin4 to connect to PostgreSQL database.
 
-### With docker-compose
+## Dockerized environment
 
-#### Running the environment
+There is a possibility to run MathShareBackend application in an environment based on Docker. This environment consists of two images:
+ - server - MathShareBackend application
+ - postgresql - PostgreSQL database image
+ 
+Using this approach allows to run the application in an environment independent of a host. It simplifies a potential configuration and provides a possibilty to clean restart the application.
 
-This command should be executed in the root project directory (a docker-compose.yml file should be visible there).
+### Windows
+On Windows, there are two options for runninng Docker:
+* based on Hyper-V (requires Windows 10 Pro or higher)
+* based on Virtual Machine - installed by Docker Toolbox
+
+Both requires BIOS supported virtualization. This guide has been prepared using Docker based on Virtual Machine version. It is important to notice that Docker for Windows based on Virtual Machine uses a **different IP** (eg. 192.168.99.100) so the MathShareBackend server application may be different.
+
+You can get the IP by opening Docker Quickstart Terminal - the URL should be displayed as a welcome message. 
+
+### Building a docker image
+
+To build an image run the command below in the root project directory:
+
+```bash
+mvn clean package docker:build
+```
+
+### Running the environment
+
+If the process completes with success, a new docker image should be created. Now it is possible to run the whole docker environment (the command should be executed in the root project directory - a docker-compose.yml file should be visible there).
 
 ```bash
 docker-compose up
@@ -80,15 +84,6 @@ Optionally, you can also remove the non-volatile database storage by removing th
 ```bash
 docker-compose down -v && docker-compose up
 ```
-
-#### Copying artifact from container to the host
-
-To get the built maven artifact from docker container run this:
-
-```bash
-docker cp "$(docker-compose ps -q server)":/mathshare/app.jar /location/of/output
-```
-
 
 ### Docker variables
 

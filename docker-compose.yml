@@ -2,13 +2,11 @@ version: '3'
 services:
     server:
         image: benetech/mathshare-server
-        build: .
         env_file: .env
         ports:
             - 8080:8080
         depends_on:
             - postgresql
-        entrypoint: java -Djava.security.egd=file:/dev/./urandom -jar /mathshare/app.jar
     postgresql:
         image: postgres:9.5.12
         env_file: .env
