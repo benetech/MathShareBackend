@@ -18,6 +18,8 @@ public class SolutionDTO {
 
     private String shareCode;
 
+    private String reviewCode;
+
     private List<SolutionStepDTO> steps = new ArrayList<>();
 
     private List<String> palettes;
@@ -27,5 +29,11 @@ public class SolutionDTO {
         this.steps = steps;
         this.editCode = editCode;
         this.palettes = palettes;
+    }
+
+    public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode, List<String> palettes,
+                       String reviewCode) {
+        this(problem, steps, editCode, palettes);
+        this.reviewCode = reviewCode;
     }
 }

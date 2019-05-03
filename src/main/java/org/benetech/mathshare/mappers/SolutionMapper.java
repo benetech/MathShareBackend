@@ -2,6 +2,7 @@ package org.benetech.mathshare.mappers;
 
 import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.SolutionDTO;
+import org.benetech.mathshare.model.dto.SolutionPublicDTO;
 import org.benetech.mathshare.model.dto.SolutionStepDTO;
 import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSolution;
@@ -21,12 +22,19 @@ public interface SolutionMapper {
 
     @Mappings({
             @Mapping(source = "problem", target = "problem", qualifiedByName = "toProblemDto"),
-            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")})
+            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode"),
+            @Mapping(source = "reviewCode", target = "reviewCode", qualifiedByName = "toReviewCode")})
     SolutionDTO toDto(ProblemSolution solution);
 
     @Mappings({
+            @Mapping(source = "problem", target = "problem", qualifiedByName = "toProblemDto"),
+            @Mapping(source = "reviewCode", target = "reviewCode", qualifiedByName = "toReviewCode")})
+    SolutionPublicDTO toReadonlyDto(ProblemSolution solution);
+
+    @Mappings({
             @Mapping(source = "problem", target = "problem", qualifiedByName = "fromProblemDto"),
-            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")})
+            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode"),
+            @Mapping(source = "reviewCode", target = "reviewCode", qualifiedByName = "fromReviewCode")})
     ProblemSolution fromDto(SolutionDTO solution);
 
     @Mapping(source = "scratchpad", target = "scratchpad", qualifiedByName = "fromScratchpad")
@@ -49,6 +57,16 @@ public interface SolutionMapper {
     @Named("fromCode")
     default Long fromCode(String editCode) {
         return MapperUtils.fromCode(editCode);
+    }
+
+    @Named("toReviewCode")
+    default String toReviewCode(Long reviewCode) {
+        return MapperUtils.toCode(reviewCode);
+    }
+
+    @Named("fromReviewCode")
+    default Long fromReviewCode(String reviewCode) {
+        return MapperUtils.fromCode(reviewCode);
     }
 
     @Named("fromScratchpad")
