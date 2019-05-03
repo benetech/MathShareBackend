@@ -1,14 +1,18 @@
 package org.benetech.mathshare.service.impl;
 
 import org.benetech.mathshare.converters.UrlCodeConverter;
+import org.benetech.mathshare.mappers.MapperUtils;
 import org.benetech.mathshare.mappers.ProblemMapper;
 import org.benetech.mathshare.mappers.SolutionMapper;
-import org.benetech.mathshare.model.dto.ProblemDTO;
+import org.benetech.mathshare.model.dto.SolutionSetPublicDTO;
 import org.benetech.mathshare.model.dto.SolutionDTO;
+import org.benetech.mathshare.model.dto.SolutionSetDTO;
 import org.benetech.mathshare.model.dto.SolutionStepDTO;
+import org.benetech.mathshare.model.dto.ProblemDTO;
+import org.benetech.mathshare.model.dto.SolutionPublicDTO;
 import org.benetech.mathshare.model.entity.Problem;
-import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.entity.ProblemSolution;
+import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
 import org.benetech.mathshare.repository.ProblemRepository;
@@ -24,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,6 +135,65 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
     }
 
+    @Override
+    public SolutionSetDTO createReviewSolutions(String code) {
+        SolutionSetDTO solutionSet = new SolutionSetDTO();
+        ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
+                UrlCodeConverter.fromUrlCode(code));
+        if (revision == null) {
+            return null;
+        }
+
+        List<Problem> problems = problemRepository.findAllByProblemSetRevision(revision);
+        List<SolutionDTO> savedSolutions = new ArrayList<>();
+
+        Long reviewCode = MapperUtils.nextCode(em);
+        for (Problem problem: problems) {
+            ProblemDTO problemDTO = ProblemMapper.INSTANCE.toDto(problem);
+            List<SolutionStep> steps = getFirstStep(problemDTO);
+            ProblemSolution problemSolution = new ProblemSolution(problem);
+            problemSolution.setReviewCode(reviewCode);
+            problemSolutionRepository.save(problemSolution);
+            em.refresh(problemSolution);
+
+            SolutionRevision rev = saveNewVersionOfSolution(problemSolution, steps);
+            problemSolution = rev.getProblemSolution();
+            SolutionDTO solutionDTO = SolutionMapper.INSTANCE.toDto(problemSolution);
+            solutionDTO.setSteps(steps.stream()
+                    .map(SolutionMapper.INSTANCE::toDto)
+                    .collect(Collectors.toList()));
+            createOrUpdateProblemSolution(code, solutionDTO);
+
+            SolutionRevision latestRevision = solutionRevisionRepository
+                    .findTopByProblemSolutionOrderByIdDesc(problemSolution);
+            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode((latestRevision.getShareCode())));
+            savedSolutions.add(solutionDTO);
+        }
+
+        solutionSet.setSolutions(savedSolutions);
+        return solutionSet;
+    }
+
+    @Override
+    public SolutionSetPublicDTO getReviewSolutions(String reviewCode) {
+        SolutionSetPublicDTO solutionSet = new SolutionSetPublicDTO();
+        List<ProblemSolution> solutions = problemSolutionRepository
+                .findAllByReviewCode(MapperUtils.fromCode(reviewCode))
+                .stream()
+                .collect(Collectors.toList());
+        List<SolutionPublicDTO> solutionsDTO = new ArrayList<>();
+        for (ProblemSolution solution:solutions) {
+            SolutionRevision latestRevision = solutionRevisionRepository
+                    .findTopByProblemSolutionOrderByIdDesc(solution);
+            SolutionPublicDTO solutionDTO = SolutionMapper.INSTANCE.toReadonlyDto(solution);
+            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode((latestRevision.getShareCode())));
+            solutionsDTO.add(solutionDTO);
+        }
+
+        solutionSet.setSolutions(solutionsDTO);
+        return solutionSet;
+    }
+
     private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps) {
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
@@ -143,5 +207,15 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             solutionRevisionRepository.save(oldRevision);
         }
         return newRevision;
+    }
+
+    private List<SolutionStep> getFirstStep(ProblemDTO problemDTO) {
+        List<SolutionStep> steps = new ArrayList<>();
+        SolutionStep step = new SolutionStep();
+        step.setExplanation(problemDTO.getTitle());
+        step.setStepValue(problemDTO.getText());
+        step.setDeleted(false);
+        steps.add(step);
+        return steps;
     }
 }

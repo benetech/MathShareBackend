@@ -1,6 +1,8 @@
 package org.benetech.mathshare.service;
 
 import org.benetech.mathshare.model.dto.SolutionDTO;
+import org.benetech.mathshare.model.dto.SolutionSetDTO;
+import org.benetech.mathshare.model.dto.SolutionSetPublicDTO;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.springframework.data.util.Pair;
 
@@ -17,4 +19,8 @@ public interface ProblemSolutionService {
     Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(String code, SolutionDTO solution);
 
     SolutionDTO getLatestProblemSolutionForEditing(String code);
+
+    SolutionSetDTO createReviewSolutions(String code);
+
+    SolutionSetPublicDTO getReviewSolutions(String code);
 }

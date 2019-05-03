@@ -32,6 +32,9 @@ public class ProblemSolution extends AbstractEntity {
     @Column(insertable = false)
     private Long editCode;
 
+    @Column(insertable = true)
+    private Long reviewCode;
+
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)

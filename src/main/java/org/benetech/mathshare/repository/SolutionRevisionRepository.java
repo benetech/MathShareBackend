@@ -11,4 +11,6 @@ public interface SolutionRevisionRepository extends JpaRepository<SolutionRevisi
     SolutionRevision findOneByShareCode(long shareCode);
 
     SolutionRevision findOneByProblemSolutionAndReplacedBy(ProblemSolution problemSolution, SolutionRevision replacedBy);
+
+    SolutionRevision findTopByProblemSolutionOrderByIdDesc(ProblemSolution problemSolution);
 }

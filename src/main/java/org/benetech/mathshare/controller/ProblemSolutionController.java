@@ -2,6 +2,8 @@ package org.benetech.mathshare.controller;
 
 import org.benetech.mathshare.mappers.SolutionMapper;
 import org.benetech.mathshare.model.dto.SolutionDTO;
+import org.benetech.mathshare.model.dto.SolutionSetDTO;
+import org.benetech.mathshare.model.dto.SolutionSetPublicDTO;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.service.ProblemSolutionService;
 import org.slf4j.Logger;
@@ -59,6 +61,28 @@ public class ProblemSolutionController {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } else {
             logger.error("ProblemSolution with code {} wasn't found", code);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(path = "/review/{problemSetCode}")
+    ResponseEntity<SolutionSetDTO> createReviewSolution(@PathVariable String problemSetCode) {
+        SolutionSetDTO body = problemSolutionService.createReviewSolutions(problemSetCode);
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("ProblemSolution with code {} wasn't found", problemSetCode);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/review/{reviewCode}")
+    ResponseEntity<SolutionSetPublicDTO> getReviewSolution(@PathVariable String reviewCode) {
+        SolutionSetPublicDTO body = problemSolutionService.getReviewSolutions(reviewCode);
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("ProblemSolution with code {} wasn't found", reviewCode);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
