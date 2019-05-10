@@ -6,6 +6,8 @@ import org.benetech.mathshare.model.dto.SolutionSetPublicDTO;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.springframework.data.util.Pair;
 
+import java.util.List;
+
 public interface ProblemSolutionService {
 
     SolutionRevision getLatestSolutionRevision(long editUrl);
@@ -20,7 +22,7 @@ public interface ProblemSolutionService {
 
     SolutionDTO getLatestProblemSolutionForEditing(String code);
 
-    SolutionSetDTO createReviewSolutions(String code);
+    SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO);
 
     SolutionSetPublicDTO getReviewSolutions(String code);
 }

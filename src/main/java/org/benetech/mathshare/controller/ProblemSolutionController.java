@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/solution")
 public class ProblemSolutionController {
@@ -66,12 +68,14 @@ public class ProblemSolutionController {
     }
 
     @PostMapping(path = "/review/{problemSetCode}")
-    ResponseEntity<SolutionSetDTO> createReviewSolution(@PathVariable String problemSetCode) {
-        SolutionSetDTO body = problemSolutionService.createReviewSolutions(problemSetCode);
+    ResponseEntity<SolutionSetDTO> createReviewSolution(
+            @PathVariable String problemSetCode, @RequestBody List<SolutionDTO> solutions
+    ) {
+        SolutionSetDTO body = problemSolutionService.createReviewSolutions(problemSetCode, solutions);
         if (body != null) {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } else {
-            logger.error("ProblemSolution with code {} wasn't found", problemSetCode);
+            logger.error("SolutionSet with code {} wasn't found", problemSetCode);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
