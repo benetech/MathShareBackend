@@ -13,4 +13,6 @@ import java.util.List;
 public class SolutionSetPublicDTO {
 
     private List<SolutionPublicDTO> solutions = new ArrayList<>();
+
+    private String reviewCode;
 }

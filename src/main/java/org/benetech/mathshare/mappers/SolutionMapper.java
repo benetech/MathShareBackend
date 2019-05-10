@@ -22,19 +22,16 @@ public interface SolutionMapper {
 
     @Mappings({
             @Mapping(source = "problem", target = "problem", qualifiedByName = "toProblemDto"),
-            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode"),
-            @Mapping(source = "reviewCode", target = "reviewCode", qualifiedByName = "toReviewCode")})
+            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")})
     SolutionDTO toDto(ProblemSolution solution);
 
     @Mappings({
-            @Mapping(source = "problem", target = "problem", qualifiedByName = "toProblemDto"),
-            @Mapping(source = "reviewCode", target = "reviewCode", qualifiedByName = "toReviewCode")})
+            @Mapping(source = "problem", target = "problem", qualifiedByName = "toProblemDto")})
     SolutionPublicDTO toReadonlyDto(ProblemSolution solution);
 
     @Mappings({
             @Mapping(source = "problem", target = "problem", qualifiedByName = "fromProblemDto"),
-            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode"),
-            @Mapping(source = "reviewCode", target = "reviewCode", qualifiedByName = "fromReviewCode")})
+            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")})
     ProblemSolution fromDto(SolutionDTO solution);
 
     @Mapping(source = "scratchpad", target = "scratchpad", qualifiedByName = "fromScratchpad")

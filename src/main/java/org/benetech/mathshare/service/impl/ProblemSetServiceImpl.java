@@ -147,6 +147,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 problem.getProblemText(), problemSetRevision);
         if (saved == null) {
             problem.setProblemSetRevision(problemSetRevision);
+            problem.setId(null);
             return problemRepository.save(problem);
         } else {
             Problem newVersion = new Problem(saved.getProblemText(), saved.getTitle(), problemSetRevision);

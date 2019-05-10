@@ -13,11 +13,13 @@ import org.benetech.mathshare.model.dto.SolutionPublicDTO;
 import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
+import org.benetech.mathshare.model.entity.ReviewSolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
 import org.benetech.mathshare.repository.ProblemRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.repository.ProblemSolutionRepository;
+import org.benetech.mathshare.repository.ReviewSolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionStepRepository;
 import org.benetech.mathshare.service.ProblemSolutionService;
@@ -41,6 +43,9 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
     @Autowired
     private SolutionRevisionRepository solutionRevisionRepository;
+
+    @Autowired
+    private ReviewSolutionRevisionRepository reviewSolutionRevisionRepository;
 
     @Autowired
     private ProblemRepository problemRepository;
@@ -115,8 +120,11 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps);
-        boolean newSolution = problemSolutionRepository.findOneByEditCode(SolutionMapper.INSTANCE
-                .fromDto(solutionDTO).getEditCode()) == null;
+        Long editCode = SolutionMapper.INSTANCE.fromDto(solutionDTO).getEditCode();
+        boolean newSolution = false;
+        if (editCode != null) {
+            newSolution = problemSolutionRepository.findOneByEditCode(editCode) == null;
+        }
         em.refresh(newRevision);
         return Pair.of(newSolution, newRevision);
     }
@@ -136,7 +144,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public SolutionSetDTO createReviewSolutions(String code) {
+    public SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO) {
         SolutionSetDTO solutionSet = new SolutionSetDTO();
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
                 UrlCodeConverter.fromUrlCode(code));
@@ -144,32 +152,24 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             return null;
         }
 
-        List<Problem> problems = problemRepository.findAllByProblemSetRevision(revision);
         List<SolutionDTO> savedSolutions = new ArrayList<>();
-
         Long reviewCode = MapperUtils.nextCode(em);
-        for (Problem problem: problems) {
-            ProblemDTO problemDTO = ProblemMapper.INSTANCE.toDto(problem);
-            List<SolutionStep> steps = getFirstStep(problemDTO);
-            ProblemSolution problemSolution = new ProblemSolution(problem);
-            problemSolution.setReviewCode(reviewCode);
-            problemSolutionRepository.save(problemSolution);
-            em.refresh(problemSolution);
+        solutionSet.setReviewCode(MapperUtils.toCode(reviewCode));
 
-            SolutionRevision rev = saveNewVersionOfSolution(problemSolution, steps);
-            problemSolution = rev.getProblemSolution();
-            SolutionDTO solutionDTO = SolutionMapper.INSTANCE.toDto(problemSolution);
-            solutionDTO.setSteps(steps.stream()
-                    .map(SolutionMapper.INSTANCE::toDto)
-                    .collect(Collectors.toList()));
-            createOrUpdateProblemSolution(code, solutionDTO);
+        for (SolutionDTO solutionDTO: solutionsDTO) {
+            SolutionRevision solutionRevision = saveNewVersionOfSolution(solutionDTO);
+            solutionRevisionRepository.save(solutionRevision);
+            em.refresh(solutionRevision);
 
-            SolutionRevision latestRevision = solutionRevisionRepository
-                    .findTopByProblemSolutionOrderByIdDesc(problemSolution);
-            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode((latestRevision.getShareCode())));
+            ProblemSolution problemSolution = solutionRevision.getProblemSolution();
+            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode(solutionRevision.getShareCode()));
+            solutionDTO.setEditCode(UrlCodeConverter.toUrlCode(problemSolution.getEditCode()));
+            ReviewSolutionRevision reviewSolutionRevision = new ReviewSolutionRevision(solutionRevision, reviewCode);
+            reviewSolutionRevisionRepository.save(reviewSolutionRevision);
+            em.refresh(reviewSolutionRevision);
+
             savedSolutions.add(solutionDTO);
         }
-
         solutionSet.setSolutions(savedSolutions);
         return solutionSet;
     }
@@ -177,19 +177,17 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     @Override
     public SolutionSetPublicDTO getReviewSolutions(String reviewCode) {
         SolutionSetPublicDTO solutionSet = new SolutionSetPublicDTO();
-        List<ProblemSolution> solutions = problemSolutionRepository
-                .findAllByReviewCode(MapperUtils.fromCode(reviewCode))
-                .stream()
-                .collect(Collectors.toList());
+        solutionSet.setReviewCode(reviewCode);
         List<SolutionPublicDTO> solutionsDTO = new ArrayList<>();
-        for (ProblemSolution solution:solutions) {
-            SolutionRevision latestRevision = solutionRevisionRepository
-                    .findTopByProblemSolutionOrderByIdDesc(solution);
+        List<ReviewSolutionRevision> reviewSolutionRevisions = reviewSolutionRevisionRepository
+                .findAllByReviewCode(MapperUtils.fromCode(reviewCode));
+        for (ReviewSolutionRevision reviewSolutionRevision:reviewSolutionRevisions) {
+            SolutionRevision solutionRevision = reviewSolutionRevision.getSolutionRevision();
+            ProblemSolution solution = solutionRevision.getProblemSolution();
             SolutionPublicDTO solutionDTO = SolutionMapper.INSTANCE.toReadonlyDto(solution);
-            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode((latestRevision.getShareCode())));
+            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode((solutionRevision.getShareCode())));
             solutionsDTO.add(solutionDTO);
         }
-
         solutionSet.setSolutions(solutionsDTO);
         return solutionSet;
     }
@@ -207,15 +205,5 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             solutionRevisionRepository.save(oldRevision);
         }
         return newRevision;
-    }
-
-    private List<SolutionStep> getFirstStep(ProblemDTO problemDTO) {
-        List<SolutionStep> steps = new ArrayList<>();
-        SolutionStep step = new SolutionStep();
-        step.setExplanation(problemDTO.getTitle());
-        step.setStepValue(problemDTO.getText());
-        step.setDeleted(false);
-        steps.add(step);
-        return steps;
     }
 }
