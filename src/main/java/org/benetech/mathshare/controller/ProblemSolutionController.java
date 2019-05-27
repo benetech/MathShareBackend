@@ -1,5 +1,9 @@
 package org.benetech.mathshare.controller;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.benetech.mathshare.mappers.SolutionMapper;
 import org.benetech.mathshare.model.dto.SolutionDTO;
 import org.benetech.mathshare.model.dto.SolutionSetDTO;
@@ -9,6 +13,7 @@ import org.benetech.mathshare.service.ProblemSolutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 
 @RestController
@@ -30,6 +37,11 @@ public class ProblemSolutionController {
 
     @Autowired
     private ProblemSolutionService problemSolutionService;
+
+    private String watsonApiGrant = "urn:ibm:params:oauth:grant-type:apikey";
+
+    @Value("${ibm-watson.api-key}")
+    private String watsonAPiKey;
 
     @GetMapping("/revision/{shareCode}")
     ResponseEntity<SolutionDTO> getProblemSolution(@PathVariable String shareCode) {
@@ -87,6 +99,27 @@ public class ProblemSolutionController {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } else {
             logger.error("ProblemSolution with code {} wasn't found", reviewCode);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(path = "/s2t/token", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<String> getSpeechToTextToken() {
+        try {
+            OkHttpClient client = new OkHttpClient();
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType,
+                    "grant_type=" + URLEncoder.encode(this.watsonApiGrant, "UTF-8")
+                            + "&apikey=" + this.watsonAPiKey);
+            Request request = new Request.Builder()
+                    .url("https://iam.bluemix.net/identity/token")
+                    .post(body)
+                    .addHeader("Accept", "application/json")
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            return new ResponseEntity<>(response.body().string(), HttpStatus.OK);
+        } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

@@ -8,6 +8,9 @@ spring:
   jpa:
     properties:
       hiberrnate.jdbc.lob.non_contextual_creation: ${JPA_PROPERTIES_HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION:true}
+      hibernate.ddlAuto: validate
+      generateDdl: true
+      showSql: true
 
 server:
   port: ${SERVER_PORT:8080}
@@ -20,3 +23,6 @@ logging:
 
 cross-origin:
   allowed-origins: ${CROSS_ORIGIN_ALLOWED_ORIGINS:http://localhost:3000}
+
+ibm-watson:
+  api-key: ${WATSON_API_KEY:api-key}
