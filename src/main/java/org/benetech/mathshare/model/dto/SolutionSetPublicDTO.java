@@ -15,4 +15,6 @@ public class SolutionSetPublicDTO {
     private List<SolutionPublicDTO> solutions = new ArrayList<>();
 
     private String reviewCode;
+
+    private String title;
 }

@@ -19,4 +19,6 @@ public class ProblemSetDTO {
 
     private List<String> palettes;
 
+    private String title;
+
 }

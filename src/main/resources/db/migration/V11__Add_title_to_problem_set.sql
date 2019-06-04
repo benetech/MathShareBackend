@@ -1,0 +1,1 @@
+ALTER TABLE problem_set ADD COLUMN title VARCHAR(255);
