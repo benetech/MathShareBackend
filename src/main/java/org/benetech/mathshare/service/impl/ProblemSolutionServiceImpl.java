@@ -4,6 +4,7 @@ import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.mappers.MapperUtils;
 import org.benetech.mathshare.mappers.ProblemMapper;
 import org.benetech.mathshare.mappers.SolutionMapper;
+import org.benetech.mathshare.model.dto.ProblemSetDTO;
 import org.benetech.mathshare.model.dto.SolutionSetPublicDTO;
 import org.benetech.mathshare.model.dto.SolutionDTO;
 import org.benetech.mathshare.model.dto.SolutionSetDTO;
@@ -181,14 +182,27 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         List<SolutionPublicDTO> solutionsDTO = new ArrayList<>();
         List<ReviewSolutionRevision> reviewSolutionRevisions = reviewSolutionRevisionRepository
                 .findAllByReviewCode(MapperUtils.fromCode(reviewCode));
+        String title = null;
         for (ReviewSolutionRevision reviewSolutionRevision:reviewSolutionRevisions) {
             SolutionRevision solutionRevision = reviewSolutionRevision.getSolutionRevision();
             ProblemSolution solution = solutionRevision.getProblemSolution();
             SolutionPublicDTO solutionDTO = SolutionMapper.INSTANCE.toReadonlyDto(solution);
+            if (title == null) {
+                ProblemDTO problem = solutionDTO.getProblem();
+                ProblemSetRevision problemSet =  problemSetRevisionRepository.findOneByShareCode(
+                        MapperUtils.fromCode(problem.getProblemSetRevisionShareCode())
+                );
+                ProblemSetDTO problemSetDTO = ProblemMapper.INSTANCE.toProblemSetDTO((problemSet));
+                if (problemSet != null) {
+                    title = problemSetDTO.getTitle();
+                }
+            }
+
             solutionDTO.setShareCode(UrlCodeConverter.toUrlCode((solutionRevision.getShareCode())));
             solutionsDTO.add(solutionDTO);
         }
         solutionSet.setSolutions(solutionsDTO);
+        solutionSet.setTitle(title);
         return solutionSet;
     }
 
