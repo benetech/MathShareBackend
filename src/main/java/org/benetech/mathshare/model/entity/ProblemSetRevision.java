@@ -42,6 +42,9 @@ public class ProblemSetRevision extends AbstractEntity {
     @Column(insertable = false)
     private Long shareCode;
 
+    @Column
+    private boolean isExample;
+
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)

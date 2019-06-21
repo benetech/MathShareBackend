@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/problemSet")
 public class ProblemSetController {
@@ -81,6 +83,17 @@ public class ProblemSetController {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } else {
             logger.error("ProblemSet with code {} wasn't found", code);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/exampleSets")
+    ResponseEntity<List<ProblemSetDTO>> getExampleProblemSets() {
+        List<ProblemSetDTO> result = problemSetService.findAllExampleProblems();
+        if (result != null) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            logger.error("Default problem set wasn't found");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

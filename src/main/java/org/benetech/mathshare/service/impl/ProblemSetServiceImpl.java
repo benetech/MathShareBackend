@@ -82,6 +82,12 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
+    public List<ProblemSetDTO> findAllExampleProblems() {
+        List<ProblemSetRevision> problemSets = problemSetRevisionRepository.findAllByIsExample(true);
+        return problemSets.stream().map(ProblemMapper.INSTANCE::toProblemSetDTO).collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
