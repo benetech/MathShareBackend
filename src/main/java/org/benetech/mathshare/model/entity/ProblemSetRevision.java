@@ -45,12 +45,16 @@ public class ProblemSetRevision extends AbstractEntity {
     @Column
     private boolean isExample;
 
+    @Column
+    private String title;
+
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
 
-    public ProblemSetRevision(@NotNull ProblemSet problemSet) {
+    public ProblemSetRevision(@NotNull ProblemSet problemSet, @NotNull String title) {
         this.problemSet = problemSet;
+        this.title = title;
     }
 }

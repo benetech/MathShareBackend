@@ -24,9 +24,6 @@ public class ProblemSet extends AbstractEntity {
     @Column(insertable = false)
     private Long editCode;
 
-    @Column
-    private String title;
-
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
