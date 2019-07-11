@@ -26,3 +26,6 @@
 
 ### Logging ###
 logs/
+
+### Mac ###
+.DS_Store

@@ -60,7 +60,9 @@ public class ProblemSetServiceImpl implements ProblemSetService {
 
         ProblemSet set = problemSetRepository.save(problemSet);
         em.refresh(set);
-        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
+        ProblemSetRevision revision = problemSetRevisionRepository.save(
+                new ProblemSetRevision(set, problemSetDTO.getTitle())
+        );
         for (Problem problem : problems) {
             savedProblems.add(createOrUpdateProblem(problem, revision));
         }
@@ -82,6 +84,12 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
+    public List<ProblemSetDTO> findAllExampleProblems() {
+        List<ProblemSetRevision> problemSets = problemSetRevisionRepository.findAllByIsExample(true);
+        return problemSets.stream().map(ProblemMapper.INSTANCE::toProblemSetDTO).collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
@@ -93,7 +101,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes(),
-                revision.getProblemSet().getTitle());
+                revision.getTitle());
     }
 
     @Override
@@ -105,20 +113,22 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<Problem> savedProblems = new ArrayList<>();
         ProblemSetRevision result;
         boolean newSet;
+        String title = problemSetDTO.getTitle();
         if (saved == null) {
-            result = createProblemSet(savedProblems, problems, problemSet);
+            result = createProblemSet(savedProblems, problems, problemSet, title);
             newSet = true;
         } else {
-            result = updateProblemSet(savedProblems, problems, problemSet);
+            result = updateProblemSet(savedProblems, problems, problemSet, title);
             newSet = false;
         }
         em.refresh(result);
         return Pair.of(newSet, result);
     }
 
-    private ProblemSetRevision createProblemSet(List<Problem> savedProblems, List<Problem> problems, ProblemSet problemSet) {
+    private ProblemSetRevision createProblemSet(List<Problem> savedProblems, List<Problem> problems,
+                                                ProblemSet problemSet, String title) {
         ProblemSet set = problemSetRepository.save(problemSet);
-        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
+        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set, title));
         for (Problem problem : problems) {
             savedProblems.add(createOrUpdateProblem(problem, revision));
         }
@@ -126,12 +136,13 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         return problemSetRevisionRepository.save(revision);
     }
 
-    private ProblemSetRevision updateProblemSet(List<Problem> savedProblems, List<Problem> problems, ProblemSet problemSet) {
+    private ProblemSetRevision updateProblemSet(List<Problem> savedProblems, List<Problem> problems,
+                                                ProblemSet problemSet, String title) {
         ProblemSetRevision result;
         ProblemSet set = problemSetRepository.findOneByEditCode(problemSet.getEditCode());
         ProblemSetRevision oldRevision = problemSetRevisionRepository
                 .findOneByProblemSetAndReplacedBy(set, null);
-        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set));
+        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set, title));
         for (Problem problem : problems) {
             savedProblems.add(createOrUpdateProblem(problem, revision));
         }
@@ -169,6 +180,6 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes(),
-                revision.getProblemSet().getTitle());
+                revision.getTitle());
     }
 }

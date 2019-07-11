@@ -1,0 +1,19 @@
+version: '3'
+services:
+    server:
+        image: registry.gitlab.com/rupeshparab.rp/mathsharebackend:latest
+        env_file: .env
+        ports:
+            - 8080:8080
+        depends_on:
+            - postgresql
+        entrypoint: java -Djava.security.egd=file:/dev/./urandom -jar /mathshare/app.jar
+    postgresql:
+        image: postgres:9.5.12
+        ports:
+            - 5433:5432
+        env_file: .env
+        volumes:
+            - db-data:/var/lib/postgresql/data
+volumes:
+    db-data:

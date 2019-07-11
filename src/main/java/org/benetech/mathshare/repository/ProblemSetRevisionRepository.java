@@ -5,6 +5,8 @@ import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ProblemSetRevisionRepository extends JpaRepository<ProblemSetRevision, Integer> {
 
@@ -13,4 +15,7 @@ public interface ProblemSetRevisionRepository extends JpaRepository<ProblemSetRe
     ProblemSetRevision findOneByShareCode(long code);
 
     ProblemSetRevision findFirstByOrderByDateCreatedAsc();
+
+    List<ProblemSetRevision> findAllByIsExample(boolean isExmple);
+
 }
