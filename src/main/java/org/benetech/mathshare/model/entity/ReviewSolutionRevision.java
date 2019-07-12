@@ -1,5 +1,6 @@
 package org.benetech.mathshare.model.entity;
 
+import lombok.NonNull;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AccessLevel;
@@ -31,13 +32,22 @@ public class ReviewSolutionRevision extends AbstractEntity {
     @JoinColumn(name = "solution_revision_id")
     private SolutionRevision solutionRevision;
 
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "problem_set_revision_solution_id")
+    private ProblemSetRevisionSolution problemSetRevisionSolution;
+
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
 
-    public ReviewSolutionRevision(@NotNull SolutionRevision solutionRevision, Long reviewCode) {
+    @NonNull
+    private Boolean inactive = false;
+
+    public ReviewSolutionRevision(@NotNull SolutionRevision solutionRevision, Long reviewCode,
+                                  ProblemSetRevisionSolution problemSetRevisionSolution) {
         this.solutionRevision = solutionRevision;
         this.reviewCode = reviewCode;
+        this.problemSetRevisionSolution = problemSetRevisionSolution;
     }
 }

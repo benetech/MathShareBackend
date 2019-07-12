@@ -12,6 +12,7 @@ import org.benetech.mathshare.model.dto.SolutionStepDTO;
 import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.SolutionPublicDTO;
 import org.benetech.mathshare.model.entity.Problem;
+import org.benetech.mathshare.model.entity.ProblemSetRevisionSolution;
 import org.benetech.mathshare.model.entity.ProblemSolution;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.model.entity.ReviewSolutionRevision;
@@ -19,6 +20,7 @@ import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
 import org.benetech.mathshare.repository.ProblemRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
+import org.benetech.mathshare.repository.ProblemSetRevisionSolutionRepository;
 import org.benetech.mathshare.repository.ProblemSolutionRepository;
 import org.benetech.mathshare.repository.ReviewSolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionRevisionRepository;
@@ -57,6 +59,9 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     @Autowired
     private ProblemSetRevisionRepository problemSetRevisionRepository;
 
+    @Autowired
+    private ProblemSetRevisionSolutionRepository problemSetRevisionSolutionRepository;
+
     @PersistenceContext
     private EntityManager em;
 
@@ -82,6 +87,18 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         ProblemSolution problemSolution = problemSolutionRepository.save(new ProblemSolution(problem));
         em.refresh(problemSolution);
 
+        List<SolutionStep> steps = solution.getSteps()
+                .stream().map(SolutionMapper.INSTANCE::fromDto)
+                .collect(Collectors.toList());
+        return saveNewVersionOfSolution(problemSolution, steps);
+    }
+
+    @Override
+    public SolutionRevision saveNewVersionOfSolutionWithExistingEditCode(SolutionDTO solution) {
+        String editCode = solution.getEditCode();
+        ProblemSolution problemSolution = problemSolutionRepository.findOneByEditCode(
+                UrlCodeConverter.fromUrlCode(editCode)
+        );
         List<SolutionStep> steps = solution.getSteps()
                 .stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
@@ -136,43 +153,101 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         if (revision == null) {
             return null;
         }
+        String solutionEditCode = "";
+        ReviewSolutionRevision reviewSolutionRevision = reviewSolutionRevisionRepository.findOneBySolutionRevision(
+                revision);
+        if (reviewSolutionRevision != null) {
+            ProblemSetRevisionSolution problemSetRevisionSolution = reviewSolutionRevision
+                    .getProblemSetRevisionSolution();
+            if (problemSetRevisionSolution != null) {
+                solutionEditCode = UrlCodeConverter.toUrlCode(problemSetRevisionSolution.getEditCode());
+            }
+        }
 
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision)
                 .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
-        return new SolutionDTO(ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()),
+        SolutionDTO solutionDTO = new SolutionDTO(
+                ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()),
                 steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
                 revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
+        solutionDTO.setProblemSetSolutionEditCode(solutionEditCode);
+        return solutionDTO;
+    }
+
+    private SolutionSetDTO createOrUpdateReviewSolutions(List<SolutionDTO> solutionsDTO,
+                                                         ProblemSetRevisionSolution problemSetRevisionSolution,
+                                                         boolean isCreate) {
+        List<SolutionDTO> savedSolutions = new ArrayList<>();
+        Long reviewCode = MapperUtils.nextCode(em);
+        SolutionSetDTO solutionSet = new SolutionSetDTO();
+        solutionSet.setReviewCode(MapperUtils.toCode(reviewCode));
+
+        String title = null;
+        for (SolutionDTO solutionDTO: solutionsDTO) {
+            SolutionRevision solutionRevision;
+            if (isCreate) {
+                solutionRevision = saveNewVersionOfSolution(solutionDTO);
+            } else {
+                solutionRevision = saveNewVersionOfSolutionWithExistingEditCode(solutionDTO);
+            }
+            solutionRevisionRepository.save(solutionRevision);
+            em.refresh(solutionRevision);
+
+            if (title == null) {
+                ProblemDTO problem = solutionDTO.getProblem();
+                ProblemSetRevision problemSet =  problemSetRevisionRepository.findOneByShareCode(
+                        MapperUtils.fromCode(problem.getProblemSetRevisionShareCode())
+                );
+                ProblemSetDTO problemSetDTO = ProblemMapper.INSTANCE.toProblemSetDTO((problemSet));
+                if (problemSet != null) {
+                    title = problemSetDTO.getTitle();
+                }
+            }
+
+            ProblemSolution problemSolution = solutionRevision.getProblemSolution();
+            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode(solutionRevision.getShareCode()));
+            solutionDTO.setEditCode(UrlCodeConverter.toUrlCode(problemSolution.getEditCode()));
+            ReviewSolutionRevision reviewSolutionRevision = new ReviewSolutionRevision(solutionRevision, reviewCode,
+                    problemSetRevisionSolution);
+            reviewSolutionRevisionRepository.save(reviewSolutionRevision);
+            em.refresh(reviewSolutionRevision);
+
+            savedSolutions.add(solutionDTO);
+        }
+        solutionSet.setTitle(title);
+        solutionSet.setSolutions(savedSolutions);
+        return solutionSet;
     }
 
     @Override
     public SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO) {
-        SolutionSetDTO solutionSet = new SolutionSetDTO();
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
                 UrlCodeConverter.fromUrlCode(code));
         if (revision == null) {
             return null;
         }
 
-        List<SolutionDTO> savedSolutions = new ArrayList<>();
-        Long reviewCode = MapperUtils.nextCode(em);
-        solutionSet.setReviewCode(MapperUtils.toCode(reviewCode));
+        Long editCode = MapperUtils.nextCode(em);
+        ProblemSetRevisionSolution problemSetRevisionSolution = new ProblemSetRevisionSolution(revision, editCode);
+        problemSetRevisionSolutionRepository.save(problemSetRevisionSolution);
+        em.refresh(problemSetRevisionSolution);
 
-        for (SolutionDTO solutionDTO: solutionsDTO) {
-            SolutionRevision solutionRevision = saveNewVersionOfSolution(solutionDTO);
-            solutionRevisionRepository.save(solutionRevision);
-            em.refresh(solutionRevision);
+        SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, true);
+        solutionSetDTO.setEditCode(MapperUtils.toCode(editCode));
+        return solutionSetDTO;
+    }
 
-            ProblemSolution problemSolution = solutionRevision.getProblemSolution();
-            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode(solutionRevision.getShareCode()));
-            solutionDTO.setEditCode(UrlCodeConverter.toUrlCode(problemSolution.getEditCode()));
-            ReviewSolutionRevision reviewSolutionRevision = new ReviewSolutionRevision(solutionRevision, reviewCode);
-            reviewSolutionRevisionRepository.save(reviewSolutionRevision);
-            em.refresh(reviewSolutionRevision);
-
-            savedSolutions.add(solutionDTO);
+    @Override
+    public SolutionSetDTO updateReviewSolutions(String editCode, List<SolutionDTO> solutionsDTO) {
+        ProblemSetRevisionSolution problemSetRevisionSolution = problemSetRevisionSolutionRepository.findOneByEditCode(
+                UrlCodeConverter.fromUrlCode(editCode));
+        if (problemSetRevisionSolution == null) {
+            return null;
         }
-        solutionSet.setSolutions(savedSolutions);
-        return solutionSet;
+        reviewSolutionRevisionRepository.setAllReviewSolutionRevisionsInactiveFor(problemSetRevisionSolution);
+        SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, false);
+        solutionSetDTO.setEditCode(editCode);
+        return solutionSetDTO;
     }
 
     @Override
@@ -203,6 +278,44 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         }
         solutionSet.setSolutions(solutionsDTO);
         solutionSet.setTitle(title);
+        return solutionSet;
+    }
+
+    @Override
+    public SolutionSetDTO getProblemSetSolutions(String editCode) {
+        SolutionSetDTO solutionSet = new SolutionSetDTO();
+        ProblemSetRevisionSolution problemSetRevisionSolution = problemSetRevisionSolutionRepository.findOneByEditCode(
+                MapperUtils.fromCode(editCode));
+        List<SolutionDTO> solutionsDTO = new ArrayList<>();
+        List<ReviewSolutionRevision> reviewSolutionRevisions = reviewSolutionRevisionRepository
+                .findAllByProblemSetRevisionSolutionAndInactive(problemSetRevisionSolution, false);
+        String title = null;
+        String reviewCode = null;
+        for (ReviewSolutionRevision reviewSolutionRevision:reviewSolutionRevisions) {
+            SolutionRevision solutionRevision = reviewSolutionRevision.getSolutionRevision();
+            SolutionDTO solutionDTO = SolutionMapper.INSTANCE.toSolutionDTOWithSteps(solutionRevision);
+            if (title == null) {
+                ProblemDTO problem = solutionDTO.getProblem();
+                ProblemSetRevision problemSet =  problemSetRevisionRepository.findOneByShareCode(
+                        MapperUtils.fromCode(problem.getProblemSetRevisionShareCode())
+                );
+                ProblemSetDTO problemSetDTO = ProblemMapper.INSTANCE.toProblemSetDTO((problemSet));
+                if (problemSet != null) {
+                    title = problemSetDTO.getTitle();
+                }
+            }
+
+            if (reviewCode == null) {
+                reviewCode = MapperUtils.toCode(reviewSolutionRevision.getReviewCode());
+            }
+
+            solutionDTO.setShareCode(UrlCodeConverter.toUrlCode((solutionRevision.getShareCode())));
+            solutionsDTO.add(solutionDTO);
+        }
+        solutionSet.setSolutions(solutionsDTO);
+        solutionSet.setTitle(title);
+        solutionSet.setReviewCode(reviewCode);
+        solutionSet.setEditCode(editCode);
         return solutionSet;
     }
 
