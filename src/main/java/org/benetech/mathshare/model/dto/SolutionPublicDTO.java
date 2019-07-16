@@ -13,14 +13,7 @@ public class SolutionPublicDTO {
 
     private String shareCode;
 
-    private String reviewCode;
-
     public SolutionPublicDTO(ProblemDTO problem) {
         this.problem = problem;
-    }
-
-    public SolutionPublicDTO(ProblemDTO problem, String reviewCode) {
-        this(problem);
-        this.reviewCode = reviewCode;
     }
 }

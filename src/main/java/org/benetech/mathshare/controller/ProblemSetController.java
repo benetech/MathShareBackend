@@ -94,7 +94,7 @@ public class ProblemSetController {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
             logger.error("Default problem set wasn't found");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

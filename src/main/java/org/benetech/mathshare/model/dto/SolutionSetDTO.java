@@ -15,4 +15,8 @@ public class SolutionSetDTO {
     private List<SolutionDTO> solutions = new ArrayList<>();
 
     private String reviewCode;
+
+    private String editCode;
+
+    private String title;
 }

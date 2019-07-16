@@ -16,6 +16,8 @@ public interface ProblemSolutionService {
 
     SolutionRevision saveNewVersionOfSolution(SolutionDTO solution);
 
+    SolutionRevision saveNewVersionOfSolutionWithExistingEditCode(SolutionDTO solution);
+
     SolutionDTO findSolutionByUrlCode(String code) throws IllegalArgumentException;
 
     Pair<Boolean, SolutionRevision> createOrUpdateProblemSolution(String code, SolutionDTO solution);
@@ -23,6 +25,10 @@ public interface ProblemSolutionService {
     SolutionDTO getLatestProblemSolutionForEditing(String code);
 
     SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO);
+
+    SolutionSetDTO updateReviewSolutions(String code, List<SolutionDTO> solutionsDTO);
+
+    SolutionSetDTO getProblemSetSolutions(String editCode);
 
     SolutionSetPublicDTO getReviewSolutions(String code);
 }
