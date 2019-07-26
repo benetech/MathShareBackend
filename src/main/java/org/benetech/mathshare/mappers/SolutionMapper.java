@@ -46,6 +46,13 @@ public interface SolutionMapper {
             @Mapping(source = "problemSolution.editCode", target = "editCode", qualifiedByName = "toCode")})
     SolutionDTO toSolutionDTO(SolutionRevision revision);
 
+    @Mappings({
+            @Mapping(source = "problemSolution.problem", target = "problem", qualifiedByName = "problem"),
+            @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "toCode"),
+            @Mapping(source = "problemSolution.editCode", target = "editCode", qualifiedByName = "toCode"),
+            @Mapping(source = "steps", target = "steps", qualifiedByName = "toDto")})
+    SolutionDTO toSolutionDTOWithSteps(SolutionRevision revision);
+
     @Named("toCode")
     default String toCode(Long shareCode) {
         return MapperUtils.toCode(shareCode);

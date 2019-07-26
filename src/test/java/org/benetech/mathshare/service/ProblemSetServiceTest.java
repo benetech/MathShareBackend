@@ -94,7 +94,7 @@ public class ProblemSetServiceTest {
         ProblemSet problemSet = ProblemMapper.INSTANCE.fromDto(problemSetDTO);
         given(problemSetRepository.save(problemSet))
                 .willReturn(problemSet);
-        ProblemSetRevision revision = new ProblemSetRevision(problemSet);
+        ProblemSetRevision revision = new ProblemSetRevision(problemSet, problemSetDTO.getTitle());
         given(problemSetRevisionRepository.save(revision))
                 .willReturn(revision);
         revision.setProblems(new ArrayList<>());
@@ -165,8 +165,8 @@ public class ProblemSetServiceTest {
                 .willReturn(null);
         given(this.problemSetRepository.save(ProblemMapper.INSTANCE.fromDto(problemSetDTO)))
                 .willReturn(ProblemSetMother.validInstance());
-        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.validInstance())))
-                .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance()));
+        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.validInstance(), problemSetDTO.getTitle())))
+                .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance(), problemSetDTO.getTitle()));
         given(this.problemSetRevisionRepository.save(ProblemSetRevisionMother.withProblems(ProblemSetMother.validInstance(), 3)))
                 .willReturn(ProblemSetRevisionMother.withProblems(ProblemSetMother.validInstance(), 3));
 
@@ -190,7 +190,7 @@ public class ProblemSetServiceTest {
                 .willReturn(ProblemSetMother.mockInstance());
         given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.mockInstance(), null))
                 .willReturn(revision);
-        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.mockInstance())))
+        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.mockInstance(), problemSetDTO.getTitle())))
                 .willReturn(revision);
         ProblemSetRevision withProblems = revision;
         withProblems.setProblems(new ArrayList<>());

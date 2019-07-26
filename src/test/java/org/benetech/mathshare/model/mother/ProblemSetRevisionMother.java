@@ -15,12 +15,14 @@ public abstract class ProblemSetRevisionMother {
 
     public static final String INVALID_CODE = "1777777V4A43EE";
 
+    public static final String TITLE = "test";
+
     public static ProblemSetRevision validInstance(ProblemSet problemSet) {
-        return new ProblemSetRevision(problemSet);
+        return new ProblemSetRevision(problemSet, TITLE);
     }
 
     public static ProblemSetRevision revisionOf(ProblemSet problemSet) {
-        return new ProblemSetRevision(problemSet);
+        return new ProblemSetRevision(problemSet, TITLE);
     }
 
     public static ProblemSetRevision withShareCode(ProblemSet problemSet, long code) {

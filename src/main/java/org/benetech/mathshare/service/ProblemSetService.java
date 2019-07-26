@@ -4,6 +4,8 @@ import org.benetech.mathshare.model.dto.ProblemSetDTO;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.springframework.data.util.Pair;
 
+import java.util.List;
+
 public interface ProblemSetService {
 
     ProblemSetRevision getLatestProblemSet(long editUrl);
@@ -21,4 +23,6 @@ public interface ProblemSetService {
     String getDefaultProblemSetRevisionCode();
 
     String getDefaultProblemSetCode();
+
+    List<ProblemSetDTO> findAllExampleProblems();
 }

@@ -92,6 +92,29 @@ public class ProblemSolutionController {
         }
     }
 
+    @PutMapping("/solve/{editCode}")
+    ResponseEntity<SolutionSetDTO> updateProblemSetSolution(@PathVariable String editCode,
+                                                               @RequestBody List<SolutionDTO> solutions) {
+        SolutionSetDTO body = problemSolutionService.updateReviewSolutions(editCode, solutions);
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("ProblemSetSolution with code {} wasn't found", editCode);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/solve/{editCode}")
+    ResponseEntity<SolutionSetDTO> getProblemSetEditableSolution(@PathVariable String editCode) {
+        SolutionSetDTO body = problemSolutionService.getProblemSetSolutions(editCode);
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("ProblemSetSolution with code {} wasn't found", editCode);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/review/{reviewCode}")
     ResponseEntity<SolutionSetPublicDTO> getReviewSolution(@PathVariable String reviewCode) {
         SolutionSetPublicDTO body = problemSolutionService.getReviewSolutions(reviewCode);

@@ -18,6 +18,8 @@ public class SolutionDTO {
 
     private String shareCode;
 
+    private String problemSetSolutionEditCode;
+
     private List<SolutionStepDTO> steps = new ArrayList<>();
 
     private List<String> palettes;

@@ -4,24 +4,27 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.benetech.mathshare.converters.StringListConverter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Entity
+@Table(name = "problem_set_revision_solution")
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ProblemSet extends AbstractEntity {
+public class ProblemSetRevisionSolution extends AbstractEntity {
 
-    @Column(insertable = false)
+    @ManyToOne
+    private ProblemSetRevision problemSetRevision;
+
+    @Column(insertable = true)
     private Long editCode;
 
     @CreationTimestamp
@@ -29,11 +32,8 @@ public class ProblemSet extends AbstractEntity {
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
 
-    @UpdateTimestamp
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private Timestamp dateModified;
-
-    @Convert(converter = StringListConverter.class)
-    private List<String> palettes = new ArrayList<>();
+    public ProblemSetRevisionSolution(ProblemSetRevision problemSetRevision, Long editCode) {
+        this.problemSetRevision = problemSetRevision;
+        this.editCode = editCode;
+    }
 }
