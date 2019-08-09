@@ -8,18 +8,22 @@ import org.benetech.mathshare.model.dto.SolutionDTO;
 import org.benetech.mathshare.model.dto.SolutionStepDTO;
 import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
+import org.benetech.mathshare.model.entity.ProblemSetRevisionSolution;
 import org.benetech.mathshare.model.entity.ProblemSolution;
+import org.benetech.mathshare.model.entity.ReviewSolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionRevision;
 import org.benetech.mathshare.model.entity.SolutionStep;
 import org.benetech.mathshare.model.mother.ProblemMother;
 import org.benetech.mathshare.model.mother.ProblemSetMother;
 import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.benetech.mathshare.model.mother.ProblemSolutionMother;
+import org.benetech.mathshare.model.mother.ReviewSolutionRevisionMother;
 import org.benetech.mathshare.model.mother.SolutionRevisionMother;
 import org.benetech.mathshare.model.mother.SolutionStepMother;
 import org.benetech.mathshare.repository.ProblemRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.repository.ProblemSolutionRepository;
+import org.benetech.mathshare.repository.ReviewSolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionStepRepository;
 import org.benetech.mathshare.service.impl.ProblemSolutionServiceImpl;
@@ -70,6 +74,9 @@ public class ProblemSolutionServiceTest {
 
     @MockBean
     private ProblemSetRevisionRepository problemSetRevisionRepository;
+
+    @MockBean
+    private ReviewSolutionRevisionRepository reviewSolutionRevisionRepository;
 
     @InjectMocks
     private ProblemSolutionServiceImpl problemSolutionService;
@@ -155,6 +162,7 @@ public class ProblemSolutionServiceTest {
 
     @Test
     public void shouldReturnStepListByEditUrlCode() {
+        ReviewSolutionRevision reviewSolutionRevision = ReviewSolutionRevisionMother.mockInstance();
         SolutionRevision revision = SolutionRevisionMother.mockInstance();
         List<SolutionStep> steps = SolutionStepMother.createValidStepsList(revision, 3);
 
@@ -164,11 +172,12 @@ public class ProblemSolutionServiceTest {
                 .thenReturn(revision);
         when(solutionStepRepository.findAllBySolutionRevision(revision))
                 .thenReturn(steps);
+        when(reviewSolutionRevisionRepository.findOneBySolutionRevision(revision))
+                .thenReturn(reviewSolutionRevision);
 
-//        TODO: Figure out how to pass this test case with shareable problem solution set
-//        SolutionDTO result = problemSolutionService.getLatestProblemSolutionForEditing(UrlCodeConverter.toUrlCode(CODE));
-//        Assert.assertEquals(steps.stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList()),
-//                result.getSteps());
+        SolutionDTO result = problemSolutionService.getLatestProblemSolutionForEditing(UrlCodeConverter.toUrlCode(CODE));
+        Assert.assertEquals(steps.stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList()),
+                result.getSteps());
     }
 
     @Test
