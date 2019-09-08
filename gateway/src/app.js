@@ -92,12 +92,13 @@ const apiProxy = proxy({
   onProxyReq,
 });
 
-app.use('/api', apiProxy);
 
 app.use(i18nextMiddleware.handle(i18next));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+
+app.use('/api', apiProxy);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

@@ -1,0 +1,15 @@
+ ALTER TABLE user_info DROP CONSTRAINT user_info_role_key;
+--do $$
+--declare
+--  cons_name text;
+--begin
+--  select constraint_name
+--     into cons_name
+--  from information_schema.constraint_column_usage
+--  where constraint_schema = current_schema() and constraint_name = 'unique'
+--  and column_name in ('role')
+--  and table_name = 'user_info';
+--
+--  execute 'alter table patron drop constraint '||cons_name;
+--end;
+--$$

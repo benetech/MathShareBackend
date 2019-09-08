@@ -17,17 +17,8 @@ const router = new Router();
 // External login providers. Also see src/passport.js.
 const loginProviders = [
   {
-    // https://developers.facebook.com/docs/facebook-login/permissions/
-    provider: 'facebook',
-    options: { scope: ['public_profile', 'email'] },
-  },
-  {
     provider: 'google',
     options: { scope: 'profile email', accessType: 'offline' },
-  },
-  {
-    provider: 'twitter',
-    options: {},
   },
   {
     provider: 'azuread-openidconnect',

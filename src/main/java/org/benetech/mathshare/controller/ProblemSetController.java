@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,15 +64,23 @@ public class ProblemSetController {
     }
 
     @PostMapping(path = "/")
-    ResponseEntity<ProblemSetDTO> createProblemSet(@RequestBody ProblemSetDTO problemSet) {
-        ProblemSetRevision saved = problemSetService.saveNewProblemSet(problemSet);
+    ResponseEntity<ProblemSetDTO> createProblemSet(
+            @RequestBody ProblemSetDTO problemSet,
+            @RequestHeader(value = "x-initiator", required = false) String initiator
+    ) {
+        ProblemSetRevision saved = problemSetService.saveNewProblemSet(problemSet, initiator);
         return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved), HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/{code}")
-    ResponseEntity<ProblemSetDTO> createOrUpdateProblemSet(@PathVariable String code,
-                                                           @RequestBody ProblemSetDTO problemSet) {
-        Pair<Boolean, ProblemSetRevision> saved = problemSetService.createOrUpdateProblemSet(code, problemSet);
+    ResponseEntity<ProblemSetDTO> createOrUpdateProblemSet(
+            @PathVariable String code,
+            @RequestBody ProblemSetDTO problemSet,
+            @RequestHeader(value = "x-initiator", required = false) String initiator
+    ) {
+        Pair<Boolean, ProblemSetRevision> saved = problemSetService.createOrUpdateProblemSet(
+                code, problemSet, initiator
+        );
         HttpStatus status = saved.getFirst() ? HttpStatus.CREATED : HttpStatus.OK;
         return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved.getSecond()), status);
     }
