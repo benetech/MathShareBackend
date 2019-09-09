@@ -83,7 +83,7 @@ app.use(
 );
 
 const apiProxy = proxy({
-  target: 'http://server:8080',
+  target: 'http://localhost:8081',
   changeOrigin: true,
   logLevel: 'debug',
   pathRewrite: {
