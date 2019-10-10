@@ -28,6 +28,8 @@ import db, { dbConfig } from './db';
 import path from 'path';
 import session from 'cookie-session';
 
+console.log('process.env', process.env)
+
 i18next
   .use(LanguageDetector)
   .use(i18nextBackend)
