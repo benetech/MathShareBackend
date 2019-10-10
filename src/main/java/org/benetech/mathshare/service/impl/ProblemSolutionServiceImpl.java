@@ -220,7 +220,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO, String initiator) {
+    public SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO) {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
                 UrlCodeConverter.fromUrlCode(code));
         if (revision == null) {
@@ -228,9 +228,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         }
 
         Long editCode = MapperUtils.nextCode(em);
-        ProblemSetRevisionSolution problemSetRevisionSolution = new ProblemSetRevisionSolution(
-                revision, editCode, initiator
-        );
+        ProblemSetRevisionSolution problemSetRevisionSolution = new ProblemSetRevisionSolution(revision, editCode);
         problemSetRevisionSolutionRepository.save(problemSetRevisionSolution);
         em.refresh(problemSetRevisionSolution);
 

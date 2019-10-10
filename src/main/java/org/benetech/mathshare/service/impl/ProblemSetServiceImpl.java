@@ -12,8 +12,6 @@ import org.benetech.mathshare.repository.ProblemSetRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
 import org.benetech.mathshare.service.ProblemSetService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,10 +52,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
-    public ProblemSetRevision saveNewProblemSet(
-            ProblemSetDTO problemSetDTO, String initiator
-    ) throws IllegalArgumentException {
-        problemSetDTO.setUserId(initiator);
+    public ProblemSetRevision saveNewProblemSet(ProblemSetDTO problemSetDTO) throws IllegalArgumentException {
         ProblemSet problemSet = ProblemMapper.INSTANCE.fromDto(problemSetDTO);
         List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
@@ -95,14 +90,6 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
-    public List<ProblemSetDTO> findLastNProblemSetsOfUser(String userId, int n) {
-        List<ProblemSet> problemSets = problemSetRepository.findAllByUserId(
-                userId,
-                PageRequest.of(0, n, Sort.by("id").descending()));
-        return problemSets.stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException {
         ProblemSetRevision revision = problemSetRevisionRepository.findOneByShareCode(
@@ -114,14 +101,11 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes(),
-                revision.getTitle(), null, problems.size());
+                revision.getTitle());
     }
 
     @Override
-    public Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(
-            String code, ProblemSetDTO problemSetDTO, String initiator
-    ) {
-        problemSetDTO.setUserId(initiator);
+    public Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(String code, ProblemSetDTO problemSetDTO) {
         ProblemSet problemSet = ProblemMapper.INSTANCE.fromDto(problemSetDTO);
         ProblemSet saved = problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(code));
         List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
@@ -196,6 +180,6 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 .stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes(),
-                revision.getTitle(), null, problems.size());
+                revision.getTitle());
     }
 }

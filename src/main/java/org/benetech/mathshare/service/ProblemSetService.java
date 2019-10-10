@@ -12,11 +12,11 @@ public interface ProblemSetService {
 
     ProblemSetRevision getProblemSetByShareUrl(long shareUrl);
 
-    ProblemSetRevision saveNewProblemSet(ProblemSetDTO problemSet, String initiator) throws IllegalArgumentException;
+    ProblemSetRevision saveNewProblemSet(ProblemSetDTO problemSet) throws IllegalArgumentException;
 
     ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException;
 
-    Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(String code, ProblemSetDTO problemSet, String initiator);
+    Pair<Boolean, ProblemSetRevision> createOrUpdateProblemSet(String code, ProblemSetDTO problemSet);
 
     ProblemSetDTO getLatestProblemSetForEditing(String code);
 
@@ -25,6 +25,4 @@ public interface ProblemSetService {
     String getDefaultProblemSetCode();
 
     List<ProblemSetDTO> findAllExampleProblems();
-
-    List<ProblemSetDTO> findLastNProblemSetsOfUser(String userId, int n);
 }
