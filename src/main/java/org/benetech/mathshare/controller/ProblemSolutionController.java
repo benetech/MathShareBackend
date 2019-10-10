@@ -85,7 +85,6 @@ public class ProblemSolutionController {
             @PathVariable String problemSetCode, @RequestBody List<SolutionDTO> solutions,
             @RequestHeader(value = "x-initiator", required = false) String initiator
     ) {
-        System.out.println(initiator);
         SolutionSetDTO body = problemSolutionService.createReviewSolutions(problemSetCode, solutions, initiator);
         if (body != null) {
             return new ResponseEntity<>(body, HttpStatus.OK);
