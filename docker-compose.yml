@@ -4,6 +4,7 @@ services:
         image: benetech/mathshare-server
         build:
             context: .
+            dockerfile: Dockerfile.dev
         env_file: .env
         ports:
             - 8080:8080
