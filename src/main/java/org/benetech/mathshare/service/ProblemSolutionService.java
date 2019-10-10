@@ -24,7 +24,7 @@ public interface ProblemSolutionService {
 
     SolutionDTO getLatestProblemSolutionForEditing(String code);
 
-    SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO, String initiator);
+    SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO);
 
     SolutionSetDTO updateReviewSolutions(String code, List<SolutionDTO> solutionsDTO);
 

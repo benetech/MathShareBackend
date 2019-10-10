@@ -24,9 +24,6 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
     @ManyToOne
     private ProblemSetRevision problemSetRevision;
 
-    @Column
-    private String userId;
-
     @Column(insertable = true)
     private Long editCode;
 
@@ -35,9 +32,8 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
 
-    public ProblemSetRevisionSolution(ProblemSetRevision problemSetRevision, Long editCode, String userId) {
+    public ProblemSetRevisionSolution(ProblemSetRevision problemSetRevision, Long editCode) {
         this.problemSetRevision = problemSetRevision;
         this.editCode = editCode;
-        this.userId = userId;
     }
 }
