@@ -24,7 +24,7 @@ import flash from 'express-flash';
 import i18next from 'i18next';
 import i18nextBackend from 'i18next-node-fs-backend';
 import passport from './passport';
-import db from './db';
+import db, { dbConfig } from './db';
 import path from 'path';
 import session from 'cookie-session';
 
@@ -46,6 +46,8 @@ i18next
       ),
     },
   });
+
+db.migrate.latest([dbConfig]);
 
 const app = express();
 
@@ -91,7 +93,6 @@ const apiProxy = proxy({
   },
   onProxyReq,
 });
-
 
 app.use(i18nextMiddleware.handle(i18next));
 app.use(passport.initialize());
