@@ -110,10 +110,13 @@ COPY gateway/.prettierrc ./.prettierrc
 COPY gateway/package.json ./package.json
 COPY gateway/yarn.lock ./yarn.lock
 
+COPY startup.sh ./startup.sh
+RUN chmod +x ./startup.sh
+
 ADD supervisord.conf /etc/
 RUN yarn install --production=false && node tools/build.js
 RUN printenv
 
 EXPOSE 8080
 
-ENTRYPOINT ["printenv", "&", "supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]
+ENTRYPOINT ["./startup.sh"]
