@@ -116,4 +116,4 @@ RUN printenv
 
 EXPOSE 8080
 
-ENTRYPOINT ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]
+ENTRYPOINT ["printenv", "&", "supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]

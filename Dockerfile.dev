@@ -113,6 +113,8 @@ COPY wait-for-it.sh ./wait-for-it.sh
 RUN chmod +x ./wait-for-it.sh
 COPY gateway-startup.sh ./gateway-startup.sh
 RUN chmod +x ./gateway-startup.sh
+COPY startup-dev.sh ./startup.sh
+RUN chmod +x ./startup.sh
 RUN apk add --no-cache bash
 
 ADD supervisord.dev.conf /etc/supervisord.conf
@@ -121,4 +123,4 @@ RUN printenv
 
 EXPOSE 8080
 
-ENTRYPOINT ["./wait-for-it.sh", "postgresql:5432", "--", "supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]
+ENTRYPOINT ["./startup.sh"]
