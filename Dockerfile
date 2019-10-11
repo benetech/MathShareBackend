@@ -112,6 +112,7 @@ COPY gateway/yarn.lock ./yarn.lock
 
 ADD supervisord.conf /etc/
 RUN yarn install --production=false && node tools/build.js
+RUN printenv
 
 EXPOSE 8080
 

@@ -117,6 +117,7 @@ RUN apk add --no-cache bash
 
 ADD supervisord.dev.conf /etc/supervisord.conf
 RUN yarn install --production=false && node tools/build.js
+RUN printenv
 
 EXPOSE 8080
 
