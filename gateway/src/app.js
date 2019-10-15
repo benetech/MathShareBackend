@@ -83,6 +83,7 @@ app.use(
     name: 'sid',
     keys: [process.env.SESSION_SECRET],
     maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: false,
   }),
 );
 
@@ -118,6 +119,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.get('/user', async (req, res) => {
+  const { loginStarted } = req.session;
+  req.session.loginStarted = false;
   if (req.user) {
     res.send({
       ...req.user,
@@ -129,10 +132,12 @@ app.get('/user', async (req, res) => {
           'users.id': req.user.id,
         })
         .pluck('emails.email'),
+      isLogin: loginStarted,
     });
   } else {
     res.status(401).send({
       message: 'Unauthorized',
+      isLogin: loginStarted,
     });
   }
 });

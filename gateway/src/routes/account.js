@@ -71,6 +71,7 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
     `/login/${provider}`,
     (req, res, next) => {
       req.session.returnTo = getSuccessRedirect(req);
+      req.session.loginStarted = true;
       next();
     },
     passport.authenticate(provider, { failureFlash: true, ...options }),
