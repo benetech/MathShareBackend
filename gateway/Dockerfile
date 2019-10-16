@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 #   apk add --no-cache ...
 
 # Install Node.js dependencies
-COPY package.json yarn.lock ./
+COPY gateway/package.json gateway/yarn.lock ./
 RUN set -ex; \
   if [ "$NODE_ENV" = "production" ]; then \
   yarn install --no-cache --frozen-lockfile --production; \
