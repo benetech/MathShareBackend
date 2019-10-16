@@ -90,6 +90,9 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
           failureRedirect: req.session.returnTo,
         },
         (err, user, info) => {
+          console.log(err);
+          console.log(user);
+          console.log(info);
           if (err || !user) { return res.redirect(req.session.returnTo); }
           req.logIn(user, function (err) {
             return res.redirect(req.session.returnTo);
