@@ -107,8 +107,6 @@ COPY gateway/.babelrc ./.babelrc
 COPY gateway/.eslintrc.js ./.eslintrc.js
 COPY gateway/.gitignore ./.gitignore
 COPY gateway/.prettierrc ./.prettierrc
-COPY gateway/package.json ./package.json
-COPY gateway/yarn.lock ./yarn.lock
 
 COPY startup.sh ./startup.sh
 RUN chmod +x ./startup.sh

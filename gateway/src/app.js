@@ -12,7 +12,7 @@ import i18nextMiddleware, {
 } from 'i18next-express-middleware';
 
 import PrettyError from 'pretty-error';
-import accountRoutes from './routes/account';
+import accountRoutes, { defaultRedirect } from './routes/account';
 import proxy from 'http-proxy-middleware';
 import bodyParser from 'body-parser';
 import compression from 'compression';
@@ -28,7 +28,7 @@ import db, { dbConfig } from './db';
 import path from 'path';
 import session from 'cookie-session';
 
-console.log('process.env', process.env)
+console.log('process.env', process.env);
 
 i18next
   .use(LanguageDetector)
@@ -141,7 +141,11 @@ const pe = new PrettyError();
 pe.skipNodeFiles();
 pe.skipPackage('express');
 
-app.use((err, req, res, next) => {
+app.get('*', (_req, res) => {
+  res.redirect(defaultRedirect);
+});
+
+app.use((err, _req, _res, next) => {
   process.stderr.write(pe.render(err));
   next();
 });

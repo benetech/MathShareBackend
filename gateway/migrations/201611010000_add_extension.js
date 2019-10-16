@@ -8,8 +8,10 @@
 // Add extensions
 module.exports.up = async db => {
   // these need to be run manually on local, or uncomment only for local
-  // await db.raw('CREATE EXTENSION "uuid-ossp"');
-  // await db.raw('CREATE EXTENSION "hstore"');
+  if (process.env.CREATE_EXTENSIONS) {
+    await db.raw('CREATE EXTENSION "uuid-ossp"');
+    await db.raw('CREATE EXTENSION "hstore"');
+  }
 };
 
 module.exports.down = async db => {};

@@ -12,6 +12,9 @@ import URL from 'url';
 import passport from 'passport';
 import validator from 'validator';
 
+
+export const defaultRedirect = process.env.CORS_ORIGIN.split(',')[0];
+
 const router = new Router();
 
 // External login providers. Also see src/passport.js.
@@ -76,12 +79,28 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
     passport.authenticate(provider, { failureFlash: true, ...options }),
   );
 
-  const callbackProcessor = (req, res, next) =>
-    passport.authenticate(provider, {
-      successReturnToOrRedirect: true,
-      failureFlash: true,
-      failureRedirect: `${getOrigin(req.session.returnTo)}/login`,
-    })(req, res, next);
+  const callbackProcessor = (req, res, next) => {
+    try {
+      return passport.authenticate(
+        provider,
+        {
+          successReturnToOrRedirect: true,
+          failureFlash: true,
+          failureRedirect: req.session.returnTo,
+        },
+        (err, user, info) => {
+          if (err || !user) { return res.redirect(req.session.returnTo); }
+          req.logIn(user, function (err) {
+            return res.redirect(req.session.returnTo);
+          });
+        },
+      )(req, res, next);
+    } catch (error) {
+      res.redirect(
+        req.session.returnTo || defaultRedirect,
+      );
+    }
+  };
 
   if (hasPostCallback) {
     router.post(`/login/${provider}/return`, callbackProcessor);
@@ -95,7 +114,7 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
 //     .then(() => window.location = '/')
 router.get('/logout', (req, res) => {
   req.logout();
-  res.status(200).send({ 'message': 'Logged Out' });
+  res.status(200).send({ message: 'Logged Out' });
 });
 
 // Allows to fetch the last login error(s) (which is usefull for single-page apps)
