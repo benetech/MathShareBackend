@@ -222,7 +222,7 @@ passport.use(
       clientSecret: process.env.AZURE_SECRET,
       responseType: 'code id_token',
       responseMode: 'form_post',
-      redirectUrl: `${process.env.GATEWAY_BASE_URL}/login/azuread-openidconnect/return/`,
+      redirectUrl: `${process.env.GATEWAY_BASE_URL}login/azuread-openidconnect/return/`,
       allowHttpForRedirectUrl: true,
       validateIssuer: false,
       isB2C: false,
