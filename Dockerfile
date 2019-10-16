@@ -14,13 +14,14 @@ COPY ./checkstyle ./checkstyle
 RUN mvn package
 
 # our final base image
-FROM node:8.9.3-alpine
+FROM node:8.16.2-alpine
 
 ARG NODE_ENV=production
 ENV NODE_ENV=$NODE_ENV
 
 # Install JDK
 RUN apk --update add --no-cache --virtual .build-deps curl binutils supervisor \
+    build-base bash linux-headers libuv libuv-dev openssl openssl-dev lua5.1 lua5.1-dev \
     && GLIBC_VER="2.28-r0" \
     && ALPINE_GLIBC_REPO="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" \
     && GCC_LIBS_URL="https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-8.2.1%2B20180831-1-x86_64.pkg.tar.xz" \
