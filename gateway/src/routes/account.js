@@ -12,7 +12,6 @@ import URL from 'url';
 import passport from 'passport';
 import validator from 'validator';
 
-
 export const defaultRedirect = process.env.CORS_ORIGIN.split(',')[0];
 
 const router = new Router();
@@ -81,29 +80,25 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
   );
 
   const callbackProcessor = (req, res, next) => {
-    try {
-      return passport.authenticate(
-        provider,
-        {
-          successReturnToOrRedirect: true,
-          failureFlash: true,
-          failureRedirect: req.session.returnTo,
-        },
-        (err, user, info) => {
-          console.log(err);
-          console.log(user);
-          console.log(info);
-          if (err || !user) { return res.redirect(req.session.returnTo); }
-          req.logIn(user, function (err) {
-            return res.redirect(req.session.returnTo);
-          });
-        },
-      )(req, res, next);
-    } catch (error) {
-      res.redirect(
-        req.session.returnTo || defaultRedirect,
-      );
-    }
+    return passport.authenticate(
+      provider,
+      {
+        successReturnToOrRedirect: true,
+        failureFlash: true,
+        failureRedirect: req.session.returnTo || defaultRedirect,
+      },
+      (err, user, info) => {
+        console.log('err', err);
+        console.log('user', user);
+        console.log('info', info);
+        if (err || !user) {
+          return res.redirect(req.session.returnTo || defaultRedirect);
+        }
+        req.logIn(user, function (err) {
+          return res.redirect(req.session.returnTo || defaultRedirect);
+        });
+      },
+    )(req, res, next);
   };
 
   if (hasPostCallback) {

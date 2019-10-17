@@ -30,6 +30,13 @@ import session from 'cookie-session';
 
 console.log('process.env', process.env);
 
+// const { GATEWAY_BASE_URL } = process.env;
+// const cookieDomain = `.${GATEWAY_BASE_URL.split('://')[1]
+//   .split('.')
+//   .slice(2)
+//   .join('.')}`;
+// console.log('cookieDomain', cookieDomain);
+
 i18next
   .use(LanguageDetector)
   .use(i18nextBackend)
@@ -52,8 +59,6 @@ i18next
 db.migrate.latest([dbConfig]);
 
 const app = express();
-
-app.set('trust proxy', 'loopback');
 
 app.use(
   cors({
