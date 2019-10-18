@@ -20,6 +20,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import email from './email';
 import express from 'express';
+import expressWinston from 'express-winston';
+import winston from 'winston';
 import flash from 'express-flash';
 import i18next from 'i18next';
 import i18nextBackend from 'i18next-node-fs-backend';
@@ -30,12 +32,15 @@ import session from 'cookie-session';
 
 console.log('process.env', process.env);
 
-// const { GATEWAY_BASE_URL } = process.env;
-// const cookieDomain = `.${GATEWAY_BASE_URL.split('://')[1]
-//   .split('.')
-//   .slice(2)
-//   .join('.')}`;
-// console.log('cookieDomain', cookieDomain);
+const { GATEWAY_BASE_URL } = process.env;
+const cookieDomain = `.${GATEWAY_BASE_URL.split('://')[1]
+  .split('.')
+  .slice(2)
+  .join('.')
+  .split('/')[0]}`;
+console.log('cookieDomain', cookieDomain);
+
+expressWinston.responseWhitelist.push('_headers');
 
 i18next
   .use(LanguageDetector)
@@ -89,6 +94,7 @@ app.use(
     keys: [process.env.SESSION_SECRET],
     maxAge: 24 * 60 * 60 * 1000,
     httpOnly: false,
+    domain: cookieDomain,
   }),
 );
 
@@ -106,6 +112,16 @@ app.use(i18nextMiddleware.handle(i18next));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.Console()
+  ],
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.json()
+  )
+}));
 
 app.use('/api', apiProxy);
 
@@ -155,9 +171,14 @@ app.get('*', (_req, res) => {
   res.redirect(defaultRedirect);
 });
 
-app.use((err, _req, _res, next) => {
-  process.stderr.write(pe.render(err));
-  next();
-});
+app.use(expressWinston.errorLogger({
+  transports: [
+    new winston.transports.Console()
+  ],
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.json()
+  )
+}));
 
 export default app;

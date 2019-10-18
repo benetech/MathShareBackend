@@ -15,6 +15,7 @@ import db from './db';
 import passport from 'passport';
 
 passport.serializeUser((user, done) => {
+  console.log('user', user);
   done(null, {
     id: user.id,
     displayName: user.displayName,
