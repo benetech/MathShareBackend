@@ -91,11 +91,23 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
         console.log('err', err);
         console.log('user', user);
         console.log('info', info);
+        console.log('res1', res._headers);
         if (err || !user) {
           return res.redirect(req.session.returnTo || defaultRedirect);
         }
         req.logIn(user, function (err) {
-          return res.redirect(req.session.returnTo || defaultRedirect);
+          console.log('res2', res._headers);
+          const token = Buffer.from(JSON.stringify({
+            "passport": {
+              "user": {
+                id: user.id,
+                displayName: user.displayName,
+                imageUrl: user.imageUrl,
+              }
+            }
+          })).toString('base64')
+          const url = `${defaultRedirect}?sid=${token}`
+          return res.redirect(req.session.returnTo || url);
         });
       },
     )(req, res, next);
