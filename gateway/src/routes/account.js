@@ -10,7 +10,7 @@
 import { Router } from 'express';
 import URL from 'url';
 import passport from 'passport';
-import Keygrip from 'keygrip';
+// import Keygrip from 'keygrip';
 import validator from 'validator';
 
 export const defaultRedirect = process.env.CORS_ORIGIN.split(',')[0];
@@ -96,22 +96,22 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
         if (err || !user) {
           return res.redirect(req.session.returnTo || defaultRedirect);
         }
-        // req.logIn(user, function (err) {
-        console.log('res2', res._headers);
-        const token = Buffer.from(JSON.stringify({
-          "passport": {
-            "user": {
-              id: user.id,
-              displayName: user.displayName,
-              imageUrl: user.imageUrl,
-            }
-          }
-        })).toString('base64');
-        const data = `sid=${token}`;
-        const sign = (new Keygrip([process.env.SESSION_SECRET]).sign(data))
-        const url = `${defaultRedirect}?${data}&sid.sig=${sign}`
-        return res.redirect(url);
-        // });
+        req.logIn(user, function (err) {
+          console.log('res2', res._headers);
+          // const token = Buffer.from(JSON.stringify({
+          //   "passport": {
+          //     "user": {
+          //       id: user.id,
+          //       displayName: user.displayName,
+          //       imageUrl: user.imageUrl,
+          //     }
+          //   }
+          // })).toString('base64');
+          // const data = `sid=${token}`;
+          // const sign = (new Keygrip([process.env.SESSION_SECRET]).sign(data))
+          // const url = `${defaultRedirect}?${data}&sid.sig=${sign}`
+          return res.redirect(req.session.returnTo || defaultRedirect);
+        });
       },
     )(req, res, next);
   };

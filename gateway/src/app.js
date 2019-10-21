@@ -33,11 +33,14 @@ import session from 'cookie-session';
 console.log('process.env', process.env);
 
 const { GATEWAY_BASE_URL } = process.env;
-const cookieDomain = `.${GATEWAY_BASE_URL.split('://')[1]
-  .split('.')
-  .slice(2)
-  .join('.')
-  .split('/')[0]}`;
+let cookieDomain = undefined;
+if (GATEWAY_BASE_URL !== 'http://localhost:8080/') {
+  cookieDomain = `.${GATEWAY_BASE_URL.split('://')[1]
+    .split('.')
+    .slice(2)
+    .join('.')
+    .split('/')[0]}`;
+}
 console.log('cookieDomain', cookieDomain);
 
 expressWinston.responseWhitelist.push('_headers');
