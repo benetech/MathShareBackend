@@ -7,8 +7,6 @@ services:
             - 8080:8080
         depends_on:
             - postgresql
-            - gateway
-        entrypoint: java -Djava.security.egd=file:/dev/./urandom -jar /mathshare/app.jar
     postgresql:
         image: postgres:9.5.12
         ports:
