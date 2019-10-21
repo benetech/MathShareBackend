@@ -37,7 +37,7 @@ let cookieDomain = undefined;
 if (GATEWAY_BASE_URL !== 'http://localhost:8080/') {
   cookieDomain = `.${GATEWAY_BASE_URL.split('://')[1]
     .split('.')
-    .slice(2)
+    .slice(1)
     .join('.')
     .split('/')[0]}`;
 }
