@@ -86,6 +86,9 @@ app.use(cookieParser());
 const onProxyReq = (proxyReq, req, res) => {
   if (req.user) {
     proxyReq.setHeader('x-initiator', req.user.id);
+    if (req.user.emails && req.user.emails.length > 0) {
+      proxyReq.setHeader('x-initiator-email', req.user.emails[0].value);
+    }
   } else if (req.path.startsWith('/api/private')) {
     res.status(401).send({ message: 'Unauthorized' });
   }

@@ -35,4 +35,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         em.refresh(userInfo);
         return userInfo;
     }
+
+    @Override
+    public Integer setNotifyForMobile(String email, Integer notifyForMobile) {
+        return userInfoRepository.setNotifyForMobileInUserInfo(email, notifyForMobile);
+    }
 }

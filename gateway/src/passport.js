@@ -6,7 +6,6 @@
  */
 
 /* @flow */
-/* eslint-disable no-param-reassign, no-underscore-dangle, max-len */
 
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { OIDCStrategy } from 'passport-azure-ad';
@@ -20,6 +19,7 @@ passport.serializeUser((user, done) => {
     id: user.id,
     displayName: user.displayName,
     imageUrl: user.imageUrl,
+    emails: user.emails
   });
 });
 
@@ -115,6 +115,7 @@ async function login(req, provider, profile, tokens) {
     id: user.id,
     displayName: user.display_name,
     imageUrl: user.image_url,
+    emails: profile.emails,
   };
 }
 

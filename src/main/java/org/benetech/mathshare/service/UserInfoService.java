@@ -8,4 +8,6 @@ public interface UserInfoService {
     UserInfo getUserInfoByEmail(String email);
 
     UserInfo saveNewUserInfo(UserInfoDTO payload) throws IllegalArgumentException;
+
+    Integer setNotifyForMobile(String email, Integer notifyForMobile);
 }

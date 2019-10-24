@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.benetech.mathshare.converters.StringListConverter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
@@ -33,6 +34,9 @@ public class UserInfo extends AbstractEntity {
 
     @Convert(converter = StringListConverter.class)
     private List<String> grades = new ArrayList<>();
+
+    @Column
+    private Integer notifyForMobile;
 
     private String role;
 

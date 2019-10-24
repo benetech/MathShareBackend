@@ -17,5 +17,7 @@ public class UserInfoDTO {
 
     private List<String> grades;
 
+    private Integer notifyForMobile;
+
     private String role;
 }

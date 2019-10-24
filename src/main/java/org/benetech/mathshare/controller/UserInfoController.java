@@ -9,8 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,18 +27,36 @@ public class UserInfoController {
     private UserInfoService userInfoService;
 
     @PostMapping(path = "/submit")
-    ResponseEntity<UserInfoDTO> saveUserInfo(@RequestBody UserInfoDTO payload) {
+    ResponseEntity<UserInfoDTO> saveUserInfo(
+            @RequestBody UserInfoDTO payload,
+            @RequestHeader(value = "x-initiator-email") String email
+    ) {
+        payload.setEmail(email);
         UserInfo saved = userInfoService.saveNewUserInfo(payload);
         return new ResponseEntity<>(UserInfoMapper.INSTANCE.toDto(saved), HttpStatus.CREATED);
     }
 
-    @PostMapping(path = "/fetch")
-    ResponseEntity<UserInfoDTO> fetchUserInfo(@RequestBody UserInfoDTO payload) {
-        UserInfo body = userInfoService.getUserInfoByEmail(payload.getEmail());
+    @GetMapping(path = "/fetch")
+    ResponseEntity<UserInfoDTO> fetchUserInfo(@RequestHeader(value = "x-initiator-email") String email) {
+        UserInfo body = userInfoService.getUserInfoByEmail(email);
         if (body != null) {
             return new ResponseEntity<>(UserInfoMapper.INSTANCE.toDto(body), HttpStatus.OK);
         } else {
-            logger.error("User with email {} wasn't found", payload.getEmail());
+            logger.error("User with email {} wasn't found", email);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping(path = "/notifyForMobile")
+    ResponseEntity<Integer> updateNotifyForMobile(
+            @RequestBody UserInfoDTO payload,
+            @RequestHeader(value = "x-initiator-email") String email
+    ) {
+        Integer body = userInfoService.setNotifyForMobile(email, payload.getNotifyForMobile());
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("Unable to update user with email {}", email);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
