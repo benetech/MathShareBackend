@@ -12,8 +12,12 @@ spring:
       generateDdl: true
       showSql: true
 
+  flyway:
+    baselineOnMigrate: true
+
+
 server:
-  port: ${SERVER_PORT:8080}
+  port: 8081
 
 logging:
   level:
