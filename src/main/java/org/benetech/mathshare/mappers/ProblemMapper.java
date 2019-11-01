@@ -38,14 +38,22 @@ public interface ProblemMapper {
     @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")
     ProblemSet fromDto(ProblemSetDTO problemSet);
 
-    @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode")
+    @Mappings({
+            @Mapping(source = "editCode", target = "editCode", qualifiedByName = "toCode"),
+            @Mapping(source = "latestRevision.title", target = "title", qualifiedByName = "title"),
+            @Mapping(source = "latestRevision.shareCode", target = "shareCode", qualifiedByName = "toCode"),
+            @Mapping(source = "latestRevision.problems", target = "problemCount", qualifiedByName = "countOfProblems"),
+            @Mapping(source = "latestRevision.problems", target = "problems", qualifiedByName = "sortProblems"),
+    })
     ProblemSetDTO toDto(ProblemSet problemSet);
 
     @Mappings({
             @Mapping(source = "problems", target = "problems", qualifiedByName = "sortProblems"),
             @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "toCode"),
             @Mapping(source = "problemSet.editCode", target = "editCode", qualifiedByName = "toCode"),
-            @Mapping(source = "title", target = "title", qualifiedByName = "title")})
+            @Mapping(source = "title", target = "title", qualifiedByName = "title"),
+            @Mapping(source = "problems", target = "problemCount", qualifiedByName = "countOfProblems")
+    })
     ProblemSetDTO toProblemSetDTO(ProblemSetRevision revision);
 
     @Named("toCode")
@@ -73,5 +81,13 @@ public interface ProblemMapper {
         return problems.stream().sorted(Comparator.comparing(Problem::getPosition,
                 Comparator.nullsFirst(Comparator.naturalOrder())))
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
+    }
+
+    @Named("countOfProblems")
+    default int countOfProblems(List<Problem> problems) {
+        if (problems == null) {
+            return 0;
+        }
+        return problems.size();
     }
 }

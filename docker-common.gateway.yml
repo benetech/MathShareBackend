@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  # Data API and authentication/authorization
+  gateway:
+    image: gateway
+    build:
+      context: ./gateway
+      args:
+        NODE_ENV: development
+    hostname: gateway
+    depends_on:
+      - postgresql
+    env_file: .env
+    ports:
+      - "80:8080"
+    volumes:
+      - yarn:/home/node/.cache/yarn
+      - ./gateway/build:/usr/src/app/build
+      - ./gateway/locales:/usr/src/app/locales
+      - ./gateway/migrations:/usr/src/app/migrations
+      - ./gateway/seeds:/usr/src/app/seeds
+      - ./gateway/src:/usr/src/app/src
+      - ./gateway/tools:/usr/src/app/tools
+      - ./gateway/.babelrc:/usr/src/app/.babelrc
+      - ./gateway/.eslintrc.js:/usr/src/app/.eslintrc.js
+      - ./gateway/.gitignore:/usr/src/app/.gitignore
+      - ./gateway/.prettierrc:/usr/src/app/.prettierrc
+      - ./gateway/package.json:/usr/src/app/package.json
+      - ./gateway/yarn.lock:/usr/src/app/yarn.lock
+    command: node tools/run.js # or, `node --inspect=0.0.0.0:9229 tools/run.js`

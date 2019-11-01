@@ -85,6 +85,24 @@ Optionally, you can also remove the non-volatile database storage by removing th
 docker-compose down -v && docker-compose up
 ```
 
+## Registry Approach
+1) docker-compose.pre_built.yml
+I have pushed the built image of backend to a public container registry, if you use it you won't need to build the backend image locally. I will be updating the registry every-time I make any changes in the backend.
+To run the backend using this image, run this command:
+docker-compose -f docker-compose.pre_built.yml up
+ 
+In order to take a pull of the changes in image after backend is changed, you need to run the following:
+docker-compose -f docker-compose.pre_built.yml down # to remove the container with old image
+docker-compose -f docker-compose.pre_built.yml pull # to ake a pull of the latest image
+docker-compose -f docker-compose.pre_built.yml up # to start the backend container with the updated image
+2) docker-compose.dev.yml
+You will need to use this only if you make any changes in the backend code. It will be used to build the image locally
+To build and run the image, run this command:
+docker-compose -f docker-compose.dev.yml up --build
+--build needs to be passed only when there are any backend changes
+
+
+
 ### Docker variables
 
 The properties (such as a database user login/password) are possible to be injected via a global environment variables functionality. A specification of using these properties in a dockerized environment may be found there: 

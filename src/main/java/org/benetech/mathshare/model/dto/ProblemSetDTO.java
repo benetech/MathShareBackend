@@ -21,4 +21,8 @@ public class ProblemSetDTO {
 
     private String title;
 
+    private String userId;
+
+    private int problemCount;
+
 }
