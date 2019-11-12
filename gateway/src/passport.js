@@ -125,7 +125,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
-      callbackURL: '/login/google/return',
+      callbackURL: process.env.GATEWAY_BASE_URL + 'login/google/return',
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
