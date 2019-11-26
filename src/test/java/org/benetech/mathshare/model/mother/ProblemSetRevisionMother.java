@@ -18,7 +18,9 @@ public abstract class ProblemSetRevisionMother {
     public static final String TITLE = "test";
 
     public static ProblemSetRevision validInstance(ProblemSet problemSet) {
-        return new ProblemSetRevision(problemSet, TITLE);
+        ProblemSetRevision result = new ProblemSetRevision(problemSet, TITLE);
+        result.setShareCode(UrlCodeConverter.fromUrlCode(VALID_CODE));
+        return result;
     }
 
     public static ProblemSetRevision revisionOf(ProblemSet problemSet) {
@@ -40,7 +42,6 @@ public abstract class ProblemSetRevisionMother {
 
     public static ProblemSetRevision mockInstance() {
         ProblemSetRevision result = validInstance(ProblemSetMother.mockInstance());
-        result.setShareCode(UrlCodeConverter.fromUrlCode(VALID_CODE));
         return result;
     }
 }
