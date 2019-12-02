@@ -29,7 +29,7 @@
     "jsonwebtoken": "^8.5.1",
     "juice": "^4.2.2",
     "keygrip": "^1.1.0",
-    "knex": "^0.14.2",
+    "knex": "^0.19.5",
     "node-fetch": "^1.7.3",
     "nodemailer": "^4.4.1",
     "passport": "^0.4.0",

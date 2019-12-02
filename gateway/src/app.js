@@ -13,6 +13,7 @@ import i18nextMiddleware, {
 
 import PrettyError from 'pretty-error';
 import accountRoutes, { defaultRedirect } from './routes/account';
+import configRoutes from './routes/config';
 import proxy from 'http-proxy-middleware';
 import bodyParser from 'body-parser';
 import compression from 'compression';
@@ -135,6 +136,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(accountRoutes);
+app.use(configRoutes);
 
 // The following routes are intended to be used in development mode only
 if (process.env.NODE_ENV !== 'production') {
