@@ -115,47 +115,48 @@ public class ProblemSetControllerTest {
         Assert.assertEquals(problems, result.getProblems());
     }
 
-//    @Test
-//    public void shouldReturn201IfCreated() throws Exception {
-//        ProblemSet toSave = ProblemSetMother.validInstance();
-//        when(problemSetService.saveNewProblemSet(ProblemMapper.INSTANCE.toDto(toSave), USER_ID)).thenReturn(null);
-//        mockMvc.perform(createProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
-//                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-//    }
+   @Test
+   public void shouldReturn201IfCreated() throws Exception {
+       ProblemSet toSave = ProblemSetMother.mockInstance();
+       when(problemSetService.saveNewProblemSet(ProblemMapper.INSTANCE.toDto(toSave), USER_ID)).thenReturn(null);
+       mockMvc.perform(createProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
+               .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+   }
 
-//    @Test
-//    public void shouldReturnProblemSetWithShareAndEditCodes() throws Exception {
-//        ProblemSet problemSet = ProblemSetMother.mockInstance();
-//        ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode(problemSet, SHARE_CODE);
-//        ProblemSet toSave = revision.getProblemSet();
-//        toSave.setEditCode(EDIT_CODE);
-//        when(problemSetService.saveNewProblemSet(any(), USER_ID)).thenReturn(revision);
-//
-//        String response = mockMvc.perform(createProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
-//                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-//        ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
-//
-//        Assert.assertEquals(UrlCodeConverter.toUrlCode(EDIT_CODE), result.getEditCode());
-//        Assert.assertEquals(UrlCodeConverter.toUrlCode(SHARE_CODE), result.getShareCode());
-//    }
+   @Test
+   public void shouldReturnProblemSetWithShareAndEditCodes() throws Exception {
+       ProblemSet problemSet = ProblemSetMother.mockInstance();
+       ProblemSetRevision revision = ProblemSetRevisionMother.withShareCode(problemSet, SHARE_CODE);
+       ProblemSet toSave = revision.getProblemSet();
+       toSave.setEditCode(EDIT_CODE);
+       ProblemSetDTO dto = ProblemMapper.INSTANCE.toDto(toSave);
+       when(problemSetService.saveNewProblemSet(any(), any())).thenReturn(revision);
 
-//    @Test
-//    public void putShouldReturn201IfCreated() throws Exception {
-//        ProblemSet toSave = ProblemSetMother.mockInstance();
-//        when(problemSetService.createOrUpdateProblemSet(UrlCodeConverter.toUrlCode(toSave.getEditCode()),
-//                ProblemMapper.INSTANCE.toDto(toSave), USER_ID)).thenReturn(Pair.of(true, ProblemSetRevisionMother.validInstance(toSave)));
-//        mockMvc.perform(createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
-//                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-//    }
+       String response = mockMvc.perform(createProblemSet(dto))
+               .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+       ProblemSetDTO result = new ObjectMapper().readValue(response, ProblemSetDTO.class);
 
-//    @Test
-//    public void putShouldReturn200IfUpdated() throws Exception {
-//        ProblemSet toSave = ProblemSetMother.mockInstance();
-//        when(problemSetService.createOrUpdateProblemSet(UrlCodeConverter.toUrlCode(toSave.getEditCode()),
-//                ProblemMapper.INSTANCE.toDto(toSave), USER_ID)).thenReturn(Pair.of(false, ProblemSetRevisionMother.validInstance(toSave)));
-//        mockMvc.perform(createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
-//                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-//    }
+       Assert.assertEquals(UrlCodeConverter.toUrlCode(EDIT_CODE), result.getEditCode());
+       Assert.assertEquals(UrlCodeConverter.toUrlCode(SHARE_CODE), result.getShareCode());
+   }
+
+   @Test
+   public void putShouldReturn201IfCreated() throws Exception {
+       ProblemSet toSave = ProblemSetMother.mockInstance();
+       when(problemSetService.createOrUpdateProblemSet(any(), any(), any()))
+               .thenReturn(Pair.of(true, ProblemSetRevisionMother.validInstance(toSave)));
+       mockMvc.perform(createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
+               .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+   }
+
+   @Test
+   public void putShouldReturn200IfUpdated() throws Exception {
+       ProblemSet toSave = ProblemSetMother.mockInstance();
+       when(problemSetService.createOrUpdateProblemSet(any(), any(), any()))
+               .thenReturn(Pair.of(false, ProblemSetRevisionMother.validInstance(toSave)));
+       mockMvc.perform(createOrUpdateProblemSet(ProblemMapper.INSTANCE.toDto(toSave)))
+               .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+   }
 
     @Test
     public void shouldReturnProblemSetDTOForEditing() throws Exception {
@@ -190,12 +191,14 @@ public class ProblemSetControllerTest {
     private static MockHttpServletRequestBuilder createProblemSet(ProblemSetDTO problemSet) throws JsonProcessingException {
         return post(BASE_ENDPOINT)
                 .content(new ObjectMapper().writeValueAsString(problemSet))
-                .contentType(MediaType.APPLICATION_JSON);
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("x-initiator", USER_ID);
     }
 
     private static MockHttpServletRequestBuilder createOrUpdateProblemSet(ProblemSetDTO problemSet) throws JsonProcessingException {
         return put(BASE_ENDPOINT + problemSet.getEditCode())
                 .content(new ObjectMapper().writeValueAsString(problemSet))
-                .contentType(MediaType.APPLICATION_JSON);
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("x-initiator", USER_ID);
     }
 }
