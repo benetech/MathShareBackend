@@ -230,7 +230,7 @@ passport.use(
       isB2C: false,
       issuer: null,
       passReqToCallback: true,
-      scope: ['profile', 'offline_access', 'https://graph.microsoft.com/mail.read'],
+      scope: ['profile', 'offline_access'],
       loggingLevel: 'info',
       nonceLifetime: null,
       nonceMaxAmount: 5,
