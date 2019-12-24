@@ -1,7 +1,9 @@
 package org.benetech.mathshare.controller;
 
+import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.mappers.ProblemMapper;
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
+import org.benetech.mathshare.model.dto.ProblemStepDTO;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.benetech.mathshare.service.ProblemSetService;
 import org.slf4j.Logger;
@@ -103,6 +105,39 @@ public class ProblemSetController {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
             logger.error("Default problem set wasn't found");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping(path = "/{code}/steps/{problemId}")
+    ResponseEntity<ProblemSetDTO> updateProblemSteps(
+            @PathVariable String code,
+            @PathVariable String problemId,
+            @RequestBody List<ProblemStepDTO> problemSteps,
+            @RequestHeader(value = "x-initiator", required = false) String initiator
+    ) {
+        ProblemSetRevision saved = problemSetService.updateProblemStepsInProblemSet(
+            code, Integer.parseInt(problemId), problemSteps, initiator
+        );
+        return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/convert/{code}")
+    ResponseEntity<Long> convertCode(@PathVariable String code) {
+        Long result = UrlCodeConverter.fromUrlCode(code);
+        if (result != null) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/convertX/{code}")
+    ResponseEntity<String> convertCode(@PathVariable Long code) {
+        String result = UrlCodeConverter.toUrlCode(code);
+        if (result != null) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

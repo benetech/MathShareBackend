@@ -1,6 +1,7 @@
 package org.benetech.mathshare.service;
 
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
+import org.benetech.mathshare.model.dto.ProblemStepDTO;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
 import org.springframework.data.util.Pair;
 
@@ -13,6 +14,9 @@ public interface ProblemSetService {
     ProblemSetRevision getProblemSetByShareUrl(long shareUrl);
 
     ProblemSetRevision saveNewProblemSet(ProblemSetDTO problemSet, String initiator) throws IllegalArgumentException;
+
+    ProblemSetRevision updateProblemStepsInProblemSet(String code, Integer problemId, List<ProblemStepDTO> problemSteps,
+                                                      String initiator);
 
     ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException;
 
