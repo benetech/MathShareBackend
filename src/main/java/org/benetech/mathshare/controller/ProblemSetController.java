@@ -9,6 +9,7 @@ import org.benetech.mathshare.service.ProblemSetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/problemSet")
@@ -31,6 +33,9 @@ public class ProblemSetController {
 
     @Autowired
     private ProblemSetService problemSetService;
+
+    @Value("${admin.api-key}")
+    private String adminApiKey;
 
     @GetMapping("/revision/{shareCode}")
     ResponseEntity<ProblemSetDTO> getProblemSetRevision(@PathVariable String shareCode) {
@@ -106,6 +111,23 @@ public class ProblemSetController {
         } else {
             logger.error("Default problem set wasn't found");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{code}/example/{isExample}")
+    ResponseEntity<Integer> updateIsProblem(
+        @PathVariable String code,
+        @PathVariable String isExample,
+        @RequestHeader(value = "x-auth-token", required = true) String authToken) {
+        if (!authToken.equals(adminApiKey)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Integer body = problemSetService.updateIsExampleForSet(code, isExample.toLowerCase(Locale.ROOT).equals("y"));
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("Unable to ProblemSet with code {}", code);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 

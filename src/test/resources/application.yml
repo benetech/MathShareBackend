@@ -21,3 +21,6 @@ cross-origin:
 
 ibm-watson:
   api-key: test
+
+admin:
+  api-key: admin

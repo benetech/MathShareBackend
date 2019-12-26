@@ -31,4 +31,6 @@ public interface ProblemSetService {
     List<ProblemSetDTO> findAllExampleProblems();
 
     List<ProblemSetDTO> findLastNProblemSetsOfUser(String userId, int n);
+
+    Integer updateIsExampleForSet(String code, boolean isExample);
 }

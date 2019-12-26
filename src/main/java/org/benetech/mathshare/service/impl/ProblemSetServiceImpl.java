@@ -246,4 +246,10 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes(),
                 revision.getTitle(), null, problems.size());
     }
+
+    @Override
+    public Integer updateIsExampleForSet(String code, boolean isExample) {
+        return problemSetRevisionRepository.setIsExampleForProblemSetRevision(
+            UrlCodeConverter.fromUrlCode(code), isExample);
+    }
 }
