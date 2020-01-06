@@ -19,4 +19,13 @@ public class SolutionSetDTO {
     private String editCode;
 
     private String title;
+
+    private String archiveMode;
+
+    public SolutionSetDTO(List<SolutionDTO> solutions, String reviewCode, String editCode, String title) {
+        this.solutions = solutions;
+        this.reviewCode = reviewCode;
+        this.editCode = editCode;
+        this.title = title;
+    }
 }

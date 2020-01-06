@@ -30,7 +30,9 @@ public interface ProblemSetService {
 
     List<ProblemSetDTO> findAllExampleProblems();
 
-    List<ProblemSetDTO> findLastNProblemSetsOfUser(String userId, int n);
+    List<ProblemSetDTO> findLastNProblemSetsOfUser(String userId, String archiveMode, int n);
+
+    ProblemSetDTO setArchiveMode(String code, String userId, String role, String archiveMode);
 
     Integer updateIsExampleForSet(String code, boolean isExample);
 }

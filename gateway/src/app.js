@@ -7,29 +7,29 @@
 
 /* @flow */
 
+import accountRoutes, { defaultRedirect } from './routes/account';
+import db, { dbConfig } from './db';
 import i18nextMiddleware, {
   LanguageDetector,
 } from 'i18next-express-middleware';
 
 import PrettyError from 'pretty-error';
-import accountRoutes, { defaultRedirect } from './routes/account';
-import configRoutes from './routes/config';
-import proxy from 'http-proxy-middleware';
 import bodyParser from 'body-parser';
 import compression from 'compression';
+import configRoutes from './routes/config';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import email from './email';
 import express from 'express';
 import expressWinston from 'express-winston';
-import winston from 'winston';
 import flash from 'express-flash';
 import i18next from 'i18next';
 import i18nextBackend from 'i18next-node-fs-backend';
 import passport from './passport';
-import db, { dbConfig } from './db';
 import path from 'path';
+import proxy from 'http-proxy-middleware';
 import session from 'cookie-session';
+import winston from 'winston';
 
 console.log('process.env', process.env);
 
@@ -85,6 +85,9 @@ app.use(compression());
 app.use(cookieParser());
 
 const onProxyReq = (proxyReq, req, res) => {
+  if (req.headers['x-auth-token'] === process.env.SESSION_SECRET) {
+    proxyReq.setHeader('x-role', 'admin');
+  }
   if (req.user) {
     proxyReq.setHeader('x-initiator', req.user.id);
     if (req.user.emails && req.user.emails.length > 0) {

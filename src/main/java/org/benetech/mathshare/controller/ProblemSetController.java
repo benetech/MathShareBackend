@@ -103,6 +103,22 @@ public class ProblemSetController {
         }
     }
 
+    @PutMapping("/{code}/archive")
+    ResponseEntity<ProblemSetDTO> archiveProblemSet(
+        @PathVariable String code,
+        @RequestBody ProblemSetDTO problemSetDTO,
+        @RequestHeader(value = "x-initiator", required = true) String initiator,
+        @RequestHeader(value = "x-role", required = false) String role
+    ) {
+        ProblemSetDTO body = problemSetService.setArchiveMode(code, initiator, role, problemSetDTO.getArchiveMode());
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("ProblemSet with code {} wasn't found", code);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/exampleSets")
     ResponseEntity<List<ProblemSetDTO>> getExampleProblemSets() {
         List<ProblemSetDTO> result = problemSetService.findAllExampleProblems();
@@ -146,21 +162,11 @@ public class ProblemSetController {
 
     @GetMapping("/convert/{code}")
     ResponseEntity<Long> convertCode(@PathVariable String code) {
-        Long result = UrlCodeConverter.fromUrlCode(code);
-        if (result != null) {
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(UrlCodeConverter.fromUrlCode(code), HttpStatus.OK);
     }
 
     @GetMapping("/convertX/{code}")
     ResponseEntity<String> convertCode(@PathVariable Long code) {
-        String result = UrlCodeConverter.toUrlCode(code);
-        if (result != null) {
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(UrlCodeConverter.toUrlCode(code), HttpStatus.OK);
     }
 }

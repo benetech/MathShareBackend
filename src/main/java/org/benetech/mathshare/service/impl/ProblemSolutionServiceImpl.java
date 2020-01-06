@@ -181,6 +181,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         Long reviewCode = MapperUtils.nextCode(em);
         SolutionSetDTO solutionSet = new SolutionSetDTO();
         solutionSet.setReviewCode(MapperUtils.toCode(reviewCode));
+        solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
 
         String title = null;
         for (SolutionDTO solutionDTO: solutionsDTO) {
@@ -236,6 +237,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, true);
         solutionSetDTO.setEditCode(MapperUtils.toCode(editCode));
+        solutionSetDTO.setArchiveMode(revision.getProblemSet().getArchiveMode());
         return solutionSetDTO;
     }
 
@@ -249,6 +251,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         reviewSolutionRevisionRepository.setAllReviewSolutionRevisionsInactiveFor(problemSetRevisionSolution);
         SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, false);
         solutionSetDTO.setEditCode(editCode);
+        solutionSetDTO.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
         return solutionSetDTO;
     }
 
@@ -318,6 +321,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionSet.setTitle(title);
         solutionSet.setReviewCode(reviewCode);
         solutionSet.setEditCode(editCode);
+        solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
         return solutionSet;
     }
 

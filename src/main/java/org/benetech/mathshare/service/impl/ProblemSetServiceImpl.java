@@ -100,10 +100,31 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
-    public List<ProblemSetDTO> findLastNProblemSetsOfUser(String userId, int n) {
-        List<ProblemSet> problemSets = problemSetRepository.findAllByUserId(userId,
+    public List<ProblemSetDTO> findLastNProblemSetsOfUser(String userId, String archiveMode, int n) {
+        List<ProblemSet> problemSets = problemSetRepository.findAllByUserIdAndArchiveMode(userId,
+                archiveMode,
                 PageRequest.of(0, n, Sort.by("id").descending()));
         return problemSets.stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public ProblemSetDTO setArchiveMode(String code, String initiator, String role, String archiveMode) {
+        ProblemSet current = problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(code));
+        if (current == null) {
+            return null;
+        }
+        if (!"admin".equals(role)) {
+            if (initiator == null) {
+                return null;
+            } else if (current.getUserId() == null) {
+                return null;
+            } else if (!initiator.equals(current.getUserId())) {
+                return null;
+            }
+        }
+        current.setArchiveMode(archiveMode);
+        current.setArchivedBy(initiator);
+        return ProblemMapper.INSTANCE.toDto(problemSetRepository.save(current));
     }
 
     @Override
@@ -125,7 +146,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
 
         return new ProblemSetDTO(problemsDto, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes(),
-                revision.getTitle(), null, problems.size());
+                revision.getTitle(), null, problems.size(), revision.getProblemSet().getArchiveMode());
     }
 
     @Override
