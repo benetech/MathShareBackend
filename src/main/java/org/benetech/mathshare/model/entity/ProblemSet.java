@@ -56,7 +56,7 @@ public class ProblemSet extends AbstractEntity {
     private List<String> palettes = new ArrayList<>();
 
     public void setArchiveMode(String archiveMode) {
-        if (!"deleted".equals(archiveMode) && !"archived".equals(archiveMode)) {
+        if (!"deleted".equals(archiveMode) && !"archived".equals(archiveMode) && archiveMode != null) {
             return;
         }
         this.archiveMode = archiveMode;
