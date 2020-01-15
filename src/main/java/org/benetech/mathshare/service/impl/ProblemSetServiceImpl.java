@@ -233,8 +233,8 @@ public class ProblemSetServiceImpl implements ProblemSetService {
             saved = this.problemRepository.findById(problem.getId()).get();
         }
         if (saved == null) {
-            Problem newSaved = problemRepository.save(new Problem(problem.getProblemText(), problem.getTitle(),
-                    problemSetRevision, problem.getPosition()));
+            problem.setProblemSetRevision(problemSetRevision);
+            Problem newSaved = problemRepository.save(problem);
             problemRepository.save(newSaved);
             em.refresh(newSaved);
             steps.forEach(s -> s.setProblem(newSaved));
@@ -242,15 +242,15 @@ public class ProblemSetServiceImpl implements ProblemSetService {
             return newSaved;
         } else {
             Problem newVersion = problemRepository.save(
-                    new Problem(saved.getProblemText(), saved.getTitle(), problemSetRevision, saved.getPosition()));
+                new Problem(problem.getProblemText(), problem.getTitle(), problemSetRevision, steps,
+                        problem.getScratchpad())
+            );
             steps.forEach(s -> s.setProblem(newVersion));
             saved.setReplacedBy(newVersion);
             problemRepository.save(saved);
             problemStepRepository.saveAll(steps);
-            em.refresh(saved);
             newVersion.setSteps(steps);
             problemRepository.save(newVersion);
-            em.refresh(newVersion);
             return newVersion;
         }
     }

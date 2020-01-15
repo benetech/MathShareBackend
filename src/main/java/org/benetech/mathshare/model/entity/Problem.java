@@ -81,4 +81,10 @@ public class Problem extends AbstractEntity {
         this(problemText, title, problemSetRevision);
         this.steps = steps;
     }
+
+    public Problem(String problemText, String title, ProblemSetRevision problemSetRevision, List<ProblemStep> steps,
+                   Scratchpad scratchpad) {
+        this(problemText, title, problemSetRevision, steps);
+        this.scratchpad = scratchpad;
+    }
 }
