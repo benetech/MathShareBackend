@@ -64,6 +64,6 @@ public class SolutionSetDTO {
     }
 
     public String getSolutionUrl() {
-        return System.getenv("CORS_ORIGIN") + "/#/app/problemSet/solve/" + this.editCode;
+        return "/#/app/problemSet/solve/" + this.editCode;
     }
 }
