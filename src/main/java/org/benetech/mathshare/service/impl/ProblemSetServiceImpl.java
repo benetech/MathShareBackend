@@ -242,7 +242,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
             return newSaved;
         } else {
             Problem newVersion = problemRepository.save(
-                new Problem(problem.getProblemText(), problem.getTitle(), problemSetRevision, steps,
+                new Problem(problem.getProblemText(), problem.getTitle(), problemSetRevision,
                         problem.getScratchpad())
             );
             steps.forEach(s -> s.setProblem(newVersion));

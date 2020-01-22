@@ -33,8 +33,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,8 +93,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         ProblemSolution problemSolution = problemSolutionRepository.save(new ProblemSolution(problem));
         em.refresh(problemSolution);
 
-        List<SolutionStep> steps = solution.getSteps()
-                .stream().map(SolutionMapper.INSTANCE::fromDto)
+        List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         return saveNewVersionOfSolution(problemSolution, steps);
     }
@@ -96,28 +101,25 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     @Override
     public SolutionRevision saveNewVersionOfSolutionWithExistingEditCode(SolutionDTO solution) {
         String editCode = solution.getEditCode();
-        ProblemSolution problemSolution = problemSolutionRepository.findOneByEditCode(
-                UrlCodeConverter.fromUrlCode(editCode)
-        );
-        List<SolutionStep> steps = solution.getSteps()
-                .stream().map(SolutionMapper.INSTANCE::fromDto)
+        ProblemSolution problemSolution = problemSolutionRepository
+                .findOneByEditCode(UrlCodeConverter.fromUrlCode(editCode));
+        List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         return saveNewVersionOfSolution(problemSolution, steps);
     }
 
     @Override
     public SolutionDTO findSolutionByUrlCode(String code) throws IllegalArgumentException {
-        SolutionRevision revision = solutionRevisionRepository.findOneByShareCode(
-                UrlCodeConverter.fromUrlCode(code));
+        SolutionRevision revision = solutionRevisionRepository.findOneByShareCode(UrlCodeConverter.fromUrlCode(code));
         if (revision == null) {
             return null;
         }
 
-        ProblemDTO problem = ProblemMapper.INSTANCE.toDto(
-                problemRepository.findById(revision.getProblemSolution().getProblem().getId()).get());
+        ProblemDTO problem = ProblemMapper.INSTANCE
+                .toDto(problemRepository.findById(revision.getProblemSolution().getProblem().getId()).get());
 
-        List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision)
-                .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
+        List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision).stream()
+                .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
         return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
                 revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
@@ -129,13 +131,12 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         ProblemSolution fromDB = problemSolutionRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(code));
         if (fromDB == null) {
             Problem problem = problemRepository.findOneByTitleAndProblemTextAndProblemSetRevision(
-                    solution.getProblem().getTitle(),
-                    solution.getProblem().getProblemText(), problemSetRevisionRepository.findOneByShareCode(
+                    solution.getProblem().getTitle(), solution.getProblem().getProblemText(),
+                    problemSetRevisionRepository.findOneByShareCode(
                             UrlCodeConverter.fromUrlCode(solutionDTO.getProblem().getProblemSetRevisionShareCode())));
             fromDB = problemSolutionRepository.save(new ProblemSolution(problem));
         }
-        List<SolutionStep> steps = solutionDTO.getSteps()
-                .stream().map(SolutionMapper.INSTANCE::fromDto)
+        List<SolutionStep> steps = solutionDTO.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps);
         Long editCode = SolutionMapper.INSTANCE.fromDto(solutionDTO).getEditCode();
@@ -154,8 +155,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             return null;
         }
         String solutionEditCode = "";
-        ReviewSolutionRevision reviewSolutionRevision = reviewSolutionRevisionRepository.findOneBySolutionRevision(
-                revision);
+        ReviewSolutionRevision reviewSolutionRevision = reviewSolutionRevisionRepository
+                .findOneBySolutionRevision(revision);
         if (reviewSolutionRevision != null) {
             ProblemSetRevisionSolution problemSetRevisionSolution = reviewSolutionRevision
                     .getProblemSetRevisionSolution();
@@ -164,19 +165,18 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             }
         }
 
-        List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision)
-                .stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
+        List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision).stream()
+                .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
         SolutionDTO solutionDTO = new SolutionDTO(
-                ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()),
-                steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
+                ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()), steps,
+                UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
                 revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
         solutionDTO.setProblemSetSolutionEditCode(solutionEditCode);
         return solutionDTO;
     }
 
     private SolutionSetDTO createOrUpdateReviewSolutions(List<SolutionDTO> solutionsDTO,
-                                                         ProblemSetRevisionSolution problemSetRevisionSolution,
-                                                         boolean isCreate) {
+            ProblemSetRevisionSolution problemSetRevisionSolution, boolean isCreate) {
         List<SolutionDTO> savedSolutions = new ArrayList<>();
         Long reviewCode = MapperUtils.nextCode(em);
         SolutionSetDTO solutionSet = new SolutionSetDTO();
@@ -196,9 +196,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
             if (title == null) {
                 ProblemDTO problem = solutionDTO.getProblem();
-                ProblemSetRevision problemSet =  problemSetRevisionRepository.findOneByShareCode(
-                        MapperUtils.fromCode(problem.getProblemSetRevisionShareCode())
-                );
+                ProblemSetRevision problemSet = problemSetRevisionRepository
+                        .findOneByShareCode(MapperUtils.fromCode(problem.getProblemSetRevisionShareCode()));
                 ProblemSetDTO problemSetDTO = ProblemMapper.INSTANCE.toProblemSetDTO((problemSet));
                 if (problemSet != null) {
                     title = problemSetDTO.getTitle();
@@ -218,6 +217,52 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionSet.setTitle(title);
         solutionSet.setSolutions(savedSolutions);
         return solutionSet;
+    }
+
+    @Override
+    public SolutionSetDTO createReviewSolutionsFromShareCode(String code, Map<String, String> searchParameters,
+            String initiator) {
+        ProblemSetRevision revision = problemSetRevisionRepository
+                .findOneByShareCode(UrlCodeConverter.fromUrlCode(code));
+        if (revision == null) {
+            return null;
+        }
+
+        String json = null;
+        try {
+            for (String getParamKey : searchParameters.keySet()) {
+                if (!Arrays.asList("studyPlanResourceId").contains(getParamKey)) {
+                    searchParameters.remove(getParamKey);
+                }
+            }
+            json = new ObjectMapper().writeValueAsString(searchParameters);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        List<SolutionDTO> solutionsDTO = new ArrayList<>();
+
+        for (Problem problem:revision.getProblems()) {
+            SolutionDTO solutionDTO = new SolutionDTO();
+            solutionDTO.setProblem(ProblemMapper.INSTANCE.toDto(problem));
+            List<SolutionStepDTO> solutionSteps = new ArrayList<>();
+            solutionSteps.add(new SolutionStepDTO(problem.getTitle(), problem.getProblemText(), false, null, null));
+            solutionDTO.setSteps(solutionSteps);
+            solutionsDTO.add(solutionDTO);
+        }
+
+        Long editCode = MapperUtils.nextCode(em);
+        ProblemSetRevisionSolution problemSetRevisionSolution = new ProblemSetRevisionSolution(
+            revision, editCode, initiator, json
+        );
+        problemSetRevisionSolutionRepository.save(problemSetRevisionSolution);
+        em.refresh(problemSetRevisionSolution);
+
+        SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, true);
+        solutionSetDTO.setEditCode(MapperUtils.toCode(editCode));
+        solutionSetDTO.setArchiveMode(revision.getProblemSet().getArchiveMode());
+        solutionSetDTO.deserializeAndSetMetadata(json);
+        return solutionSetDTO;
     }
 
     @Override

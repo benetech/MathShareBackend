@@ -24,11 +24,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/solution")
@@ -76,6 +78,23 @@ public class ProblemSolutionController {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } else {
             logger.error("ProblemSolution with code {} wasn't found", code);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(path = "/create/{problemSetCode}")
+    ResponseEntity<SolutionSetDTO> createReviewSolutionsFromShareCode(
+            @PathVariable String problemSetCode,
+            @RequestParam Map<String, String> searchParameters,
+            @RequestHeader(value = "x-initiator", required = false) String initiator
+    ) {
+        SolutionSetDTO body = problemSolutionService.createReviewSolutionsFromShareCode(
+            problemSetCode, searchParameters, initiator
+        );
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("SolutionSet with code {} wasn't found", problemSetCode);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
