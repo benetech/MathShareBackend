@@ -157,7 +157,7 @@ const partnerValidator = async (req, res, next) => {
       req.partner = partner;
     } else {
       res.status(401).send({
-        'message': 'Invalid x-partner-code in header',
+        'message': 'Invalid x-partner-token in header',
       });
     }
   }
