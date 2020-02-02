@@ -28,6 +28,9 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
     private String userId;
 
     @Column
+    private String source;
+
+    @Column
     private String metadata;
 
     @Column(insertable = true)

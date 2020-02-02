@@ -86,10 +86,11 @@ public class ProblemSolutionController {
     ResponseEntity<SolutionSetDTO> createReviewSolutionsFromShareCode(
             @PathVariable String problemSetCode,
             @RequestParam Map<String, String> searchParameters,
-            @RequestHeader(value = "x-initiator", required = false) String initiator
+            @RequestHeader(value = "x-initiator", required = false) String initiator,
+            @RequestHeader(value = "x-partner-code", required = false) String partnerCode
     ) {
         SolutionSetDTO body = problemSolutionService.createReviewSolutionsFromShareCode(
-            problemSetCode, searchParameters, initiator
+            problemSetCode, searchParameters, initiator, partnerCode
         );
         if (body != null) {
             return new ResponseEntity<>(body, HttpStatus.OK);

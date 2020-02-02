@@ -27,7 +27,8 @@ public interface ProblemSolutionService {
 
     SolutionSetDTO createReviewSolutions(String code, List<SolutionDTO> solutionsDTO, String initiator);
 
-    SolutionSetDTO createReviewSolutionsFromShareCode(String code, Map<String, String> searchParameters, String initiator);
+    SolutionSetDTO createReviewSolutionsFromShareCode(String code, Map<String, String> searchParameters, String initiator,
+        String partnerCode);
 
     SolutionSetDTO updateReviewSolutions(String code, List<SolutionDTO> solutionsDTO);
 

@@ -180,6 +180,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         List<SolutionDTO> savedSolutions = new ArrayList<>();
         Long reviewCode = MapperUtils.nextCode(em);
         SolutionSetDTO solutionSet = new SolutionSetDTO();
+        solutionSet.setSource(problemSetRevisionSolution.getSource());
         solutionSet.setReviewCode(MapperUtils.toCode(reviewCode));
         solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
 
@@ -221,7 +222,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
     @Override
     public SolutionSetDTO createReviewSolutionsFromShareCode(String code, Map<String, String> searchParameters,
-            String initiator) {
+            String initiator, String source) {
         ProblemSetRevision revision = problemSetRevisionRepository
                 .findOneByShareCode(UrlCodeConverter.fromUrlCode(code));
         if (revision == null) {
@@ -255,6 +256,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         ProblemSetRevisionSolution problemSetRevisionSolution = new ProblemSetRevisionSolution(
             revision, editCode, initiator, json
         );
+        problemSetRevisionSolution.setSource(source);
         problemSetRevisionSolutionRepository.save(problemSetRevisionSolution);
         em.refresh(problemSetRevisionSolution);
 
@@ -296,6 +298,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         reviewSolutionRevisionRepository.setAllReviewSolutionRevisionsInactiveFor(problemSetRevisionSolution);
         SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, false);
         solutionSetDTO.setEditCode(editCode);
+        solutionSetDTO.setSource(problemSetRevisionSolution.getSource());
         solutionSetDTO.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
         return solutionSetDTO;
     }
@@ -366,6 +369,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionSet.setTitle(title);
         solutionSet.setReviewCode(reviewCode);
         solutionSet.setEditCode(editCode);
+        solutionSet.setSource(problemSetRevisionSolution.getSource());
         solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
         return solutionSet;
     }

@@ -25,6 +25,7 @@ import expressWinston from 'express-winston';
 import flash from 'express-flash';
 import i18next from 'i18next';
 import i18nextBackend from 'i18next-node-fs-backend';
+import partnerRoutes from './routes/partner';
 import passport from './passport';
 import path from 'path';
 import proxy from 'http-proxy-middleware';
@@ -88,6 +89,9 @@ const onProxyReq = (proxyReq, req, res) => {
   if (req.headers['x-auth-token'] === process.env.SESSION_SECRET) {
     proxyReq.setHeader('x-role', 'admin');
   }
+  if (req.partner) {
+    proxyReq.setHeader('x-partner-code', req.partner.code);
+  }
   if (req.user) {
     proxyReq.setHeader('x-initiator', req.user.id);
     if (req.user.emails && req.user.emails.length > 0) {
@@ -133,13 +137,41 @@ app.use(expressWinston.logger({
   )
 }));
 
-app.use('/api', apiProxy);
+const partnerValidator = async (req, res, next) => {
+  const partnerToken = req.headers['x-partner-token']
+  if (partnerToken) {
+    let partner = null;
+    try {
+      partner = await db
+            .table('partner_api_keys')
+            .innerJoin('partners', 'partners.id', 'partner_api_keys.partner_id')
+            .where({
+                'partner_api_keys.id': partnerToken,
+            })
+            .whereRaw('("expired_at" is NULL or "expired_at" > CURRENT_TIMESTAMP)')
+            .first('partners.*');
+    } catch (error) {
+      console.log('error', error);
+    }
+    if (partner) {
+      req.partner = partner;
+    } else {
+      res.status(401).send({
+        'message': 'Invalid x-partner-code in header',
+      });
+    }
+  }
+  next();
+}
+
+app.use('/api', partnerValidator, apiProxy);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(accountRoutes);
 app.use(configRoutes);
+app.use(partnerRoutes);
 
 // The following routes are intended to be used in development mode only
 if (process.env.NODE_ENV !== 'production') {

@@ -29,6 +29,8 @@ public class SolutionSetDTO {
 
     private String title;
 
+    private String source;
+
     private Map<String, String> metadata;
 
     private String archiveMode;
@@ -44,6 +46,12 @@ public class SolutionSetDTO {
             String metadata) {
         this(solutions, reviewCode, editCode, title);
         this.deserializeAndSetMetadata(metadata);
+    }
+
+    public SolutionSetDTO(List<SolutionDTO> solutions, String reviewCode, String editCode, String title,
+            String metadata, String source) {
+        this(solutions, reviewCode, editCode, title, metadata);
+        this.source = source;
     }
 
     public void deserializeAndSetMetadata(String metadata) {
