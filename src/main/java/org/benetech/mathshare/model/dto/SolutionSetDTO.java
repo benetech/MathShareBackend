@@ -35,6 +35,8 @@ public class SolutionSetDTO {
 
     private String archiveMode;
 
+    private Integer id;
+
     public SolutionSetDTO(List<SolutionDTO> solutions, String reviewCode, String editCode, String title) {
         this.solutions = solutions;
         this.reviewCode = reviewCode;

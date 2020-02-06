@@ -180,6 +180,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         List<SolutionDTO> savedSolutions = new ArrayList<>();
         Long reviewCode = MapperUtils.nextCode(em);
         SolutionSetDTO solutionSet = new SolutionSetDTO();
+        solutionSet.setId(problemSetRevisionSolution.getId());
         solutionSet.setSource(problemSetRevisionSolution.getSource());
         solutionSet.setReviewCode(MapperUtils.toCode(reviewCode));
         solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
@@ -369,6 +370,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionSet.setTitle(title);
         solutionSet.setReviewCode(reviewCode);
         solutionSet.setEditCode(editCode);
+        solutionSet.setId(problemSetRevisionSolution.getId());
         solutionSet.setSource(problemSetRevisionSolution.getSource());
         solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
         return solutionSet;
