@@ -74,6 +74,6 @@ public class SolutionSetDTO {
     }
 
     public String getSolutionUrl() {
-        return "/#/app/problemSet/solve/" + this.editCode;
+        return System.getenv("CROSS_ORIGIN_ALLOWED_ORIGINS") + "/#/app/problemSet/solve/" + this.editCode;
     }
 }
