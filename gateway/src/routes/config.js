@@ -37,6 +37,7 @@ router.post('/config', async (req, res) => {
     const body = req.body || {};
     const allowedKeys = {
       ui: {
+        alertAutoClose: 'number',
         font: 'string',
         lineHeight: 'number',
         letterSpacing: 'number',
