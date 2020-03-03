@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import axios from 'axios';
 import db from '../db';
+import { getPayload, getRequestHeaders } from '../helpers/partner';
 
 export const defaultRedirect = process.env.CORS_ORIGIN.split(',')[0];
 
@@ -118,7 +119,7 @@ router.post('/partner/submit', async (req, res) => {
           .first();
         if (partner) {
           const { config } = partner;
-          if (!config || !config.submitUrl) {
+          if (!config || !config.submit) {
             res.status(400).send({
               message: 'Partner submission not configured',
             });
@@ -141,16 +142,21 @@ router.post('/partner/submit', async (req, res) => {
                 message: 'Not authorised to submit this set',
               });
             } else {
-              const payload = {
+              const mathsharePayload = {
                 editCode,
                 shareCode,
                 metadata: metadataFinal,
               };
+              const payload = getPayload(config, mathsharePayload);
+              const authHeaders = await getRequestHeaders(config);
               const submitResponse = await axios.post(
-                config.submitUrl,
+                config.submit.url,
                 payload,
                 {
-                  headers: config.submitHeaders || {},
+                  headers: Object.assign(
+                    config.submit.staticHeaders || {},
+                    authHeaders || {},
+                  ),
                 },
               );
               if (submitResponse.status === 200) {
@@ -224,7 +230,10 @@ router.post('/partner/submitOptions', async (req, res) => {
         .first();
       if (partner) {
         res.status(200).send({
-          canSubmit: partner.config && !!partner.config.submitUrl,
+          canSubmit:
+            partner.config &&
+            !!partner.config.submit &&
+            !!partner.config.submit.url,
           name: partner.name || '',
         });
       } else {
