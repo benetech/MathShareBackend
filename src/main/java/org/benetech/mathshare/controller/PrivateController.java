@@ -4,7 +4,9 @@ package org.benetech.mathshare.controller;
 //import org.slf4j.LoggerFactory;
 ////import org.springframework.beans.factory.annotation.Autowired;
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
+import org.benetech.mathshare.model.dto.SolutionSetDTO;
 import org.benetech.mathshare.service.ProblemSetService;
+import org.benetech.mathshare.service.ProblemSolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,9 @@ public class PrivateController {
     @Autowired
     private ProblemSetService problemSetService;
 
+    @Autowired
+    private ProblemSolutionService problemSolutionService;
+
     @GetMapping(path = "/recent")
     ResponseEntity<List<ProblemSetDTO>> getRecentProblemSets(
             @RequestHeader(value = "x-initiator", required = false) String initiator,
@@ -33,6 +38,16 @@ public class PrivateController {
             ) {
         return new ResponseEntity<>(problemSetService.findLastNProblemSetsOfUser(
                 initiator, archiveMode, Integer.parseInt(size)
+        ), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/recentSolutions")
+    ResponseEntity<List<SolutionSetDTO>> getRecentSolutionSets(
+            @RequestHeader(value = "x-initiator", required = false) String initiator,
+            @RequestParam(value = "x-content-size", defaultValue = "15") String size
+            ) {
+        return new ResponseEntity<>(problemSolutionService.getProblemSetSolutionsForUsers(
+                initiator, Integer.parseInt(size)
         ), HttpStatus.OK);
     }
 }

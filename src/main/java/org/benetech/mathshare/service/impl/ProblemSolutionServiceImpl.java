@@ -27,6 +27,8 @@ import org.benetech.mathshare.repository.SolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionStepRepository;
 import org.benetech.mathshare.service.ProblemSolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -337,9 +339,28 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
     @Override
     public SolutionSetDTO getProblemSetSolutions(String editCode) {
+        return getSolutionSetDTOfromProblemSetRevisionSolution(
+            problemSetRevisionSolutionRepository.findOneByEditCode(MapperUtils.fromCode(editCode))
+        );
+    }
+
+    @Override
+    public List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, int n) {
+        List<SolutionSetDTO> solutionSets = new ArrayList<>();
+        List<ProblemSetRevisionSolution> problemSetRevisions = problemSetRevisionSolutionRepository.findAllByUserId(
+            userId,
+            PageRequest.of(0, n, Sort.by("id").descending())
+        );
+        for (ProblemSetRevisionSolution problemSetRevision : problemSetRevisions) {
+            solutionSets.add(getSolutionSetDTOfromProblemSetRevisionSolution(problemSetRevision));
+        }
+        return solutionSets;
+    }
+
+    private SolutionSetDTO getSolutionSetDTOfromProblemSetRevisionSolution(
+        ProblemSetRevisionSolution problemSetRevisionSolution
+    ) {
         SolutionSetDTO solutionSet = new SolutionSetDTO();
-        ProblemSetRevisionSolution problemSetRevisionSolution = problemSetRevisionSolutionRepository.findOneByEditCode(
-                MapperUtils.fromCode(editCode));
         List<SolutionDTO> solutionsDTO = new ArrayList<>();
         List<ReviewSolutionRevision> reviewSolutionRevisions = reviewSolutionRevisionRepository
                 .findAllByProblemSetRevisionSolutionAndInactive(problemSetRevisionSolution, false);
@@ -369,7 +390,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionSet.setSolutions(solutionsDTO);
         solutionSet.setTitle(title);
         solutionSet.setReviewCode(reviewCode);
-        solutionSet.setEditCode(editCode);
+        solutionSet.setEditCode(MapperUtils.toCode(problemSetRevisionSolution.getEditCode()));
         solutionSet.setId(problemSetRevisionSolution.getId());
         solutionSet.setSource(problemSetRevisionSolution.getSource());
         solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
