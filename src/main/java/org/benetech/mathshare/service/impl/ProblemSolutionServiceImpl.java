@@ -97,7 +97,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        return saveNewVersionOfSolution(problemSolution, steps);
+        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished());
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .findOneByEditCode(UrlCodeConverter.fromUrlCode(editCode));
         List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        return saveNewVersionOfSolution(problemSolution, steps);
+        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished());
     }
 
     @Override
@@ -140,7 +140,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         }
         List<SolutionStep> steps = solutionDTO.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps);
+        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps, solutionDTO.getFinished());
         Long editCode = SolutionMapper.INSTANCE.fromDto(solutionDTO).getEditCode();
         boolean newSolution = false;
         if (editCode != null) {
@@ -397,11 +397,12 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         return solutionSet;
     }
 
-    private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps) {
+    private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps,
+            boolean finished) {
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
         SolutionRevision newRevision = solutionRevisionRepository.save(
-                new SolutionRevision(problemSolution));
+                new SolutionRevision(problemSolution, finished));
         steps.forEach(s -> s.setSolutionRevision(newRevision));
         solutionStepRepository.saveAll(steps);
         em.refresh(newRevision);
