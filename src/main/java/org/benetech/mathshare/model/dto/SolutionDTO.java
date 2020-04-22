@@ -24,7 +24,7 @@ public class SolutionDTO {
 
     private List<String> palettes;
 
-    private Boolean finished;
+    private Boolean finished = false;
 
     public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode, List<String> palettes) {
         this.problem = problem;
