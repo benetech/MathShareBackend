@@ -25,4 +25,18 @@ public class ProblemSetDTO {
 
     private int problemCount;
 
+    private String archiveMode;
+
+    public ProblemSetDTO(
+        List<ProblemDTO> problems, String editCode, String shareCode,
+        List<String> palettes, String title, String userId, int problemCount
+    ) {
+        this.problems = problems;
+        this.editCode = editCode;
+        this.shareCode = shareCode;
+        this.palettes = palettes;
+        this.title = title;
+        this.userId = userId;
+        this.problemCount = problemCount;
+    }
 }

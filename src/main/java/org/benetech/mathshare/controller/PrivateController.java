@@ -28,10 +28,11 @@ public class PrivateController {
     @GetMapping(path = "/recent")
     ResponseEntity<List<ProblemSetDTO>> getRecentProblemSets(
             @RequestHeader(value = "x-initiator", required = false) String initiator,
+            @RequestHeader(value = "x-archive-mode", required = false) String archiveMode,
             @RequestParam(value = "x-content-size", defaultValue = "15") String size
             ) {
         return new ResponseEntity<>(problemSetService.findLastNProblemSetsOfUser(
-                initiator, Integer.parseInt(size)
+                initiator, archiveMode, Integer.parseInt(size)
         ), HttpStatus.OK);
     }
 }

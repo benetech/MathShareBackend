@@ -30,3 +30,6 @@ cross-origin:
 
 ibm-watson:
   api-key: ${WATSON_API_KEY:api-key}
+
+admin:
+  api-key: ${SESSION_SECRET:admin}

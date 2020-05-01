@@ -3,6 +3,9 @@ package org.benetech.mathshare.model.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class ProblemDTO {
@@ -11,6 +14,8 @@ public class ProblemDTO {
 
     private String problemSetRevisionShareCode;
 
+    private String editCode;
+
     private String text;
 
     private String title;
@@ -18,4 +23,6 @@ public class ProblemDTO {
     private String scratchpad;
 
     private int position;
+
+    private List<ProblemStepDTO> steps = new ArrayList<>();
 }
