@@ -27,6 +27,12 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
     @Column
     private String userId;
 
+    @Column
+    private String source;
+
+    @Column
+    private String metadata;
+
     @Column(insertable = true)
     private Long editCode;
 
@@ -39,5 +45,10 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
         this.problemSetRevision = problemSetRevision;
         this.editCode = editCode;
         this.userId = userId;
+    }
+
+    public ProblemSetRevisionSolution(ProblemSetRevision problemSetRevision, Long editCode, String userId, String metadata) {
+        this(problemSetRevision, editCode, userId);
+        this.metadata = metadata;
     }
 }

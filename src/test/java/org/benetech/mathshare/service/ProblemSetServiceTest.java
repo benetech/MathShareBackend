@@ -12,6 +12,7 @@ import org.benetech.mathshare.model.mother.ProblemSetRevisionMother;
 import org.benetech.mathshare.repository.ProblemRepository;
 import org.benetech.mathshare.repository.ProblemSetRepository;
 import org.benetech.mathshare.repository.ProblemSetRevisionRepository;
+import org.benetech.mathshare.repository.ProblemStepRepository;
 import org.benetech.mathshare.service.impl.ProblemSetServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static org.benetech.mathshare.model.mother.ProblemSetRevisionMother.INVALID_CODE;
 import static org.benetech.mathshare.model.mother.ProblemSetRevisionMother.VALID_CODE;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,7 +48,7 @@ public class ProblemSetServiceTest {
 
     private static final Long CODE = 1L;
 
-    private static  final String USER_ID = "aab63d78-cff6-11e9-83a9-935feb96b1df";
+    private static final String USER_ID = "aab63d78-cff6-11e9-83a9-935feb96b1df";
 
     @MockBean
     private ProblemSetRevisionRepository problemSetRevisionRepository;
@@ -56,6 +58,9 @@ public class ProblemSetServiceTest {
 
     @MockBean
     private ProblemRepository problemRepository;
+
+    @MockBean
+    private ProblemStepRepository problemStepRepository;
 
     @SuppressWarnings("PMD.UnusedPrivateField")
     @Mock
@@ -122,6 +127,8 @@ public class ProblemSetServiceTest {
                 .thenReturn(revision);
         when(problemRepository.findAllByProblemSetRevision(revision))
                 .thenReturn(problems);
+        when(problemStepRepository.findAllByProblemOrderByIdAsc(any()))
+                .thenReturn(new ArrayList<>());
 
         ProblemSetDTO result = problemSetService.findProblemsByUrlCode(VALID_CODE);
         Assert.assertEquals(problems.stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList()),

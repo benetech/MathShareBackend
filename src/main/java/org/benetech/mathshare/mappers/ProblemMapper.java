@@ -2,9 +2,11 @@ package org.benetech.mathshare.mappers;
 
 import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
+import org.benetech.mathshare.model.dto.ProblemStepDTO;
 import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSet;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
+import org.benetech.mathshare.model.entity.ProblemStep;
 import org.benetech.mathshare.model.entity.Scratchpad;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,6 +26,7 @@ public interface ProblemMapper {
     @Mappings({
             @Mapping(source = "scratchpad", target = "scratchpad", qualifiedByName = "fromScratchpad"),
             @Mapping(source = "problemText", target = "text"),
+            @Mapping(source = "steps", target = "steps", qualifiedByName = "toStepDto"),
             @Mapping(source = "problemSetRevision.shareCode", target = "problemSetRevisionShareCode",
                     qualifiedByName = "toCode")})
     ProblemDTO toDto(Problem problem);
@@ -34,6 +37,12 @@ public interface ProblemMapper {
             @Mapping(source = "problemSetRevisionShareCode", target = "problemSetRevision.shareCode",
                     qualifiedByName = "fromCode")})
     Problem fromDto(ProblemDTO problem);
+
+    @Mapping(source = "scratchpad", target = "scratchpad", qualifiedByName = "fromScratchpad")
+    ProblemStepDTO toStepDto(ProblemStep problemStep);
+
+    @Mapping(source = "scratchpad", target = "scratchpad", qualifiedByName = "toScratchpad")
+    ProblemStep fromStepDto(ProblemStepDTO problemStep);
 
     @Mapping(source = "editCode", target = "editCode", qualifiedByName = "fromCode")
     ProblemSet fromDto(ProblemSetDTO problemSet);

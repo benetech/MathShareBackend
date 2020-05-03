@@ -13,5 +13,5 @@ public interface ProblemSetRepository extends JpaRepository<ProblemSet, Integer>
         PagingAndSortingRepository<ProblemSet, Integer> {
     ProblemSet findOneByEditCode(long editCode);
 
-    List<ProblemSet> findAllByUserId(String userId, Pageable pageable);
+    List<ProblemSet> findAllByUserIdAndArchiveMode(String userId, String archiveMode, Pageable pageable);
 }

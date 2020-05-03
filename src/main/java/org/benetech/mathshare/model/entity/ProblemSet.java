@@ -29,6 +29,11 @@ public class ProblemSet extends AbstractEntity {
 
     private String userId;
 
+    @Getter(AccessLevel.PUBLIC)
+    private String archiveMode;
+
+    private String archivedBy;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinFormula("(SELECT r.id FROM problem_set_revision r WHERE r.problem_set_id = id ORDER BY r.id DESC LIMIT 1)")
     private ProblemSetRevision latestRevision;
@@ -43,6 +48,20 @@ public class ProblemSet extends AbstractEntity {
     @Setter(AccessLevel.NONE)
     private Timestamp dateModified;
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.PRIVATE)
+    private Timestamp archivedAt;
+
     @Convert(converter = StringListConverter.class)
     private List<String> palettes = new ArrayList<>();
+
+    public void setArchiveMode(String archiveMode) {
+        if (!"deleted".equals(archiveMode) && !"archived".equals(archiveMode) && archiveMode != null) {
+            return;
+        }
+        this.archiveMode = archiveMode;
+        if (archiveMode != null) {
+            this.setArchivedAt(new Timestamp(System.currentTimeMillis()));
+        }
+    }
 }

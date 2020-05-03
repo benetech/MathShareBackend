@@ -29,7 +29,7 @@ export const insertOrUpdate = (tableName, tuple, uniqueIdKey) => {
     ))
       .transacting(trx);
     return query.then(trx.commit).catch(trx.rollback);
-  })
+  });
 };
 
 export default db;

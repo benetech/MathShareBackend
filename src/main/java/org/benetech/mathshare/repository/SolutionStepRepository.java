@@ -9,6 +9,5 @@ import java.util.List;
 
 @Repository
 public interface SolutionStepRepository extends JpaRepository<SolutionStep, Integer> {
-
     List<SolutionStep> findAllBySolutionRevision(SolutionRevision solutionRevision);
 }
