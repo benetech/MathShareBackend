@@ -10,7 +10,6 @@
 import { Router } from 'express';
 import URL from 'url';
 import passport from 'passport';
-// import Keygrip from 'keygrip';
 import validator from 'validator';
 
 export const defaultRedirect = process.env.CORS_ORIGIN.split(',')[0];
