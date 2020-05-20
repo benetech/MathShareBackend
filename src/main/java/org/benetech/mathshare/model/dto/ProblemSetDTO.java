@@ -27,6 +27,10 @@ public class ProblemSetDTO {
 
     private String archiveMode;
 
+    private Boolean optionalExplanations;
+
+    private Boolean hideSteps;
+
     public ProblemSetDTO(
         List<ProblemDTO> problems, String editCode, String shareCode,
         List<String> palettes, String title, String userId, int problemCount
@@ -38,5 +42,15 @@ public class ProblemSetDTO {
         this.title = title;
         this.userId = userId;
         this.problemCount = problemCount;
+    }
+
+    public ProblemSetDTO(
+        List<ProblemDTO> problems, String editCode, String shareCode,
+        List<String> palettes, String title, String userId, int problemCount,
+        Boolean optionalExplanations, Boolean hideSteps
+    ) {
+        this(problems, editCode, shareCode, palettes, title, userId, problemCount);
+        this.hideSteps = hideSteps;
+        this.optionalExplanations = optionalExplanations;
     }
 }

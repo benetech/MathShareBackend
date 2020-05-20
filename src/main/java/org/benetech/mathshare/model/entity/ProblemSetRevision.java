@@ -46,6 +46,12 @@ public class ProblemSetRevision extends AbstractEntity {
     private boolean isExample;
 
     @Column
+    private boolean optionalExplanations;
+
+    @Column
+    private boolean hideSteps;
+
+    @Column
     private String title;
 
     @CreationTimestamp
@@ -56,5 +62,12 @@ public class ProblemSetRevision extends AbstractEntity {
     public ProblemSetRevision(@NotNull ProblemSet problemSet, @NotNull String title) {
         this.problemSet = problemSet;
         this.title = title;
+    }
+
+    public ProblemSetRevision(@NotNull ProblemSet problemSet, @NotNull String title,
+                              boolean optionalExplanations, boolean hideSteps) {
+        this(problemSet, title);
+        this.optionalExplanations = optionalExplanations;
+        this.hideSteps = hideSteps;
     }
 }
