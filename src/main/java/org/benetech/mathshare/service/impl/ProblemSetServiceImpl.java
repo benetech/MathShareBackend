@@ -228,6 +228,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         revision.setProblems(savedProblems);
         oldRevision.setProblems(this.problemRepository.findAllByProblemSetRevision(oldRevision));
         result = problemSetRevisionRepository.save(revision);
+        em.refresh(result);
         oldRevision.setReplacedBy(result);
         problemSetRevisionRepository.save(oldRevision);
         return result;
