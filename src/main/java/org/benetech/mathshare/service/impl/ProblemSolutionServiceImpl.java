@@ -124,7 +124,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
         return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
-                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
+                revision.getProblemSolution().getProblem().getProblemSetRevision().getPalettes());
     }
 
     @Override
@@ -172,7 +172,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         SolutionDTO solutionDTO = new SolutionDTO(
                 ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()), steps,
                 UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
-                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
+                revision.getProblemSolution().getProblem().getProblemSetRevision().getPalettes());
         solutionDTO.setProblemSetSolutionEditCode(solutionEditCode);
         return solutionDTO;
     }

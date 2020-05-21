@@ -18,13 +18,13 @@ public abstract class ProblemSetRevisionMother {
     public static final String TITLE = "test";
 
     public static ProblemSetRevision validInstance(ProblemSet problemSet) {
-        ProblemSetRevision result = new ProblemSetRevision(problemSet, TITLE);
+        ProblemSetRevision result = new ProblemSetRevision(problemSet, TITLE, false, false, problemSet.getPalettes());
         result.setShareCode(UrlCodeConverter.fromUrlCode(VALID_CODE));
         return result;
     }
 
     public static ProblemSetRevision revisionOf(ProblemSet problemSet) {
-        return new ProblemSetRevision(problemSet, TITLE);
+        return new ProblemSetRevision(problemSet, TITLE, false, false, problemSet.getPalettes());
     }
 
     public static ProblemSetRevision withShareCode(ProblemSet problemSet, long code) {

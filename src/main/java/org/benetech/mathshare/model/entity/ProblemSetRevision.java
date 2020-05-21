@@ -7,10 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+
+import org.benetech.mathshare.converters.StringListConverter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -59,15 +62,20 @@ public class ProblemSetRevision extends AbstractEntity {
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
 
+    @Convert(converter = StringListConverter.class)
+    private List<String> palettes = new ArrayList<>();
+
     public ProblemSetRevision(@NotNull ProblemSet problemSet, @NotNull String title) {
         this.problemSet = problemSet;
         this.title = title;
     }
 
     public ProblemSetRevision(@NotNull ProblemSet problemSet, @NotNull String title,
-                              boolean optionalExplanations, boolean hideSteps) {
+                              boolean optionalExplanations, boolean hideSteps,
+                              List<String> palettes) {
         this(problemSet, title);
         this.optionalExplanations = optionalExplanations;
         this.hideSteps = hideSteps;
+        this.palettes = palettes;
     }
 }
