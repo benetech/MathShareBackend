@@ -69,7 +69,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         List<Problem> savedProblems = new ArrayList<>();
-        boolean optionalExplanations = false;
+        boolean optionalExplanations = true;
         if (problemSetDTO.getOptionalExplanations() != null) {
             optionalExplanations = problemSetDTO.getOptionalExplanations().booleanValue();
         }
@@ -182,7 +182,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         List<Problem> savedProblems = new ArrayList<>();
-        boolean optionalExplanations = false;
+        boolean optionalExplanations = true;
         if (problemSetDTO.getOptionalExplanations() != null) {
             optionalExplanations = problemSetDTO.getOptionalExplanations().booleanValue();
         }
@@ -216,7 +216,13 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 .map(ProblemMapper.INSTANCE::fromDto).collect(Collectors.toList());
         List<Problem> savedProblems = new ArrayList<>();
         ProblemSetRevision oldRevision = problemSet.getLatestRevision();
-        ProblemSetRevision result = new ProblemSetRevision(problemSet, oldRevision.getTitle());
+        ProblemSetRevision result = new ProblemSetRevision(
+            problemSet,
+            oldRevision.getTitle(),
+            oldRevision.isOptionalExplanations(),
+            oldRevision.isHideSteps(),
+            oldRevision.getPalettes()
+        );
         ProblemSetRevision revision = problemSetRevisionRepository.save(result);
         for (Problem problem : problems) {
             List<ProblemStep> steps = problem.getSteps();

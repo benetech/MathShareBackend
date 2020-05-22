@@ -123,8 +123,10 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision).stream()
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
+        ProblemSetRevision psr = revision.getProblemSolution().getProblem().getProblemSetRevision();
+
         return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
-                revision.getProblemSolution().getProblem().getProblemSetRevision().getPalettes());
+            psr.getPalettes(), revision.getFinished(), psr.isOptionalExplanations(), psr.isHideSteps());
     }
 
     @Override
@@ -169,10 +171,11 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision).stream()
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
+        ProblemSetRevision psr = revision.getProblemSolution().getProblem().getProblemSetRevision();
         SolutionDTO solutionDTO = new SolutionDTO(
                 ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()), steps,
                 UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
-                revision.getProblemSolution().getProblem().getProblemSetRevision().getPalettes());
+                psr.getPalettes(), revision.getFinished(), psr.isOptionalExplanations(), psr.isHideSteps());
         solutionDTO.setProblemSetSolutionEditCode(solutionEditCode);
         return solutionDTO;
     }
