@@ -73,7 +73,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         if (problemSetDTO.getOptionalExplanations() != null) {
             optionalExplanations = problemSetDTO.getOptionalExplanations().booleanValue();
         }
-        boolean hideSteps = false;
+        boolean hideSteps = true;
         if (problemSetDTO.getHideSteps() != null) {
             hideSteps = problemSetDTO.getHideSteps().booleanValue();
         }
@@ -182,7 +182,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         List<Problem> savedProblems = new ArrayList<>();
-        boolean optionalExplanations = true;
+        boolean optionalExplanations = false;
         if (problemSetDTO.getOptionalExplanations() != null) {
             optionalExplanations = problemSetDTO.getOptionalExplanations().booleanValue();
         }
