@@ -138,11 +138,14 @@ public class ProblemSolutionServiceTest {
         ProblemSetRevision revision1 = new ProblemSetRevision();
         Problem problem = ProblemMother.validInstance(revision1);
         List<SolutionStep> solutionStepList = SolutionStepMother.createValidStepsList(solutionRevision, 3);
+        ReviewSolutionRevision reviewSolutionRevision = ReviewSolutionRevisionMother.mockInstance();
 
         when(solutionRevisionRepository.findOneByShareCode(CODE)).thenReturn(solutionRevision);
         when(problemRepository.findById(solutionRevision.getProblemSolution().getId())).thenReturn(Optional.of(problem));
         when(solutionStepRepository.findAllBySolutionRevision(solutionRevision))
                 .thenReturn(solutionStepList);
+        when(reviewSolutionRevisionRepository.findOneBySolutionRevision(solutionRevision))
+                .thenReturn(reviewSolutionRevision);
 
         SolutionDTO result = problemSolutionService.findSolutionByUrlCode(UrlCodeConverter.toUrlCode(CODE));
         Assert.assertEquals(solutionStepList.stream().map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList()), result.getSteps());

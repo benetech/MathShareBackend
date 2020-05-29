@@ -117,6 +117,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             return null;
         }
 
+        ReviewSolutionRevision rsr = reviewSolutionRevisionRepository.findOneBySolutionRevision(revision);
+
         ProblemDTO problem = ProblemMapper.INSTANCE
                 .toDto(problemRepository.findById(revision.getProblemSolution().getProblem().getId()).get());
 
@@ -124,7 +126,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
         return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
-                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
+                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes(),
+                null, UrlCodeConverter.toUrlCode(rsr.getReviewCode()));
     }
 
     @Override
