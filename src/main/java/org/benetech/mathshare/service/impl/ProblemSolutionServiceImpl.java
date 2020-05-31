@@ -27,6 +27,8 @@ import org.benetech.mathshare.repository.SolutionRevisionRepository;
 import org.benetech.mathshare.repository.SolutionStepRepository;
 import org.benetech.mathshare.service.ProblemSolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +97,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        return saveNewVersionOfSolution(problemSolution, steps);
+        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished());
     }
 
     @Override
@@ -105,7 +107,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .findOneByEditCode(UrlCodeConverter.fromUrlCode(editCode));
         List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        return saveNewVersionOfSolution(problemSolution, steps);
+        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished());
     }
 
     @Override
@@ -115,6 +117,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             return null;
         }
 
+        ReviewSolutionRevision rsr = reviewSolutionRevisionRepository.findOneBySolutionRevision(revision);
+
         ProblemDTO problem = ProblemMapper.INSTANCE
                 .toDto(problemRepository.findById(revision.getProblemSolution().getProblem().getId()).get());
 
@@ -122,7 +126,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
         return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
-                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
+                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes(),
+                null, UrlCodeConverter.toUrlCode(rsr.getReviewCode()));
     }
 
     @Override
@@ -138,7 +143,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         }
         List<SolutionStep> steps = solutionDTO.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps);
+        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps, solutionDTO.getFinished());
         Long editCode = SolutionMapper.INSTANCE.fromDto(solutionDTO).getEditCode();
         boolean newSolution = false;
         if (editCode != null) {
@@ -337,9 +342,28 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
     @Override
     public SolutionSetDTO getProblemSetSolutions(String editCode) {
+        return getSolutionSetDTOfromProblemSetRevisionSolution(
+            problemSetRevisionSolutionRepository.findOneByEditCode(MapperUtils.fromCode(editCode))
+        );
+    }
+
+    @Override
+    public List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, int n) {
+        List<SolutionSetDTO> solutionSets = new ArrayList<>();
+        List<ProblemSetRevisionSolution> problemSetRevisions = problemSetRevisionSolutionRepository.findAllByUserId(
+            userId,
+            PageRequest.of(0, n, Sort.by("id").descending())
+        );
+        for (ProblemSetRevisionSolution problemSetRevision : problemSetRevisions) {
+            solutionSets.add(getSolutionSetDTOfromProblemSetRevisionSolution(problemSetRevision));
+        }
+        return solutionSets;
+    }
+
+    private SolutionSetDTO getSolutionSetDTOfromProblemSetRevisionSolution(
+        ProblemSetRevisionSolution problemSetRevisionSolution
+    ) {
         SolutionSetDTO solutionSet = new SolutionSetDTO();
-        ProblemSetRevisionSolution problemSetRevisionSolution = problemSetRevisionSolutionRepository.findOneByEditCode(
-                MapperUtils.fromCode(editCode));
         List<SolutionDTO> solutionsDTO = new ArrayList<>();
         List<ReviewSolutionRevision> reviewSolutionRevisions = reviewSolutionRevisionRepository
                 .findAllByProblemSetRevisionSolutionAndInactive(problemSetRevisionSolution, false);
@@ -369,18 +393,19 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionSet.setSolutions(solutionsDTO);
         solutionSet.setTitle(title);
         solutionSet.setReviewCode(reviewCode);
-        solutionSet.setEditCode(editCode);
+        solutionSet.setEditCode(MapperUtils.toCode(problemSetRevisionSolution.getEditCode()));
         solutionSet.setId(problemSetRevisionSolution.getId());
         solutionSet.setSource(problemSetRevisionSolution.getSource());
         solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
         return solutionSet;
     }
 
-    private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps) {
+    private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps,
+            boolean finished) {
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
         SolutionRevision newRevision = solutionRevisionRepository.save(
-                new SolutionRevision(problemSolution));
+                new SolutionRevision(problemSolution, finished));
         steps.forEach(s -> s.setSolutionRevision(newRevision));
         solutionStepRepository.saveAll(steps);
         em.refresh(newRevision);

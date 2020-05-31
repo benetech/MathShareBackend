@@ -35,4 +35,6 @@ public interface ProblemSolutionService {
     SolutionSetDTO getProblemSetSolutions(String editCode);
 
     SolutionSetPublicDTO getReviewSolutions(String code);
+
+    List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, int n);
 }

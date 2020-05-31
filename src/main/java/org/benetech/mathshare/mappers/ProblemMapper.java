@@ -61,6 +61,7 @@ public interface ProblemMapper {
             @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "toCode"),
             @Mapping(source = "problemSet.editCode", target = "editCode", qualifiedByName = "toCode"),
             @Mapping(source = "title", target = "title", qualifiedByName = "title"),
+            @Mapping(source = "problemSet.palettes", target = "palettes", qualifiedByName = "palettes"),
             @Mapping(source = "problems", target = "problemCount", qualifiedByName = "countOfProblems")
     })
     ProblemSetDTO toProblemSetDTO(ProblemSetRevision revision);
@@ -87,9 +88,12 @@ public interface ProblemMapper {
 
     @Named("sortProblems")
     default List<ProblemDTO> sortProblems(List<Problem> problems) {
-        return problems.stream().sorted(Comparator.comparing(Problem::getPosition,
-                Comparator.nullsFirst(Comparator.naturalOrder())))
-                .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
+        return problems.stream().sorted(
+            Comparator.comparing(Problem::getPosition, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(
+                    Comparator.comparing(Problem::getId, Comparator.nullsLast(Comparator.naturalOrder()))
+                )
+        ).map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
     @Named("countOfProblems")

@@ -74,7 +74,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         ProblemSetRevision revision = problemSetRevisionRepository
                 .save(new ProblemSetRevision(set, problemSetDTO.getTitle()));
         for (Problem problem : problems) {
-            savedProblems.add(createOrUpdateProblem(problem, revision, new ArrayList<>()));
+            savedProblems.add(createOrUpdateProblem(problem, revision, problem.getSteps()));
         }
         revision.setProblems(savedProblems);
         em.refresh(revision);
@@ -193,6 +193,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         revision.setProblems(savedProblems);
         oldRevision.setProblems(this.problemRepository.findAllByProblemSetRevision(oldRevision));
         result = problemSetRevisionRepository.save(revision);
+        em.refresh(result);
         oldRevision.setReplacedBy(result);
         problemSetRevisionRepository.save(oldRevision);
         return result;

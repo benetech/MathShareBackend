@@ -44,6 +44,9 @@ public class SolutionRevision extends AbstractEntity {
     @JoinColumn(name = "replaced_by")
     private SolutionRevision replacedBy;
 
+    @NonNull
+    private Boolean finished = false;
+
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
@@ -52,5 +55,17 @@ public class SolutionRevision extends AbstractEntity {
     public SolutionRevision(@NotNull ProblemSolution problemSolution, List<SolutionStep> steps) {
         this.problemSolution = problemSolution;
         this.steps = steps;
+    }
+
+    public SolutionRevision(@NotNull ProblemSolution problemSolution, List<SolutionStep> steps,
+            Boolean finished
+    ) {
+        this(problemSolution, steps);
+        this.finished = finished;
+    }
+
+    public SolutionRevision(@NotNull ProblemSolution problemSolution, Boolean finished) {
+        this.problemSolution = problemSolution;
+        this.finished = finished;
     }
 }
