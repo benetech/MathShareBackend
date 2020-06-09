@@ -174,8 +174,10 @@ public class ProblemSetServiceTest {
                 .willReturn(null);
         given(this.problemSetRepository.save(ProblemMapper.INSTANCE.fromDto(problemSetDTO)))
                 .willReturn(ProblemSetMother.validInstance());
-        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.validInstance(), problemSetDTO.getTitle())))
-                .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance(), problemSetDTO.getTitle()));
+        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.validInstance(), problemSetDTO.getTitle(),
+                        false, false, problemSetDTO.getPalettes())))
+                .willReturn(new ProblemSetRevision(ProblemSetMother.validInstance(), problemSetDTO.getTitle(), false, false,
+                        problemSetDTO.getPalettes()));
         given(this.problemSetRevisionRepository.save(ProblemSetRevisionMother.withProblems(ProblemSetMother.validInstance(), 3)))
                 .willReturn(ProblemSetRevisionMother.withProblems(ProblemSetMother.validInstance(), 3));
 

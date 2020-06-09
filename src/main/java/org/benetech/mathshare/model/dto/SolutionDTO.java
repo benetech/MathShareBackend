@@ -28,6 +28,10 @@ public class SolutionDTO {
 
     private Boolean finished = false;
 
+    private Boolean optionalExplanations = false;
+
+    private Boolean hideSteps = false;
+
     public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode, List<String> palettes) {
         this.problem = problem;
         this.steps = steps;
@@ -46,5 +50,13 @@ public class SolutionDTO {
     Boolean finished, String reviewCode) {
         this(problem, steps, editCode, palettes, finished);
         this.reviewCode = reviewCode;
+    }
+
+    public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode, List<String> palettes,
+    Boolean finished, String reviewCode, Boolean optionalExplanations, Boolean hideSteps
+    ) {
+        this(problem, steps, editCode, palettes, finished, reviewCode);
+        this.optionalExplanations = optionalExplanations;
+        this.hideSteps = hideSteps;
     }
 }

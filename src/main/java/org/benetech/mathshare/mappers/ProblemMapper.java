@@ -60,8 +60,7 @@ public interface ProblemMapper {
             @Mapping(source = "problems", target = "problems", qualifiedByName = "sortProblems"),
             @Mapping(source = "shareCode", target = "shareCode", qualifiedByName = "toCode"),
             @Mapping(source = "problemSet.editCode", target = "editCode", qualifiedByName = "toCode"),
-            @Mapping(source = "title", target = "title", qualifiedByName = "title"),
-            @Mapping(source = "problemSet.palettes", target = "palettes", qualifiedByName = "palettes"),
+            @Mapping(source = "palettes", target = "palettes", qualifiedByName = "palettes"),
             @Mapping(source = "problems", target = "problemCount", qualifiedByName = "countOfProblems")
     })
     ProblemSetDTO toProblemSetDTO(ProblemSetRevision revision);

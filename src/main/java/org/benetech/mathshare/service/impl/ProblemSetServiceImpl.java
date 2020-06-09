@@ -25,6 +25,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,11 +69,28 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         List<Problem> savedProblems = new ArrayList<>();
-
+        boolean optionalExplanations = true;
+        if (problemSetDTO.getOptionalExplanations() != null) {
+            optionalExplanations = problemSetDTO.getOptionalExplanations().booleanValue();
+        }
+        boolean hideSteps = true;
+        if (problemSetDTO.getHideSteps() != null) {
+            hideSteps = problemSetDTO.getHideSteps().booleanValue();
+        }
+        List<String> palettes = problemSet.getPalettes();
+        if (palettes == null) {
+            palettes = Arrays.asList("Edit;Operators;Notations;Geometry".split(";"));
+        }
         ProblemSet set = problemSetRepository.save(problemSet);
         em.refresh(set);
         ProblemSetRevision revision = problemSetRevisionRepository
-                .save(new ProblemSetRevision(set, problemSetDTO.getTitle()));
+                .save(new ProblemSetRevision(
+                    set,
+                    problemSetDTO.getTitle(),
+                    optionalExplanations,
+                    hideSteps,
+                    palettes
+                ));
         for (Problem problem : problems) {
             savedProblems.add(createOrUpdateProblem(problem, revision, problem.getSteps()));
         }
@@ -139,14 +157,19 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<Problem> problems = problemRepository.findAllByProblemSetRevision(revision);
         for (Problem problem : problems) {
             ProblemDTO problemDto = ProblemMapper.INSTANCE.toDto(problem);
-            problemDto.setSteps(problemStepRepository.findAllByProblemOrderByIdAsc(problem).stream()
-                    .map(ProblemMapper.INSTANCE::toStepDto).collect(Collectors.toList()));
+            if (revision.isHideSteps()) {
+                problemDto.setSteps(new ArrayList<>());
+            } else {
+                problemDto.setSteps(problemStepRepository.findAllByProblemOrderByIdAsc(problem).stream()
+                        .map(ProblemMapper.INSTANCE::toStepDto).collect(Collectors.toList()));
+            }
             problemsDto.add(problemDto);
         }
 
         return new ProblemSetDTO(problemsDto, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
-                UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes(),
-                revision.getTitle(), null, problems.size(), revision.getProblemSet().getArchiveMode());
+                UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getPalettes(),
+                revision.getTitle(), null, problems.size(), revision.getProblemSet().getArchiveMode(),
+                revision.isOptionalExplanations(), revision.isHideSteps());
     }
 
     @Override
@@ -159,14 +182,26 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<Problem> problems = problemSetDTO.getProblems().stream().map(ProblemMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
         List<Problem> savedProblems = new ArrayList<>();
+        boolean optionalExplanations = false;
+        if (problemSetDTO.getOptionalExplanations() != null) {
+            optionalExplanations = problemSetDTO.getOptionalExplanations().booleanValue();
+        }
+        boolean hideSteps = false;
+        if (problemSetDTO.getHideSteps() != null) {
+            hideSteps = problemSetDTO.getHideSteps().booleanValue();
+        }
         ProblemSetRevision result;
         boolean newSet;
         String title = problemSetDTO.getTitle();
+        List<String> palettes = problemSet.getPalettes();
         if (saved == null) {
-            result = createProblemSet(savedProblems, problems, problemSet, title);
+            result = createProblemSet(savedProblems, problems, problemSet, title, optionalExplanations, hideSteps, palettes);
             newSet = true;
         } else {
-            result = updateProblemSet(savedProblems, problems, problemSet, title);
+            if (palettes == null) {
+                palettes = saved.getLatestRevision().getPalettes();
+            }
+            result = updateProblemSet(savedProblems, problems, problemSet, title, optionalExplanations, hideSteps, palettes);
             newSet = false;
         }
         em.refresh(result);
@@ -181,7 +216,13 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 .map(ProblemMapper.INSTANCE::fromDto).collect(Collectors.toList());
         List<Problem> savedProblems = new ArrayList<>();
         ProblemSetRevision oldRevision = problemSet.getLatestRevision();
-        ProblemSetRevision result = new ProblemSetRevision(problemSet, oldRevision.getTitle());
+        ProblemSetRevision result = new ProblemSetRevision(
+            problemSet,
+            oldRevision.getTitle(),
+            oldRevision.isOptionalExplanations(),
+            oldRevision.isHideSteps(),
+            oldRevision.getPalettes()
+        );
         ProblemSetRevision revision = problemSetRevisionRepository.save(result);
         for (Problem problem : problems) {
             List<ProblemStep> steps = problem.getSteps();
@@ -200,9 +241,13 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     private ProblemSetRevision createProblemSet(List<Problem> savedProblems, List<Problem> problems,
-                                                ProblemSet problemSet, String title) {
+                                                ProblemSet problemSet, String title,
+                                                boolean optionalExplanations, boolean hideSteps,
+                                                List<String> palettes) {
         ProblemSet set = problemSetRepository.save(problemSet);
-        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set, title));
+        ProblemSetRevision revision = problemSetRevisionRepository.save(
+            new ProblemSetRevision(set, title, optionalExplanations, hideSteps, palettes)
+        );
         for (Problem problem : problems) {
             savedProblems.add(createOrUpdateProblem(problem, revision, new ArrayList<>()));
         }
@@ -211,11 +256,15 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     private ProblemSetRevision updateProblemSet(List<Problem> savedProblems, List<Problem> problems,
-                                                ProblemSet problemSet, String title) {
+                                                ProblemSet problemSet, String title,
+                                                boolean optionalExplanations, boolean hideSteps,
+                                                List<String> palettes) {
         ProblemSetRevision result;
         ProblemSet set = problemSetRepository.findOneByEditCode(problemSet.getEditCode());
         ProblemSetRevision oldRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(set, null);
-        ProblemSetRevision revision = problemSetRevisionRepository.save(new ProblemSetRevision(set, title));
+        ProblemSetRevision revision = problemSetRevisionRepository.save(
+            new ProblemSetRevision(set, title, optionalExplanations, hideSteps, palettes)
+        );
         for (Problem problem : problems) {
             savedProblems.add(createOrUpdateProblem(problem, revision, problem.getSteps()));
         }
@@ -265,8 +314,8 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         List<ProblemDTO> problems = problemRepository.findAllByProblemSetRevision(revision).stream()
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
-                UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getProblemSet().getPalettes(),
-                revision.getTitle(), null, problems.size());
+                UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getPalettes(),
+                revision.getTitle(), null, problems.size(), revision.isOptionalExplanations(), revision.isHideSteps());
     }
 
     @Override

@@ -1,8 +1,6 @@
 package org.benetech.mathshare.model.mother;
 
-import org.benetech.mathshare.model.entity.Problem;
 import org.benetech.mathshare.model.entity.ProblemSet;
-import org.benetech.mathshare.model.entity.ProblemSetRevision;
 
 import java.util.Arrays;
 
