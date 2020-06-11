@@ -17,10 +17,11 @@ router.get('/config', async (req, res) => {
       .where({
         'users.id': req.user.id,
       })
-      .select('user_configs.ui', 'user_configs.analytics')
+      .select('user_configs.ui', 'user_configs.analytics', 'user_configs.tts')
       .first()) || {
       ui: {},
       analytics: {},
+      tts: {},
     };
     res.status(200).send(config);
   } catch (error) {
@@ -41,6 +42,9 @@ router.post('/config', async (req, res) => {
         font: 'string',
         lineHeight: 'number',
         letterSpacing: 'number',
+      },
+      tts: {
+        speed: 'number',
       },
     };
     Object.keys(body).forEach(key => {
@@ -69,7 +73,7 @@ router.post('/config', async (req, res) => {
       .where({
         'users.id': req.user.id,
       })
-      .select('user_configs.ui', 'user_configs.analytics')
+      .select('user_configs.ui', 'user_configs.analytics', 'user_configs.tts')
       .first();
     res.status(200).send(config);
   } catch (error) {
