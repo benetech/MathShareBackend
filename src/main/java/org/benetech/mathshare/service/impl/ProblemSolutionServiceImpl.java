@@ -125,9 +125,11 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision).stream()
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
 
+        ProblemSetRevision psr = revision.getProblemSolution().getProblem().getProblemSetRevision();
+
         return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
-                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes(),
-                null, UrlCodeConverter.toUrlCode(rsr.getReviewCode()));
+                psr.getPalettes(), revision.getFinished(), UrlCodeConverter.toUrlCode(rsr.getReviewCode()),
+                psr.isOptionalExplanations(), psr.isHideSteps());
     }
 
     @Override
@@ -160,6 +162,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             return null;
         }
         String solutionEditCode = "";
+        String reviewCode = null;
         ReviewSolutionRevision reviewSolutionRevision = reviewSolutionRevisionRepository
                 .findOneBySolutionRevision(revision);
         if (reviewSolutionRevision != null) {
@@ -168,14 +171,17 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             if (problemSetRevisionSolution != null) {
                 solutionEditCode = UrlCodeConverter.toUrlCode(problemSetRevisionSolution.getEditCode());
             }
+            reviewCode = UrlCodeConverter.toUrlCode(reviewSolutionRevision.getReviewCode());
         }
 
         List<SolutionStepDTO> steps = solutionStepRepository.findAllBySolutionRevision(revision).stream()
                 .map(SolutionMapper.INSTANCE::toDto).collect(Collectors.toList());
+        ProblemSetRevision psr = revision.getProblemSolution().getProblem().getProblemSetRevision();
         SolutionDTO solutionDTO = new SolutionDTO(
                 ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()), steps,
-                UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
-                revision.getProblemSolution().getProblem().getProblemSetRevision().getProblemSet().getPalettes());
+                UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()), psr.getPalettes(),
+                revision.getFinished(), reviewCode,
+                psr.isOptionalExplanations(), psr.isHideSteps());
         solutionDTO.setProblemSetSolutionEditCode(solutionEditCode);
         return solutionDTO;
     }
