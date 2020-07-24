@@ -11,9 +11,10 @@ public abstract class SolutionStepMother {
 
     public static final String DEFAULT_STEP_VALUE = "step value";
     public static final Boolean DEFAULT_DELETED_VALUE = false;
+    public static final Boolean DEFAULT_IN_PROGRESS_VALUE = false;
 
     public static SolutionStep validInstance(SolutionRevision revision) {
-        return new SolutionStep(DEFAULT_STEP_VALUE, revision, DEFAULT_DELETED_VALUE);
+        return new SolutionStep(DEFAULT_STEP_VALUE, revision, DEFAULT_DELETED_VALUE, DEFAULT_IN_PROGRESS_VALUE);
     }
 
     public static List<SolutionStep> createValidStepsList(SolutionRevision revision, int size) {

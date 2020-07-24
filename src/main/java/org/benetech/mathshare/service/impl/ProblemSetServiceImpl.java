@@ -210,7 +210,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
 
     @Override
     public ProblemSetRevision updateProblemStepsInProblemSet(String code, Integer problemId,
-            List<ProblemStepDTO> problemSteps, String initiator) {
+            List<ProblemStepDTO> problemSteps, Integer editorPosition, String initiator) {
         ProblemSet problemSet = problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(code));
         List<Problem> problems = ProblemMapper.INSTANCE.toDto(problemSet).getProblems().stream()
                 .map(ProblemMapper.INSTANCE::fromDto).collect(Collectors.toList());
@@ -228,6 +228,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
             List<ProblemStep> steps = problem.getSteps();
             if (problem.getId().equals(problemId)) {
                 steps = problemSteps.stream().map(ProblemMapper.INSTANCE::fromStepDto).collect(Collectors.toList());
+                problem.setEditorPosition(editorPosition);
             }
             savedProblems.add(createOrUpdateProblem(problem, revision, steps));
         }
@@ -293,7 +294,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         } else {
             Problem newVersion = problemRepository.save(
                 new Problem(problem.getProblemText(), problem.getTitle(), problemSetRevision,
-                        problem.getScratchpad())
+                        problem.getScratchpad(), problem.getEditorPosition())
             );
             steps.forEach(s -> s.setProblem(newVersion));
             saved.setReplacedBy(newVersion);

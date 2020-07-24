@@ -97,7 +97,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished());
+        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished(), solution.getEditorPosition());
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .findOneByEditCode(UrlCodeConverter.fromUrlCode(editCode));
         List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished());
+        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished(), solution.getEditorPosition());
     }
 
     @Override
@@ -129,7 +129,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
                 psr.getPalettes(), revision.getFinished(), UrlCodeConverter.toUrlCode(rsr.getReviewCode()),
-                psr.isOptionalExplanations(), psr.isHideSteps());
+                psr.isOptionalExplanations(), psr.isHideSteps(), revision.getEditorPosition());
     }
 
     @Override
@@ -145,7 +145,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         }
         List<SolutionStep> steps = solutionDTO.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps, solutionDTO.getFinished());
+        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps, solutionDTO.getFinished(),
+                                                                solutionDTO.getEditorPosition());
         Long editCode = SolutionMapper.INSTANCE.fromDto(solutionDTO).getEditCode();
         boolean newSolution = false;
         if (editCode != null) {
@@ -181,7 +182,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()), steps,
                 UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()), psr.getPalettes(),
                 revision.getFinished(), reviewCode,
-                psr.isOptionalExplanations(), psr.isHideSteps());
+                psr.isOptionalExplanations(), psr.isHideSteps(), revision.getEditorPosition());
         solutionDTO.setProblemSetSolutionEditCode(solutionEditCode);
         return solutionDTO;
     }
@@ -259,7 +260,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             SolutionDTO solutionDTO = new SolutionDTO();
             solutionDTO.setProblem(ProblemMapper.INSTANCE.toDto(problem));
             List<SolutionStepDTO> solutionSteps = new ArrayList<>();
-            solutionSteps.add(new SolutionStepDTO(problem.getTitle(), problem.getProblemText(), false, null, null));
+            solutionSteps.add(new SolutionStepDTO(problem.getTitle(), problem.getProblemText(), false, true, null, null));
             solutionDTO.setSteps(solutionSteps);
             solutionsDTO.add(solutionDTO);
         }
@@ -407,11 +408,11 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps,
-            boolean finished) {
+            boolean finished, Integer editorPosition) {
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
         SolutionRevision newRevision = solutionRevisionRepository.save(
-                new SolutionRevision(problemSolution, finished));
+                new SolutionRevision(problemSolution, finished, editorPosition));
         steps.forEach(s -> s.setSolutionRevision(newRevision));
         solutionStepRepository.saveAll(steps);
         em.refresh(newRevision);

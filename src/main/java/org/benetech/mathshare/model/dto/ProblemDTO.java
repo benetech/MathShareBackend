@@ -24,5 +24,7 @@ public class ProblemDTO {
 
     private int position;
 
+    private Integer editorPosition;
+
     private List<ProblemStepDTO> steps = new ArrayList<>();
 }

@@ -2,6 +2,7 @@ package org.benetech.mathshare.controller;
 
 import org.benetech.mathshare.converters.UrlCodeConverter;
 import org.benetech.mathshare.mappers.ProblemMapper;
+import org.benetech.mathshare.model.dto.ProblemDTO;
 import org.benetech.mathshare.model.dto.ProblemSetDTO;
 import org.benetech.mathshare.model.dto.ProblemStepDTO;
 import org.benetech.mathshare.model.entity.ProblemSetRevision;
@@ -147,6 +148,18 @@ public class ProblemSetController {
         }
     }
 
+    @PutMapping(path = "/{code}/problem")
+    ResponseEntity<ProblemSetDTO> updateProblem(
+            @PathVariable String code,
+            @RequestBody ProblemDTO problem,
+            @RequestHeader(value = "x-initiator", required = false) String initiator
+    ) {
+        ProblemSetRevision saved = problemSetService.updateProblemStepsInProblemSet(
+            code, problem.getId(), problem.getSteps(), problem.getEditorPosition(), initiator
+        );
+        return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved), HttpStatus.CREATED);
+    }
+
     @PutMapping(path = "/{code}/steps/{problemId}")
     ResponseEntity<ProblemSetDTO> updateProblemSteps(
             @PathVariable String code,
@@ -155,7 +168,7 @@ public class ProblemSetController {
             @RequestHeader(value = "x-initiator", required = false) String initiator
     ) {
         ProblemSetRevision saved = problemSetService.updateProblemStepsInProblemSet(
-            code, Integer.parseInt(problemId), problemSteps, initiator
+            code, Integer.parseInt(problemId), problemSteps, null, initiator
         );
         return new ResponseEntity<>(ProblemMapper.INSTANCE.toProblemSetDTO(saved), HttpStatus.CREATED);
     }
