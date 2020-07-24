@@ -16,7 +16,7 @@ public interface ProblemSetService {
     ProblemSetRevision saveNewProblemSet(ProblemSetDTO problemSet, String initiator) throws IllegalArgumentException;
 
     ProblemSetRevision updateProblemStepsInProblemSet(String code, Integer problemId, List<ProblemStepDTO> problemSteps,
-                                                      String initiator);
+                                                      Integer editorPosition, String initiator);
 
     ProblemSetDTO findProblemsByUrlCode(String code) throws IllegalArgumentException;
 

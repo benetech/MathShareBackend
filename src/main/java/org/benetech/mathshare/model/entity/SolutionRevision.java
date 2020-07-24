@@ -47,6 +47,8 @@ public class SolutionRevision extends AbstractEntity {
     @NonNull
     private Boolean finished = false;
 
+    private Integer editorPosition;
+
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
@@ -67,5 +69,12 @@ public class SolutionRevision extends AbstractEntity {
     public SolutionRevision(@NotNull ProblemSolution problemSolution, Boolean finished) {
         this.problemSolution = problemSolution;
         this.finished = finished;
+    }
+
+    public SolutionRevision(@NotNull ProblemSolution problemSolution,
+            Boolean finished, Integer editorPosition
+    ) {
+        this(problemSolution, finished);
+        this.editorPosition = editorPosition;
     }
 }

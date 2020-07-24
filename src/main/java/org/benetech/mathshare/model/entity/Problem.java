@@ -56,6 +56,8 @@ public class Problem extends AbstractEntity {
 
     private Integer position;
 
+    private Integer editorPosition;
+
     @OneToOne(cascade = CascadeType.ALL)
     private Scratchpad scratchpad;
 
@@ -91,5 +93,11 @@ public class Problem extends AbstractEntity {
     public Problem(String problemText, String title, ProblemSetRevision problemSetRevision, Scratchpad scratchpad) {
         this(problemText, title, problemSetRevision);
         this.scratchpad = scratchpad;
+    }
+
+    public Problem(String problemText, String title, ProblemSetRevision problemSetRevision,
+                   Scratchpad scratchpad, Integer editorPosition) {
+        this(problemText, title, problemSetRevision, scratchpad);
+        this.editorPosition = editorPosition;
     }
 }
