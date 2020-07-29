@@ -316,7 +316,8 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getPalettes(),
-                revision.getTitle(), null, problems.size(), revision.isOptionalExplanations(), revision.isHideSteps());
+                revision.getTitle(), problems.size(), revision.isOptionalExplanations(),
+                revision.isHideSteps(), revision.getProblemSet().getArchiveMode());
     }
 
     @Override

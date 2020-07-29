@@ -27,6 +27,11 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
     @Column
     private String userId;
 
+    @Getter(AccessLevel.PUBLIC)
+    private String archiveMode;
+
+    private String archivedBy;
+
     @Column
     private String source;
 
@@ -41,6 +46,10 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.PRIVATE)
+    private Timestamp archivedAt;
+
     public ProblemSetRevisionSolution(ProblemSetRevision problemSetRevision, Long editCode, String userId) {
         this.problemSetRevision = problemSetRevision;
         this.editCode = editCode;
@@ -50,5 +59,15 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
     public ProblemSetRevisionSolution(ProblemSetRevision problemSetRevision, Long editCode, String userId, String metadata) {
         this(problemSetRevision, editCode, userId);
         this.metadata = metadata;
+    }
+
+    public void setArchiveMode(String archiveMode) {
+        if (!"deleted".equals(archiveMode) && !"archived".equals(archiveMode) && archiveMode != null) {
+            return;
+        }
+        this.archiveMode = archiveMode;
+        if (archiveMode != null) {
+            this.setArchivedAt(new Timestamp(System.currentTimeMillis()));
+        }
     }
 }
