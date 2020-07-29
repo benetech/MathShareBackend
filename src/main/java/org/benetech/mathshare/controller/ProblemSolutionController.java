@@ -82,6 +82,22 @@ public class ProblemSolutionController {
         }
     }
 
+    @PutMapping("/{code}/archive")
+    ResponseEntity<SolutionSetDTO> archiveProblemSet(
+        @PathVariable String code,
+        @RequestBody SolutionSetDTO solutionSetDTO,
+        @RequestHeader(value = "x-initiator", required = true) String initiator,
+        @RequestHeader(value = "x-role", required = false) String role
+    ) {
+        SolutionSetDTO body = problemSolutionService.setArchiveMode(code, initiator, role, solutionSetDTO.getArchiveMode());
+        if (body != null) {
+            return new ResponseEntity<>(body, HttpStatus.OK);
+        } else {
+            logger.error("ProblemSet with code {} wasn't found", code);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping(path = "/create/{problemSetCode}")
     ResponseEntity<SolutionSetDTO> createReviewSolutionsFromShareCode(
             @PathVariable String problemSetCode,
