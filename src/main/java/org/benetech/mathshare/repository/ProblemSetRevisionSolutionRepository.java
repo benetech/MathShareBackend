@@ -15,4 +15,6 @@ public interface ProblemSetRevisionSolutionRepository extends JpaRepository<Prob
     ProblemSetRevisionSolution findOneByEditCode(long editCode);
 
     List<ProblemSetRevisionSolution> findAllByUserId(String userId, Pageable pageable);
+
+    List<ProblemSetRevisionSolution> findAllByUserIdAndArchiveMode(String userId, String archiveMode, Pageable pageable);
 }

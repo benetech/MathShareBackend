@@ -97,7 +97,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished());
+        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished(), solution.getEditorPosition());
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .findOneByEditCode(UrlCodeConverter.fromUrlCode(editCode));
         List<SolutionStep> steps = solution.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished());
+        return saveNewVersionOfSolution(problemSolution, steps, solution.getFinished(), solution.getEditorPosition());
     }
 
     @Override
@@ -129,7 +129,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         return new SolutionDTO(problem, steps, UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()),
                 psr.getPalettes(), revision.getFinished(), UrlCodeConverter.toUrlCode(rsr.getReviewCode()),
-                psr.isOptionalExplanations(), psr.isHideSteps());
+                psr.isOptionalExplanations(), psr.isHideSteps(), revision.getEditorPosition());
     }
 
     @Override
@@ -145,7 +145,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         }
         List<SolutionStep> steps = solutionDTO.getSteps().stream().map(SolutionMapper.INSTANCE::fromDto)
                 .collect(Collectors.toList());
-        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps, solutionDTO.getFinished());
+        SolutionRevision newRevision = saveNewVersionOfSolution(fromDB, steps, solutionDTO.getFinished(),
+                                                                solutionDTO.getEditorPosition());
         Long editCode = SolutionMapper.INSTANCE.fromDto(solutionDTO).getEditCode();
         boolean newSolution = false;
         if (editCode != null) {
@@ -181,9 +182,32 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 ProblemMapper.INSTANCE.toDto(revision.getProblemSolution().getProblem()), steps,
                 UrlCodeConverter.toUrlCode(revision.getProblemSolution().getEditCode()), psr.getPalettes(),
                 revision.getFinished(), reviewCode,
-                psr.isOptionalExplanations(), psr.isHideSteps());
+                psr.isOptionalExplanations(), psr.isHideSteps(), revision.getEditorPosition());
         solutionDTO.setProblemSetSolutionEditCode(solutionEditCode);
         return solutionDTO;
+    }
+
+    @Override
+    public SolutionSetDTO setArchiveMode(String code, String initiator, String role, String archiveMode) {
+        ProblemSetRevisionSolution current = problemSetRevisionSolutionRepository.findOneByEditCode(
+                UrlCodeConverter.fromUrlCode(code));
+        if (current == null) {
+            return null;
+        }
+        if (!"admin".equals(role)) {
+            if (initiator == null) {
+                return null;
+            } else if (current.getUserId() == null) {
+                return null;
+            } else if (!initiator.equals(current.getUserId())) {
+                return null;
+            }
+        }
+        current.setArchiveMode(archiveMode);
+        current.setArchivedBy(initiator);
+        return getSolutionSetDTOfromProblemSetRevisionSolution(
+            problemSetRevisionSolutionRepository.save(current)
+        );
     }
 
     private SolutionSetDTO createOrUpdateReviewSolutions(List<SolutionDTO> solutionsDTO,
@@ -194,7 +218,10 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionSet.setId(problemSetRevisionSolution.getId());
         solutionSet.setSource(problemSetRevisionSolution.getSource());
         solutionSet.setReviewCode(MapperUtils.toCode(reviewCode));
-        solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
+        solutionSet.setArchiveMode(problemSetRevisionSolution.getArchiveMode());
+        solutionSet.setArchiveModeProblemSet(
+            problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode()
+        );
 
         String title = null;
         for (SolutionDTO solutionDTO: solutionsDTO) {
@@ -259,7 +286,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             SolutionDTO solutionDTO = new SolutionDTO();
             solutionDTO.setProblem(ProblemMapper.INSTANCE.toDto(problem));
             List<SolutionStepDTO> solutionSteps = new ArrayList<>();
-            solutionSteps.add(new SolutionStepDTO(problem.getTitle(), problem.getProblemText(), false, null, null));
+            solutionSteps.add(new SolutionStepDTO(problem.getTitle(), problem.getProblemText(), false, true, null, null));
             solutionDTO.setSteps(solutionSteps);
             solutionsDTO.add(solutionDTO);
         }
@@ -274,7 +301,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, true);
         solutionSetDTO.setEditCode(MapperUtils.toCode(editCode));
-        solutionSetDTO.setArchiveMode(revision.getProblemSet().getArchiveMode());
+        solutionSetDTO.setArchiveMode(problemSetRevisionSolution.getArchiveMode());
+        solutionSetDTO.setArchiveModeProblemSet(revision.getProblemSet().getArchiveMode());
         solutionSetDTO.deserializeAndSetMetadata(json);
         return solutionSetDTO;
     }
@@ -296,7 +324,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
 
         SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, true);
         solutionSetDTO.setEditCode(MapperUtils.toCode(editCode));
-        solutionSetDTO.setArchiveMode(revision.getProblemSet().getArchiveMode());
+        solutionSetDTO.setArchiveMode(problemSetRevisionSolution.getArchiveMode());
+        solutionSetDTO.setArchiveModeProblemSet(revision.getProblemSet().getArchiveMode());
         return solutionSetDTO;
     }
 
@@ -311,7 +340,10 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, false);
         solutionSetDTO.setEditCode(editCode);
         solutionSetDTO.setSource(problemSetRevisionSolution.getSource());
-        solutionSetDTO.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
+        solutionSetDTO.setArchiveMode(problemSetRevisionSolution.getArchiveMode());
+        solutionSetDTO.setArchiveModeProblemSet(
+            problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode()
+        );
         return solutionSetDTO;
     }
 
@@ -354,12 +386,14 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, int n) {
+    public List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, String archiveMode, int n) {
         List<SolutionSetDTO> solutionSets = new ArrayList<>();
-        List<ProblemSetRevisionSolution> problemSetRevisions = problemSetRevisionSolutionRepository.findAllByUserId(
-            userId,
-            PageRequest.of(0, n, Sort.by("id").descending())
-        );
+        List<ProblemSetRevisionSolution> problemSetRevisions = problemSetRevisionSolutionRepository
+            .findAllByUserIdAndArchiveMode(
+                userId,
+                archiveMode,
+                PageRequest.of(0, n, Sort.by("id").descending())
+            );
         for (ProblemSetRevisionSolution problemSetRevision : problemSetRevisions) {
             solutionSets.add(getSolutionSetDTOfromProblemSetRevisionSolution(problemSetRevision));
         }
@@ -402,16 +436,19 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionSet.setEditCode(MapperUtils.toCode(problemSetRevisionSolution.getEditCode()));
         solutionSet.setId(problemSetRevisionSolution.getId());
         solutionSet.setSource(problemSetRevisionSolution.getSource());
-        solutionSet.setArchiveMode(problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode());
+        solutionSet.setArchiveMode(problemSetRevisionSolution.getArchiveMode());
+        solutionSet.setArchiveModeProblemSet(
+            problemSetRevisionSolution.getProblemSetRevision().getProblemSet().getArchiveMode()
+        );
         return solutionSet;
     }
 
     private SolutionRevision saveNewVersionOfSolution(ProblemSolution problemSolution, List<SolutionStep> steps,
-            boolean finished) {
+            boolean finished, Integer editorPosition) {
         SolutionRevision oldRevision = solutionRevisionRepository
                 .findOneByProblemSolutionAndReplacedBy(problemSolution, null);
         SolutionRevision newRevision = solutionRevisionRepository.save(
-                new SolutionRevision(problemSolution, finished));
+                new SolutionRevision(problemSolution, finished, editorPosition));
         steps.forEach(s -> s.setSolutionRevision(newRevision));
         solutionStepRepository.saveAll(steps);
         em.refresh(newRevision);

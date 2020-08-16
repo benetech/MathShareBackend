@@ -49,6 +49,10 @@ public class ProblemStep extends AbstractEntity {
     @NonNull
     private Boolean deleted;
 
+    @NotNull
+    @NonNull
+    private Boolean inProgress;
+
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "replaced_by")
     private ProblemStep replacedBy;

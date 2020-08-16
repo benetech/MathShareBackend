@@ -44,10 +44,11 @@ public class PrivateController {
     @GetMapping(path = "/recentSolutions")
     ResponseEntity<List<SolutionSetDTO>> getRecentSolutionSets(
             @RequestHeader(value = "x-initiator", required = false) String initiator,
+            @RequestHeader(value = "x-archive-mode", required = false) String archiveMode,
             @RequestParam(value = "x-content-size", defaultValue = "15") String size
             ) {
         return new ResponseEntity<>(problemSolutionService.getProblemSetSolutionsForUsers(
-                initiator, Integer.parseInt(size)
+                initiator, archiveMode, Integer.parseInt(size)
         ), HttpStatus.OK);
     }
 }

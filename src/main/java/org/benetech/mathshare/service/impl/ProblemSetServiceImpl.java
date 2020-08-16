@@ -210,7 +210,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
 
     @Override
     public ProblemSetRevision updateProblemStepsInProblemSet(String code, Integer problemId,
-            List<ProblemStepDTO> problemSteps, String initiator) {
+            List<ProblemStepDTO> problemSteps, Integer editorPosition, String initiator) {
         ProblemSet problemSet = problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(code));
         List<Problem> problems = ProblemMapper.INSTANCE.toDto(problemSet).getProblems().stream()
                 .map(ProblemMapper.INSTANCE::fromDto).collect(Collectors.toList());
@@ -228,6 +228,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
             List<ProblemStep> steps = problem.getSteps();
             if (problem.getId().equals(problemId)) {
                 steps = problemSteps.stream().map(ProblemMapper.INSTANCE::fromStepDto).collect(Collectors.toList());
+                problem.setEditorPosition(editorPosition);
             }
             savedProblems.add(createOrUpdateProblem(problem, revision, steps));
         }
@@ -293,7 +294,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         } else {
             Problem newVersion = problemRepository.save(
                 new Problem(problem.getProblemText(), problem.getTitle(), problemSetRevision,
-                        problem.getScratchpad())
+                        problem.getScratchpad(), problem.getEditorPosition())
             );
             steps.forEach(s -> s.setProblem(newVersion));
             saved.setReplacedBy(newVersion);
@@ -315,7 +316,8 @@ public class ProblemSetServiceImpl implements ProblemSetService {
                 .map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
         return new ProblemSetDTO(problems, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getPalettes(),
-                revision.getTitle(), null, problems.size(), revision.isOptionalExplanations(), revision.isHideSteps());
+                revision.getTitle(), problems.size(), revision.isOptionalExplanations(),
+                revision.isHideSteps(), revision.getProblemSet().getArchiveMode());
     }
 
     @Override

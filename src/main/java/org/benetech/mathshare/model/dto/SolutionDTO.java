@@ -26,6 +26,8 @@ public class SolutionDTO {
 
     private List<String> palettes;
 
+    private Integer editorPosition;
+
     private Boolean finished = false;
 
     private Boolean optionalExplanations = false;
@@ -58,5 +60,12 @@ public class SolutionDTO {
         this(problem, steps, editCode, palettes, finished, reviewCode);
         this.optionalExplanations = optionalExplanations;
         this.hideSteps = hideSteps;
+    }
+
+    public SolutionDTO(ProblemDTO problem, List<SolutionStepDTO> steps, String editCode, List<String> palettes,
+    Boolean finished, String reviewCode, Boolean optionalExplanations, Boolean hideSteps, Integer editorPosition
+    ) {
+        this(problem, steps, editCode, palettes, finished, reviewCode, optionalExplanations, hideSteps);
+        this.editorPosition = editorPosition;
     }
 }
