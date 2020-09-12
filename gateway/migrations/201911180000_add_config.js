@@ -1,5 +1,4 @@
 module.exports.up = async db => {
-
   // Users' configs
   await db.schema.createTable('user_configs', table => {
     table.uuid('id').notNullable().defaultTo(db.raw('uuid_generate_v1mc()')).primary();

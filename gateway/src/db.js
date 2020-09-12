@@ -21,15 +21,25 @@ export const dbConfig = {
 
 const db = knex(dbConfig);
 
-export const insertOrUpdate = (tableName, tuple, uniqueIdKey) => {
-  return db.transaction(trx => {
-    let query = trx.raw(util.format(`%s ON CONFLICT (${uniqueIdKey}) DO UPDATE SET %s`,
-      trx(tableName).insert(tuple).toString().toString(),
-      trx(tableName).update(tuple).whereRaw(`${tableName}.${uniqueIdKey} = '${tuple[uniqueIdKey]}'`).toString().replace(/^update\s.*\sset\s/i, '')
-    ))
+export const insertOrUpdate = (tableName, tuple, uniqueIdKey) =>
+  db.transaction(trx => {
+    const query = trx
+      .raw(
+        util.format(
+          `%s ON CONFLICT (${uniqueIdKey}) DO UPDATE SET %s`,
+          trx(tableName)
+            .insert(tuple)
+            .toString()
+            .toString(),
+          trx(tableName)
+            .update(tuple)
+            .whereRaw(`${tableName}.${uniqueIdKey} = '${tuple[uniqueIdKey]}'`)
+            .toString()
+            .replace(/^update\s.*\sset\s/i, ''),
+        ),
+      )
       .transacting(trx);
     return query.then(trx.commit).catch(trx.rollback);
   });
-};
 
 export default db;

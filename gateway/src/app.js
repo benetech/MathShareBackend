@@ -26,6 +26,7 @@ import flash from 'express-flash';
 import i18next from 'i18next';
 import i18nextBackend from 'i18next-node-fs-backend';
 import partnerRoutes from './routes/partner';
+import ltiRoutes from './routes/lti';
 import passport from './passport';
 import path from 'path';
 import proxy from 'http-proxy-middleware';
@@ -35,13 +36,15 @@ import winston from 'winston';
 console.log('process.env', process.env);
 
 const { GATEWAY_BASE_URL } = process.env;
-let cookieDomain = undefined;
+let cookieDomain;
 if (GATEWAY_BASE_URL !== 'http://localhost:8080/') {
-  cookieDomain = `.${GATEWAY_BASE_URL.split('://')[1]
-    .split('.')
-    .slice(1)
-    .join('.')
-    .split('/')[0]}`;
+  cookieDomain = `.${
+    GATEWAY_BASE_URL.split('://')[1]
+      .split('.')
+      .slice(1)
+      .join('.')
+      .split('/')[0]
+  }`;
 }
 console.log('cookieDomain', cookieDomain);
 
@@ -127,29 +130,29 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-app.use(expressWinston.logger({
-  transports: [
-    new winston.transports.Console()
-  ],
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.json()
-  )
-}));
+app.use(
+  expressWinston.logger({
+    transports: [new winston.transports.Console()],
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.json(),
+    ),
+  }),
+);
 
 const partnerValidator = async (req, res, next) => {
-  const partnerToken = req.headers['x-partner-token']
+  const partnerToken = req.headers['x-partner-token'];
   if (partnerToken) {
     let partner = null;
     try {
       partner = await db
-            .table('partner_api_keys')
-            .innerJoin('partners', 'partners.id', 'partner_api_keys.partner_id')
-            .where({
-                'partner_api_keys.id': partnerToken,
-            })
-            .whereRaw('("expired_at" is NULL or "expired_at" > CURRENT_TIMESTAMP)')
-            .first('partners.*');
+        .table('partner_api_keys')
+        .innerJoin('partners', 'partners.id', 'partner_api_keys.partner_id')
+        .where({
+          'partner_api_keys.id': partnerToken,
+        })
+        .whereRaw('("expired_at" is NULL or "expired_at" > CURRENT_TIMESTAMP)')
+        .first('partners.*');
     } catch (error) {
       console.log('error', error);
     }
@@ -157,12 +160,12 @@ const partnerValidator = async (req, res, next) => {
       req.partner = partner;
     } else {
       res.status(401).send({
-        'message': 'Invalid x-partner-token in header',
+        message: 'Invalid x-partner-token in header',
       });
     }
   }
   next();
-}
+};
 
 app.use('/api', partnerValidator, apiProxy);
 
@@ -172,6 +175,7 @@ app.use(bodyParser.json());
 app.use(accountRoutes);
 app.use(configRoutes);
 app.use(partnerRoutes);
+app.use(ltiRoutes);
 
 // The following routes are intended to be used in development mode only
 if (process.env.NODE_ENV !== 'production') {
@@ -214,14 +218,14 @@ app.get('*', (_req, res) => {
   res.redirect(defaultRedirect);
 });
 
-app.use(expressWinston.errorLogger({
-  transports: [
-    new winston.transports.Console()
-  ],
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.json()
-  )
-}));
+app.use(
+  expressWinston.errorLogger({
+    transports: [new winston.transports.Console()],
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.json(),
+    ),
+  }),
+);
 
 export default app;

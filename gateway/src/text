@@ -1,0 +1,39 @@
+http://localhost:8080/oauth2/lti?client_id=10000000000002
+
+
+server_1      | oAuthClient http://canvas.docker/login/oauth2/auth.json
+server_1      | authenticate null { _clientId: '10000000000002',
+server_1      |   _clientSecret: 'ZWNYwkZYcX86jCNwtWZRnMfUFXzQJ70NH7TWbDvwc5JBUCFZW3j4TbVXRDX5kVnj',
+server_1      |   _baseSite: '',
+server_1      |   _authorizeUrl: 'http://canvas.docker/login/oauth2/auth.json',
+server_1      |   _accessTokenUrl: 'http://canvas.docker/login/oauth2/token.json',
+server_1      |   _accessTokenName: 'access_token',
+server_1      |   _authMethod: 'Bearer',
+server_1      |   _customHeaders: {},
+server_1      |   _useAuthorizationHeaderForGET: false,
+server_1      |   _agent: undefined }
+server_1      | accessToken 8XoUADlp2iBA4dGzghzKL6pSxlSsOhoZ7xkLMH7s5SRTPbtnKWJH92wOzS3IOIqV
+server_1      | refreshToken 9U5PI8Jip58332LzMioOWqbyiqUGw3eUMqqWLV64qzE6odYqDro2VSYpM2Am2K00
+server_1      | profile {}
+
+
+
+{
+  id: 1,
+  name: 'rupesh@toptal.com',
+  short_name: 'rupesh@toptal.com',
+  sortable_name: 'rupesh@toptal.com',
+  sis_user_id: null,
+  integration_id: null,
+  title: null,
+  bio: null,
+  primary_email: 'rupesh@toptal.com',
+  login_id: 'rupesh@toptal.com',
+  time_zone: 'America/Denver',
+  locale: null,
+  effective_locale: 'en',
+  calendar: {
+    ics: 'http://canvas.docker/feeds/calendars/user_n7tzlJvaKtVTzmBPo9hjbwLyUKD1n6CRxfIPCrLg.ics'
+  },
+  lti_user_id: '535fa085f22b4655f48cd5a36a9215f64c062838'
+}

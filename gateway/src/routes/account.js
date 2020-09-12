@@ -79,8 +79,8 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
     passport.authenticate(provider, { failureFlash: true, ...options }),
   );
 
-  const callbackProcessor = (req, res, next) => {
-    return passport.authenticate(
+  const callbackProcessor = (req, res, next) =>
+    passport.authenticate(
       provider,
       {
         successReturnToOrRedirect: true,
@@ -95,7 +95,7 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
         if (err || !user) {
           return res.redirect(req.session.returnTo || defaultRedirect);
         }
-        req.logIn(user, function (err) {
+        req.logIn(user, err => {
           console.log('res2', res._headers);
           // const token = Buffer.from(JSON.stringify({
           //   "passport": {
@@ -113,7 +113,6 @@ loginProviders.forEach(({ provider, options, hasPostCallback }) => {
         });
       },
     )(req, res, next);
-  };
 
   if (hasPostCallback) {
     router.post(`/login/${provider}/return`, callbackProcessor);
@@ -134,5 +133,28 @@ router.get('/logout', (req, res) => {
 router.post('/login/error', (req, res) => {
   res.send({ errors: req.flash('error') });
 });
+
+router.get(
+  '/oauth2/lti',
+  (req, res, next) => {
+    req.session.returnTo = getSuccessRedirect(req);
+    req.session.loginStarted = true;
+    next();
+  },
+  (req, res, next) =>
+    passport.authenticate('lti-oauth2', {
+      successReturnToOrRedirect: true,
+      failureFlash: true,
+      failureRedirect: req.session.returnTo || defaultRedirect,
+    })(req, res, next),
+);
+
+router.get('/oauth2/lti/callback', (req, res, next) =>
+  passport.authenticate('lti-oauth2', {
+    successReturnToOrRedirect: true,
+    failureFlash: true,
+    failureRedirect: req.session.returnTo || defaultRedirect,
+  })(req, res, next),
+);
 
 export default router;
