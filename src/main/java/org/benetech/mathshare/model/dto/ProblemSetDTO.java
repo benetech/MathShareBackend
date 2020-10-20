@@ -31,6 +31,8 @@ public class ProblemSetDTO {
 
     private Boolean hideSteps;
 
+    private Integer id;
+
     public ProblemSetDTO(
         List<ProblemDTO> problems, String editCode, String shareCode,
         List<String> palettes, String title, String userId, int problemCount
