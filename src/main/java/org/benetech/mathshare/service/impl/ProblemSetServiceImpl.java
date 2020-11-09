@@ -169,7 +169,7 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         return new ProblemSetDTO(problemsDto, UrlCodeConverter.toUrlCode(revision.getProblemSet().getEditCode()),
                 UrlCodeConverter.toUrlCode(revision.getShareCode()), revision.getPalettes(),
                 revision.getTitle(), null, problems.size(), revision.getProblemSet().getArchiveMode(),
-                revision.isOptionalExplanations(), revision.isHideSteps());
+                revision.isOptionalExplanations(), revision.isHideSteps(), revision.getId());
     }
 
     @Override
