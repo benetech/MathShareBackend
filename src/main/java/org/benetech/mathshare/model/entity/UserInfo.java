@@ -57,6 +57,7 @@ public class UserInfo extends AbstractEntity {
     private String grade;
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;

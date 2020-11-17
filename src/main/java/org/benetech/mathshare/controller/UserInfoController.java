@@ -32,7 +32,7 @@ public class UserInfoController {
             @RequestHeader(value = "x-initiator-email") String email
     ) {
         payload.setEmail(email);
-        UserInfo saved = userInfoService.saveNewUserInfo(payload);
+        UserInfo saved = userInfoService.updateUserInfo(payload);
         return new ResponseEntity<>(UserInfoMapper.INSTANCE.toDto(saved), HttpStatus.CREATED);
     }
 
