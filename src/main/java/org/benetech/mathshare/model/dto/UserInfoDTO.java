@@ -11,6 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class UserInfoDTO {
 
+    private Integer id;
+
     private String email;
 
     private String userType;
