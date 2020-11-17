@@ -40,6 +40,22 @@ public class UserInfo extends AbstractEntity {
 
     private String role;
 
+    @NotNull
+    @NonNull
+    private Integer infoVersion;
+
+    private String disability;
+
+    private String gender;
+
+    private Integer yearOfBirth;
+
+    private String county;
+
+    private String zipcode;
+
+    private String grade;
+
     @CreationTimestamp
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)

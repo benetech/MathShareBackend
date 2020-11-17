@@ -20,4 +20,18 @@ public class UserInfoDTO {
     private Integer notifyForMobile;
 
     private String role;
+
+    private Integer infoVersion;
+
+    private String disability;
+
+    private String gender;
+
+    private Integer yearOfBirth;
+
+    private String county;
+
+    private String zipcode;
+
+    private String grade;
 }
