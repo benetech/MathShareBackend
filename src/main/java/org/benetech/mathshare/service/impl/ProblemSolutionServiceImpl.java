@@ -386,7 +386,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, String archiveMode, int n) {
+    public List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, String archiveMode, Integer n) {
         List<SolutionSetDTO> solutionSets = new ArrayList<>();
         List<ProblemSetRevisionSolution> problemSetRevisions = problemSetRevisionSolutionRepository
             .findAllByUserIdAndArchiveMode(
@@ -394,6 +394,19 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 archiveMode,
                 PageRequest.of(0, n, Sort.by("id").descending())
             );
+        for (ProblemSetRevisionSolution problemSetRevision : problemSetRevisions) {
+            solutionSets.add(getSolutionSetDTOfromProblemSetRevisionSolution(problemSetRevision));
+        }
+        return solutionSets;
+    }
+
+    @Override
+    public List<SolutionSetDTO> getLatestProblemSetSolutionsForUsers(String userId, String archiveMode, Integer size,
+            Integer id) {
+        List<SolutionSetDTO> solutionSets = new ArrayList<>();
+        List<ProblemSetRevisionSolution> problemSetRevisions = problemSetRevisionSolutionRepository
+                .findLatestSliceByUserIdAndArchiveMode(userId, archiveMode, id,
+                        PageRequest.of(0, size, Sort.by("id").descending()));
         for (ProblemSetRevisionSolution problemSetRevision : problemSetRevisions) {
             solutionSets.add(getSolutionSetDTOfromProblemSetRevisionSolution(problemSetRevision));
         }
