@@ -73,7 +73,7 @@ public class ProblemSetRevisionRepositoryTest {
         ProblemSet problemSet = problemSetRepository.save(ProblemSetMother.validInstance());
         problemSetRevisionRepository.save(ProblemSetRevisionMother.validInstance(problemSet));
         ProblemSet problemSetFromDB = problemSetRepository.findAll().get(0);
-        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSetFromDB, null);
+        ProblemSetRevision problemSetRevision = problemSetRevisionRepository.findFirstByProblemSetAndReplacedByOrderByIdDesc(problemSetFromDB, null);
         Assert.assertNotNull(problemSetRevision);
         ProblemSetRevision newRevision = problemSetRevisionRepository.save(ProblemSetRevisionMother.revisionOf(problemSetFromDB));
         Assert.assertNotNull(newRevision);

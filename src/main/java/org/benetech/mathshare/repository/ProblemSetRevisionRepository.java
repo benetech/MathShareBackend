@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ProblemSetRevisionRepository extends JpaRepository<ProblemSetRevision, Integer> {
 
-    ProblemSetRevision findOneByProblemSetAndReplacedBy(ProblemSet problemSet, ProblemSetRevision replacedBy);
+    ProblemSetRevision findFirstByProblemSetAndReplacedByOrderByIdDesc(ProblemSet problemSet, ProblemSetRevision replacedBy);
 
     ProblemSetRevision findOneByShareCode(long code);
 
