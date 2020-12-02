@@ -89,7 +89,7 @@ public class ProblemSetServiceTest {
         ProblemSet problemSet = ProblemSetMother.mockInstance();
         ProblemSetRevision revision = ProblemSetRevisionMother.revisionOf(problemSet);
         given(problemSetRepository.findOneByEditCode(CODE)).willReturn(problemSet);
-        given(problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSet, null))
+        given(problemSetRevisionRepository.findFirstByProblemSetAndReplacedByOrderByIdDesc(problemSet, null))
                 .willReturn(revision);
         ProblemSetRevision problemSetRevisionFromDB = problemSetService.getLatestProblemSet(CODE);
         Assert.assertEquals(revision, problemSetRevisionFromDB);
@@ -156,7 +156,7 @@ public class ProblemSetServiceTest {
 
         when(problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(VALID_CODE)))
                 .thenReturn(problemSetRevision.getProblemSet());
-        when(problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(problemSetRevision.getProblemSet(), null))
+        when(problemSetRevisionRepository.findFirstByProblemSetAndReplacedByOrderByIdDesc(problemSetRevision.getProblemSet(), null))
                 .thenReturn(problemSetRevision);
         when(problemRepository.findAllByProblemSetRevision(problemSetRevision))
                 .thenReturn(problems);
@@ -199,7 +199,7 @@ public class ProblemSetServiceTest {
 //                .willReturn(ProblemSetMother.mockInstance());
 //        given(this.problemSetRepository.findOneByEditCode(ProblemSetMother.EDIT_CODE))
 //                .willReturn(ProblemSetMother.mockInstance());
-//        given(this.problemSetRevisionRepository.findOneByProblemSetAndReplacedBy(ProblemSetMother.mockInstance(), null))
+//        given(this.problemSetRevisionRepository.findFirstByProblemSetAndReplacedByOrderByIdDesc(ProblemSetMother.mockInstance(), null))
 //                .willReturn(revision);
 //        given(this.problemSetRevisionRepository.save(new ProblemSetRevision(ProblemSetMother.mockInstance(), problemSetDTO.getTitle())))
 //                .willReturn(revision);
