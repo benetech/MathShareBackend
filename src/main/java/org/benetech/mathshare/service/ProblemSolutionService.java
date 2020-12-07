@@ -38,5 +38,7 @@ public interface ProblemSolutionService {
 
     SolutionSetDTO setArchiveMode(String code, String userId, String role, String archiveMode);
 
-    List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, String archiveMode, int n);
+    List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, String archiveMode, Integer n);
+
+    List<SolutionSetDTO> getLatestProblemSetSolutionsForUsers(String userId, String archiveMode, Integer n, Integer id);
 }

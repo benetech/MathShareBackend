@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -45,6 +46,11 @@ public class ProblemSetRevisionSolution extends AbstractEntity {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;
+
+    @UpdateTimestamp
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private Timestamp dateModified;
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.PRIVATE)

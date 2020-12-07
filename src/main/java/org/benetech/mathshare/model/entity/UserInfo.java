@@ -40,7 +40,24 @@ public class UserInfo extends AbstractEntity {
 
     private String role;
 
+    @NotNull
+    @NonNull
+    private Integer infoVersion;
+
+    private String disability;
+
+    private String gender;
+
+    private Integer yearOfBirth;
+
+    private String county;
+
+    private String zipcode;
+
+    private String grade;
+
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Timestamp dateCreated;

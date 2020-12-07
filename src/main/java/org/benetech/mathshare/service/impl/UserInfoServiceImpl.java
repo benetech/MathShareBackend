@@ -37,6 +37,21 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
+    public UserInfo updateUserInfo(UserInfoDTO payload) throws IllegalArgumentException {
+        UserInfo userInfoPayload = UserInfoMapper.INSTANCE.fromDto(payload);
+        if (userInfoPayload.getId() == null) {
+            return saveNewUserInfo(payload);
+        } else {
+            UserInfo existingUserInfo = userInfoRepository.findById(userInfoPayload.getId()).get();
+            if (userInfoPayload.getInfoVersion() > existingUserInfo.getInfoVersion()) {
+                em.merge(userInfoPayload);
+                return userInfoPayload;
+            }
+            return existingUserInfo;
+        }
+    }
+
+    @Override
     public Integer setNotifyForMobile(String email, Integer notifyForMobile) {
         return userInfoRepository.setNotifyForMobileInUserInfo(email, notifyForMobile);
     }
