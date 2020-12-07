@@ -31,9 +31,8 @@ export const getRequestHeaders = async partnerConfig => {
         Authorization: `Bearer ${authToken}`,
       };
     }
-    return {};
   }
-  return partnerConfig.submit;
+  return {};
 };
 
 export const getPayload = (partnerConfig, payload) => {
@@ -53,4 +52,22 @@ export const getPayload = (partnerConfig, payload) => {
     }
   }
   return payload;
+};
+
+export const getSubmitUrl = (submitConfig, metaData) => {
+  const { url, replaceParams } = submitConfig;
+  let finalUrl = url;
+  if (replaceParams) {
+    const urlParams = url.match(/{{\w+}}/g);
+    if (urlParams) {
+      urlParams.forEach(param => {
+        const key = param.substring(2, param.length - 2);
+        if (key && metaData[key]) {
+          finalUrl = finalUrl.split(param).join(metaData[key]);
+        }
+      });
+    }
+  }
+
+  return finalUrl;
 };

@@ -271,7 +271,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         String json = null;
         try {
             for (String getParamKey : searchParameters.keySet()) {
-                if (!Arrays.asList("studyPlanResourceId").contains(getParamKey)) {
+                if (!Arrays.asList("studyPlanResourceId", "endpoint", "version").contains(getParamKey)) {
                     searchParameters.remove(getParamKey);
                 }
             }
