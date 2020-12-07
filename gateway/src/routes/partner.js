@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import axios from 'axios';
 import db from '../db';
-import { getPayload, getRequestHeaders } from '../helpers/partner';
+import {
+  getPayload,
+  getRequestHeaders,
+  getSubmitUrl,
+} from '../helpers/partner';
 
 export const defaultRedirect = process.env.CORS_ORIGIN.split(',')[0];
 
@@ -149,16 +153,13 @@ router.post('/partner/submit', async (req, res) => {
               };
               const payload = getPayload(config, mathsharePayload);
               const authHeaders = await getRequestHeaders(config);
-              const submitResponse = await axios.post(
-                config.submit.url,
-                payload,
-                {
-                  headers: Object.assign(
-                    config.submit.staticHeaders || {},
-                    authHeaders || {},
-                  ),
-                },
-              );
+              const url = getSubmitUrl(config.submit, metadataFinal);
+              const submitResponse = await axios.post(url, payload, {
+                headers: Object.assign(
+                  config.submit.staticHeaders || {},
+                  authHeaders || {},
+                ),
+              });
               if (submitResponse.status === 200) {
                 res.status(200).send(payload);
               } else {
