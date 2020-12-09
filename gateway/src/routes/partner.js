@@ -4,7 +4,7 @@ import db from '../db';
 import {
   getPayload,
   getRequestHeaders,
-  getSubmitUrl,
+  getUrlFromConfig,
 } from '../helpers/partner';
 
 export const defaultRedirect = process.env.CORS_ORIGIN.split(',')[0];
@@ -152,8 +152,11 @@ router.post('/partner/submit', async (req, res) => {
                 metadata: metadataFinal,
               };
               const payload = getPayload(config, mathsharePayload);
-              const authHeaders = await getRequestHeaders(config);
-              const url = getSubmitUrl(config.submit, metadataFinal);
+              const authHeaders = await getRequestHeaders(
+                config,
+                metadataFinal,
+              );
+              const url = getUrlFromConfig(config.submit, metadataFinal);
               const submitResponse = await axios.post(url, payload, {
                 headers: Object.assign(
                   config.submit.staticHeaders || {},

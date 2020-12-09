@@ -1,7 +1,25 @@
 import axios from 'axios';
 import jwtSimple from 'jwt-simple';
 
-export const getRequestHeaders = async partnerConfig => {
+export const getUrlFromConfig = (config, metaData) => {
+  const { url, replaceParams } = config;
+  let finalUrl = url;
+  if (replaceParams) {
+    const urlParams = url.match(/{{\w+}}/g);
+    if (urlParams) {
+      urlParams.forEach(param => {
+        const key = param.substring(2, param.length - 2);
+        if (key && metaData[key]) {
+          finalUrl = finalUrl.split(param).join(metaData[key]);
+        }
+      });
+    }
+  }
+
+  return finalUrl;
+};
+
+export const getRequestHeaders = async (partnerConfig, metadata) => {
   if (partnerConfig && partnerConfig.auth) {
     const { auth } = partnerConfig;
     if (auth.mechanism === 'jwt-secret') {
@@ -15,7 +33,8 @@ export const getRequestHeaders = async partnerConfig => {
         auth.secretKey,
         auth.algo || 'HS256',
       );
-      const authRes = await axios.post(auth.url, auth.payload || {}, {
+      const url = getUrlFromConfig(auth, metadata || {});
+      const authRes = await axios.post(url, auth.payload || {}, {
         headers: {
           Authorization: `Bearer ${jwtToken}`,
         },
@@ -52,22 +71,4 @@ export const getPayload = (partnerConfig, payload) => {
     }
   }
   return payload;
-};
-
-export const getSubmitUrl = (submitConfig, metaData) => {
-  const { url, replaceParams } = submitConfig;
-  let finalUrl = url;
-  if (replaceParams) {
-    const urlParams = url.match(/{{\w+}}/g);
-    if (urlParams) {
-      urlParams.forEach(param => {
-        const key = param.substring(2, param.length - 2);
-        if (key && metaData[key]) {
-          finalUrl = finalUrl.split(param).join(metaData[key]);
-        }
-      });
-    }
-  }
-
-  return finalUrl;
 };
