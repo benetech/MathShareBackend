@@ -32,6 +32,8 @@ passport.deserializeUser((user, done) => {
 async function login(req, provider, profile, tokens) {
   let user;
 
+  console.log('profile', profile);
+
   if (req.user) {
     user = await db
       .table('users')
