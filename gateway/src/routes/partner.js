@@ -92,6 +92,8 @@ router.patch('/partner', async (req, res) => {
 });
 
 router.post('/partner/submit', async (req, res) => {
+  let payload = null;
+  let authHeaders = null;
   try {
     const { id, editCode, shareCode } = req.body;
     if (id) {
@@ -151,11 +153,8 @@ router.post('/partner/submit', async (req, res) => {
                 shareCode,
                 metadata: metadataFinal,
               };
-              const payload = getPayload(config, mathsharePayload);
-              const authHeaders = await getRequestHeaders(
-                config,
-                metadataFinal,
-              );
+              payload = getPayload(config, mathsharePayload);
+              authHeaders = await getRequestHeaders(config, metadataFinal);
               const url = getUrlFromConfig(config.submit, metadataFinal);
               const submitResponse = await axios.post(url, payload, {
                 headers: Object.assign(
@@ -190,6 +189,8 @@ router.post('/partner/submit', async (req, res) => {
     } else {
       res.status(500).send({
         error,
+        payload,
+        authHeaders,
       });
     }
   }
