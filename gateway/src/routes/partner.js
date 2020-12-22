@@ -182,13 +182,15 @@ router.post('/partner/submit', async (req, res) => {
       });
     }
   } catch (error) {
-    console.log('error', error);
+    console.log('[partner submit] error', error);
     if (error.constraint === 'partner_api_keys_partner_id_foreign') {
       res.status(400).send({
         message: 'partner not found',
       });
     } else {
-      res.status(500).end();
+      res.status(500).send({
+        error,
+      });
     }
   }
 });
