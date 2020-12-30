@@ -41,6 +41,18 @@ public class PrivateController {
         ), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/v2/recent")
+    ResponseEntity<List<ProblemSetDTO>> getRecentProblemSetsLazyLoad(
+            @RequestHeader(value = "x-initiator", required = false) String initiator,
+            @RequestHeader(value = "x-archive-mode", required = false) String archiveMode,
+            @RequestParam(value = "x-content-size", defaultValue = "15") String size,
+            @RequestHeader(value = "x-offset", defaultValue = "-1") String offset
+            ) {
+        return new ResponseEntity<>(problemSetService.findLastNProblemSetsOfUser(
+                initiator, archiveMode, Integer.parseInt(size)
+        ), HttpStatus.OK);
+    }
+
     @GetMapping(path = "/recentSolutions")
     ResponseEntity<List<SolutionSetDTO>> getRecentSolutionSets(
             @RequestHeader(value = "x-initiator", required = true) String initiator,

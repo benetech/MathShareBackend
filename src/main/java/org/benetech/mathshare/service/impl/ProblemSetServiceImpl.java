@@ -326,4 +326,13 @@ public class ProblemSetServiceImpl implements ProblemSetService {
         return problemSetRevisionRepository.setIsExampleForProblemSetRevision(
             UrlCodeConverter.fromUrlCode(code), isExample);
     }
+
+    @Override
+    public List<ProblemSetDTO> getLatestProblemSetsForUsers(String userId, String archiveMode, Integer size,
+            Integer id) {
+        List<ProblemSet> problemSets = problemSetRepository.findLatestSliceByUserIdAndArchiveMode(userId,
+                archiveMode, id,
+                PageRequest.of(0, size, Sort.by("id").descending()));
+        return problemSets.stream().map(ProblemMapper.INSTANCE::toDto).collect(Collectors.toList());
+    }
 }

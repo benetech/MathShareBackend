@@ -35,4 +35,6 @@ public interface ProblemSetService {
     ProblemSetDTO setArchiveMode(String code, String userId, String role, String archiveMode);
 
     Integer updateIsExampleForSet(String code, boolean isExample);
+
+    List<ProblemSetDTO> getLatestProblemSetsForUsers(String userId, String archiveMode, Integer n, Integer id);
 }
