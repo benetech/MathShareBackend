@@ -79,6 +79,7 @@ app.use(
       cb(null, whitelist.includes(origin));
     },
     credentials: true,
+    exposedHeaders: ['x-load-more']
   }),
 );
 
