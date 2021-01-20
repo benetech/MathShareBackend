@@ -41,4 +41,6 @@ public interface ProblemSolutionService {
     List<SolutionSetDTO> getProblemSetSolutionsForUsers(String userId, String archiveMode, Integer n);
 
     List<SolutionSetDTO> getLatestProblemSetSolutionsForUsers(String userId, String archiveMode, Integer n, Integer id);
+
+    Integer getRemainingCountOfLatestProblemSetSolutionsForUsers(String userId, String archiveMode, Integer id);
 }

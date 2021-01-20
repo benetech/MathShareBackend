@@ -26,4 +26,10 @@ public interface ProblemSetRevisionSolutionRepository extends JpaRepository<Prob
             + " AND (:id < 1 OR p.id < :id)")
     List<ProblemSetRevisionSolution> findLatestSliceByUserIdAndArchiveMode(@Param("userId") String userId,
             @Param("archiveMode") String archiveMode, @Param("id") Integer id, Pageable pageable);
+
+    @Query("SELECT count(p) FROM ProblemSetRevisionSolution p WHERE p.userId = :userId AND (:archiveMode IS NULL"
+            + " OR p.archiveMode = :archiveMode) AND (:archiveMode IS NOT NULL OR p.archiveMode IS NULL)"
+            + " AND (:id < 1 OR p.id < :id)")
+    Integer findRemainingCountByUserIdAndArchiveMode(@Param("userId") String userId,
+            @Param("archiveMode") String archiveMode, @Param("id") Integer id);
 }

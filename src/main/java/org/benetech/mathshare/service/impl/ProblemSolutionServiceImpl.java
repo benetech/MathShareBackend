@@ -413,6 +413,11 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         return solutionSets;
     }
 
+    @Override
+    public Integer getRemainingCountOfLatestProblemSetSolutionsForUsers(String userId, String archiveMode, Integer id) {
+        return problemSetRevisionSolutionRepository.findRemainingCountByUserIdAndArchiveMode(userId, archiveMode, id);
+    }
+
     private SolutionSetDTO getSolutionSetDTOfromProblemSetRevisionSolution(
         ProblemSetRevisionSolution problemSetRevisionSolution
     ) {

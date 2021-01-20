@@ -37,4 +37,6 @@ public interface ProblemSetService {
     Integer updateIsExampleForSet(String code, boolean isExample);
 
     List<ProblemSetDTO> getLatestProblemSetsForUsers(String userId, String archiveMode, Integer n, Integer id);
+
+    Integer getRemainingCountOfLatestProblemSetsForUsers(String userId, String archiveMode, Integer id);
 }

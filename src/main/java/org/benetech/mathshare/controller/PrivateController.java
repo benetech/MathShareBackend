@@ -8,6 +8,7 @@ import org.benetech.mathshare.model.dto.SolutionSetDTO;
 import org.benetech.mathshare.service.ProblemSetService;
 import org.benetech.mathshare.service.ProblemSolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,14 +44,30 @@ public class PrivateController {
 
     @GetMapping(path = "/v2/recent")
     ResponseEntity<List<ProblemSetDTO>> getRecentProblemSetsLazyLoad(
-            @RequestHeader(value = "x-initiator", required = false) String initiator,
+            @RequestHeader(value = "x-initiator", required = true) String initiator,
             @RequestHeader(value = "x-archive-mode", required = false) String archiveMode,
             @RequestParam(value = "x-content-size", defaultValue = "15") String size,
             @RequestHeader(value = "x-offset", defaultValue = "-1") String offset
             ) {
-        return new ResponseEntity<>(problemSetService.findLastNProblemSetsOfUser(
-                initiator, archiveMode, Integer.parseInt(size)
-        ), HttpStatus.OK);
+        Integer pageCount = Integer.parseInt(size);
+        Integer offsetInt = Integer.parseInt(offset);
+        List<ProblemSetDTO> problemSets = problemSetService.getLatestProblemSetsForUsers(
+            initiator, archiveMode, pageCount, offsetInt
+        );
+        String loadMore = "true";
+        if (problemSets.size() < pageCount) {
+            loadMore = "false";
+        } else {
+            Integer remainingCount = problemSetService.getRemainingCountOfLatestProblemSetsForUsers(
+                initiator, archiveMode, offsetInt
+            );
+            if (remainingCount <= problemSets.size()) {
+                loadMore = "false";
+            }
+        }
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("x-load-more", loadMore);
+        return new ResponseEntity<>(problemSets, responseHeaders, HttpStatus.OK);
     }
 
     @GetMapping(path = "/recentSolutions")
@@ -71,8 +88,24 @@ public class PrivateController {
             @RequestHeader(value = "x-content-size", defaultValue = "15") String size,
             @RequestHeader(value = "x-offset", defaultValue = "-1") String offset
             ) {
-        return new ResponseEntity<>(problemSolutionService.getLatestProblemSetSolutionsForUsers(
-                initiator, archiveMode, Integer.parseInt(size), Integer.parseInt(offset)
-        ), HttpStatus.OK);
+        Integer pageCount = Integer.parseInt(size);
+        Integer offsetInt = Integer.parseInt(offset);
+        List<SolutionSetDTO> problemSets = problemSolutionService.getLatestProblemSetSolutionsForUsers(
+            initiator, archiveMode, pageCount, offsetInt
+        );
+        String loadMore = "true";
+        if (problemSets.size() < pageCount) {
+            loadMore = "false";
+        } else {
+            Integer remainingCount = problemSolutionService.getRemainingCountOfLatestProblemSetSolutionsForUsers(
+                initiator, archiveMode, offsetInt
+            );
+            if (remainingCount <= problemSets.size()) {
+                loadMore = "false";
+            }
+        }
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("x-load-more", loadMore);
+        return new ResponseEntity<>(problemSets, responseHeaders, HttpStatus.OK);
     }
 }

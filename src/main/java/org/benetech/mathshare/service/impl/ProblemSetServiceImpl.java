@@ -126,6 +126,11 @@ public class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
+    public Integer getRemainingCountOfLatestProblemSetsForUsers(String userId, String archiveMode, Integer id) {
+        return problemSetRepository.findRemainingCountByUserIdAndArchiveMode(userId, archiveMode, id);
+    }
+
+    @Override
     public ProblemSetDTO setArchiveMode(String code, String initiator, String role, String archiveMode) {
         ProblemSet current = problemSetRepository.findOneByEditCode(UrlCodeConverter.fromUrlCode(code));
         if (current == null) {
