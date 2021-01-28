@@ -14,6 +14,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,6 +88,9 @@ public interface ProblemMapper {
 
     @Named("sortProblems")
     default List<ProblemDTO> sortProblems(List<Problem> problems) {
+        if (problems == null) {
+            return new ArrayList<ProblemDTO>();
+        }
         return problems.stream().sorted(
             Comparator.comparing(Problem::getPosition, Comparator.nullsFirst(Comparator.naturalOrder()))
                 .thenComparing(

@@ -203,6 +203,12 @@ public class ProblemSetServiceImpl implements ProblemSetService {
             result = createProblemSet(savedProblems, problems, problemSet, title, optionalExplanations, hideSteps, palettes);
             newSet = true;
         } else {
+            if ((saved.getUserId() == null || saved.getUserId().isEmpty()) && (
+                initiator != null && !initiator.isEmpty()
+            )) {
+                saved.setUserId(initiator);
+                problemSetRepository.save(saved);
+            }
             if (palettes == null) {
                 palettes = saved.getLatestRevision().getPalettes();
             }

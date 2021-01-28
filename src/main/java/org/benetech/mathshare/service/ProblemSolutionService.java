@@ -30,7 +30,7 @@ public interface ProblemSolutionService {
     SolutionSetDTO createReviewSolutionsFromShareCode(String code, Map<String, String> searchParameters, String initiator,
         String partnerCode);
 
-    SolutionSetDTO updateReviewSolutions(String code, List<SolutionDTO> solutionsDTO);
+    SolutionSetDTO updateReviewSolutions(String code, List<SolutionDTO> solutionsDTO, String initiator);
 
     SolutionSetDTO getProblemSetSolutions(String editCode);
 

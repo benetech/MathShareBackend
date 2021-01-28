@@ -330,11 +330,18 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public SolutionSetDTO updateReviewSolutions(String editCode, List<SolutionDTO> solutionsDTO) {
+    public SolutionSetDTO updateReviewSolutions(String editCode, List<SolutionDTO> solutionsDTO, String initiator) {
         ProblemSetRevisionSolution problemSetRevisionSolution = problemSetRevisionSolutionRepository.findOneByEditCode(
                 UrlCodeConverter.fromUrlCode(editCode));
         if (problemSetRevisionSolution == null) {
             return null;
+        } else {
+            if ((problemSetRevisionSolution.getUserId() == null || problemSetRevisionSolution.getUserId().isEmpty()) && (
+                initiator != null && !initiator.isEmpty()
+            )) {
+                problemSetRevisionSolution.setUserId(initiator);
+                problemSetRevisionSolutionRepository.save(problemSetRevisionSolution);
+            }
         }
         reviewSolutionRevisionRepository.setAllReviewSolutionRevisionsInactiveFor(problemSetRevisionSolution);
         SolutionSetDTO solutionSetDTO = createOrUpdateReviewSolutions(solutionsDTO, problemSetRevisionSolution, false);

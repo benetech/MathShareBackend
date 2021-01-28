@@ -131,9 +131,11 @@ public class ProblemSolutionController {
     }
 
     @PutMapping("/solve/{editCode}")
-    ResponseEntity<SolutionSetDTO> updateProblemSetSolution(@PathVariable String editCode,
-                                                               @RequestBody List<SolutionDTO> solutions) {
-        SolutionSetDTO body = problemSolutionService.updateReviewSolutions(editCode, solutions);
+    ResponseEntity<SolutionSetDTO> updateProblemSetSolution(
+            @PathVariable String editCode,
+            @RequestBody List<SolutionDTO> solutions,
+            @RequestHeader(value = "x-initiator", required = false) String initiator) {
+        SolutionSetDTO body = problemSolutionService.updateReviewSolutions(editCode, solutions, initiator);
         if (body != null) {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } else {
