@@ -151,7 +151,7 @@ router.post('/partner/submit', async (req, res) => {
               const mathsharePayload = {
                 editCode,
                 shareCode,
-                metadata: metadataFinal,
+                metadataFinal,
               };
               payload = getPayload(config, mathsharePayload);
               authHeaders = await getRequestHeaders(config, metadataFinal);
