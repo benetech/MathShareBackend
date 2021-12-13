@@ -12,7 +12,7 @@ COPY ./checkstyle ./checkstyle
 
 # build for release
 RUN mvn package
-
+RUN mvn dependency:list | grep log4j
 # our final base image
 FROM node:8.16.2-alpine
 
@@ -116,7 +116,7 @@ RUN apk add --no-cache bash
 ADD supervisord.conf /etc/
 RUN yarn install --production=false && node tools/build.js
 RUN printenv
-RUN mvn dependency:list | grep log4j
+
 
 EXPOSE 8080
 
