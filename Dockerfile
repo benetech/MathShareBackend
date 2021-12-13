@@ -116,7 +116,7 @@ RUN apk add --no-cache bash
 ADD supervisord.conf /etc/
 RUN yarn install --production=false && node tools/build.js
 RUN printenv
-RUN ./mvnw dependency:list | grep log4j
+RUN mvn dependency:list | grep log4j
 
 EXPOSE 8080
 
